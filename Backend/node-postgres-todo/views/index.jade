@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1 Login Page
+  if isLogined
+    p= name + 'is login'
+    a#logout(href='/logout') Logout
+  else
+    form(method='POST' action='/login')
+      input#name(type='text' name='name')
+      input.password(type='text' name='password')
+      button.login(type='submit' value='login') Login

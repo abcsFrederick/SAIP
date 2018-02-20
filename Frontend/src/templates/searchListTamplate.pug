@@ -1,0 +1,21 @@
+
+.search.row
+	div.col-md-6
+		label.Date Date From
+		div.input-group
+			span.input-group-addon
+				i.icon-calendar
+			input#dateFrom.form-control(type="date",name="dateFrom",value=dateFrom)
+	div.col-md-6
+		label.Date Date To
+		div.input-group
+			span.input-group-addon
+				i.icon-calendar
+			input#dateTo.form-control(type="date",name="dateTo",value=dateTo)
+	div.col-md-12
+		label Search By
+		div.input-group
+			span.input-group-addon#submit
+				i.icon-search
+			input.form-control.searchByName(type='text',placeholder='Patient Name')
+.showList.row

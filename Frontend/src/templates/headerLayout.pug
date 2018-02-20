@@ -1,0 +1,42 @@
+.container
+	.row
+		h1.title(style='color:white') Scippy Web (BETA)
+			h3.sub
+				button.loginButton.btn.btn-primary Login
+			h3.sub2
+		.Title.col-md-8
+			
+		
+		.info.col-md-4 
+	.row
+		.searchList
+
+.footerAlter.alert-warning 
+
+#loginDialog.modal.fade(role="dialog")
+	.modal-dialog.modal-sm
+		.modal-content
+			.modal-header
+				h4.modal-title Login 
+			.modal-body.row
+				div.col-md-12
+					label(style='color:black') User Name
+					div.input-group
+						span.input-group-addon
+							i.icon-user
+						input#name.form-control(type='text' name='name')
+				div.col-md-12
+					label(style='color:black') Password
+					div.input-group
+						span.input-group-addon
+							i.icon-key-1
+						input#password.form-control(type='password' name='password')
+				div.col-md-12
+					div.input-group
+
+						span.input-group-addon
+							i.icon-login
+						button#login.btn.btn-default.form-control( value='login') Login
+					span.noUser(style="visibility:hidden")
+						p(style='color:red') Wrong Username or Password
+p.footer Scippy Web Tool(BETA),  Imaging and Visualization Group, ABCC

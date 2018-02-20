@@ -1,0 +1,33 @@
+{
+  "name": "scippy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "server": "webpack-dev-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "backbone": "^1.3.3",
+    "bootstrap": "^3.3.7",
+    "css-loader": "^0.28.7",
+    "file-loader": "^1.1.5",
+    "jquery": "^3.2.1",
+    "pug": "^2.0.0-rc.4",
+    "pug-loader": "^2.3.0",
+    "style-loader": "^0.19.1",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "underscore": "^1.8.3",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.10.0",
+    "webpack-dev": "^1.1.0",
+    "webpack-dev-server": "^2.9.7"
+  }
+}
