@@ -1,0 +1,17 @@
+extends ./searchListTamplate.pug
+
+block updateAndSelect
+	div.col-md-2
+		row
+			label Range
+				div
+					select#timeRange
+						option(value='7') last 7 days
+						option(value='14') last 2 weeks
+		row
+			div.input-group
+				span.input-group-addon#submit
+					i.icon-search
+				a.loading
+					i.icon-spin6.animate-spin
+			//	input.form-control.searchByName(type='text',placeholder='Study Description')

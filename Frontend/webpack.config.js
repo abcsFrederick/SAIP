@@ -1,5 +1,8 @@
 const path = require('path');
 var webpack = require('webpack');
+var jQuery = require('jquery');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+
 module.exports = {
     entry: './src/main.js',
     output: {
@@ -9,6 +12,16 @@ module.exports = {
     },
     module:{
         rules:[
+		{
+      		    test: /\.js$/,
+      		    exclude: /(node_modules|bower_components)/,
+      		    use: {
+        		    loader: 'babel-loader',
+        		    options: {
+          		    	presets: ['env']
+        		    }
+      			 }
+    		},
                 {
                     test:/\.pug$/,use:'pug-loader'
                 },
@@ -22,7 +35,7 @@ module.exports = {
                 },
                 { 
                     test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' 
-                }
+                },
         ]
     },
     plugins:[
@@ -30,10 +43,15 @@ module.exports = {
             jQuery: 'jquery',
             $: 'jquery',
             'window.jQuery': 'jquery'
-    })
+    }),
+new UglifyJsPlugin({
+    test: /\.js($|\?)/i,
+	uglifyOptions: {drop_console:true}
+  })
     ],
     devServer: {
         host: '0.0.0.0',
+        port:8888,
         disableHostCheck: true,
         contentBase: [path.join(__dirname, "public"),path.join("/")]
    	//contentBase:path.join("/") 

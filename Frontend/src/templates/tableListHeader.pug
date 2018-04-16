@@ -1,9 +1,24 @@
-#table-wrapper(style="width:970px")
-	table#showList.table.table-hover.table-fixed
+#table-wrapper(style="width:100hv").col-md-5
+	table#showList.table.table-hover
 		thead
 			tr
-				th(style="width:450px") Patient_Name
 				th(style="width:450px") Study_Description
-				th(style="width:50px")
+				th(class='sorting_disabled' style="width:50px") Options
 		tbody.showList
-.series 
+#table-wrapper2(style="width:100hv").col-md-7
+	table#showList2.table.table-hover
+	//-	thead
+			tr
+				th(style="width:450px") Patient
+				th(style="width:450px") Modality
+				th(style="width:450px" class='sorting_disabled') Series
+				th(class='sorting_disabled' style="width:50px") Options
+		tbody.showList
+#downloadModal.modal.fade
+	.modal-dialog
+		.modal-content
+			.modal-header
+				h4.modal-title Downloading
+			.modal-body
+				p (number)patients/(number)series are downloading
+				p please wait until downloading finished

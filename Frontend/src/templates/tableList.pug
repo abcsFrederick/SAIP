@@ -1,10 +1,11 @@
 tr 
-	td(style="width:450px") #{list.patient}
+	
 	td(style="width:450px") #{list.study_description}
+	td(style="width:450px") #{list.patient}
 	td(style="width:50px")
 
 		a.fa.fa-download(style='width:17px' href=urlBase+'/'+resoure+'/'+list.patient_path+'/'+list.study_path,download)
-			span.seriestips study Download
+		//-	span.seriestips study Download
 		a.right
 			i.fa.fa-folder(id=list.study_id||"none",value=list.patient)
 
