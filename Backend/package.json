@@ -13,11 +13,19 @@
     "pg": "^6.1.0"
   },
   "devDependencies": {
+    "agentkeepalive": "^3.4.1",
+    "archiver": "^2.1.1",
+    "async": "^2.6.0",
+    "async-each": "^1.0.1",
     "cors": "^2.8.4",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
+    "httpreq": "^0.4.24",
+    "ncp": "^2.0.0",
+    "ntlm-client": "^0.1.1",
     "session-file-store": "^1.2.0",
+    "xml2js": "^0.4.19",
     "zip-folder": "^1.0.0"
   }
 }
