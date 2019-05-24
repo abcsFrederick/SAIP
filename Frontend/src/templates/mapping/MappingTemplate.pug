@@ -1,0 +1,48 @@
+row
+    .col-md-5(style='padding: 5px;height:90vh;border: solid 2px;border-color:lightgray;border-radius:5px;overflow:auto')
+        .col-md-12.diff(style='padding: 0px;')
+            #linkErr(data-toggle="tooltip" data-placement="right" title="At Least select one to link")
+                .col-md-6(style='padding:6px 12px;')
+                    label Unmapped Patients
+                .col-md-6
+                    button#switchToAllPatients.btn.btn-warning Switch To Mapped Patients
+                table#unmapped.table.table-hover
+                    thead
+                        tr
+                            th Name
+                            th Mrn
+            
+        .col-md-12.allpatients(style='display:none;padding: 0px;')
+            #linkErr(data-toggle="tooltip" data-placement="right" title="At Least select one to link")
+                label Mapped Patients
+                button#switchToUnmappedPatients.btn.btn-warning Switch To Unmapped Patients
+                table#allpatients.table.table-hover
+                    thead
+                        tr
+                            th Name
+                            th Mrn
+
+row
+    .col-md-2(style='padding-top:40vh;height:90vh;')
+        button#Link.btn.btn-primary.col-md-12(style='margin-bottom: 25px;font-size: 30px;') >>>>
+        button#DeLink.btn.btn-danger.col-md-12(style='margin-bottom: 25px;font-size: 30px;') <<<<
+
+row
+    ul.col-md-5.anyExperiment(style='padding: 5px;height:90vh;border: solid 2px;border-color:lightgray;border-radius:5px;overflow:auto;list-style-type: none;')
+        li
+            .col-md-12(style='padding: 5px;height:50%')
+                #projectsCollapseHeader.active
+                    a#projectsCollapseTitle(href='#projectsCollapse' style='font-size: 15px;display: block;cursor:pointer;padding: 5px;background:lightgray;text-decoration:none;font-weight:bold;color:#000;border-radius:5px;' data-toggle="collapse" aria-expanded="true" class="dropdown-toggle") Projects
+                    .col-md-12.collapse.in#projectsCollapse(style='padding: 5px;height:60%')
+                        table#selectedProject.table.table-hover
+                            thead
+                                tr
+                                    th Id
+                                    th Name
+                                    th PI
+        li
+            .col-md-12.selectedExperiment(style='padding: 5px;height:50%')
+                //label(style='font-size: 15px;') Experiments
+        li
+            .col-md-12.experientParticipants(style='padding: 5px;')
+

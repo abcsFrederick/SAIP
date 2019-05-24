@@ -1,0 +1,114 @@
+
+.modal-content
+		.modal-header
+			span.close &times;
+			h2 Create a new project
+		.modal-body
+			.container
+					.col-md-12
+						label Require fields
+					.col-md-6
+						.col-md-6
+							label Project name: 
+						.col-md-6
+							input#name(required)
+					.col-md-6
+						.col-md-6
+							label PI:
+						table.col-md-6#piid
+					.col-md-6
+						.col-md-6
+							label(style='color:red') Status:
+						.col-md-6
+							input#status(required)
+					.col-md-6
+						.col-md-6
+							label(style='color:red') Proposal:
+						.col-md-6
+							input#proposal(required)
+					.col-md-6
+						.col-md-6
+							label(style='color:red') Requester:
+						.col-md-6
+							input#requester(required)
+					.col-md-12
+						label Option fields
+					.col-md-6
+						.col-md-6
+							label Authors:
+						.col-md-6
+							input#authors
+					.col-md-6
+						.col-md-6
+							label collaborator:
+						.col-md-6
+							input#collaborator
+					.col-md-6
+						.col-md-6
+							label collab_grant_num:
+						.col-md-6
+							input#collab_grant_num
+					.col-md-6
+						.col-md-6
+							label fund_project_id:
+						.col-md-6
+							input#fund_project_id
+					.col-md-6
+						.col-md-6
+							label(style='color:red') SRAC_number:
+						.col-md-6
+							input#SRAC_number
+					.col-md-6
+						.col-md-6
+							label(style='color:red') SRAC_file:
+						.col-md-6
+							input#SRAC_file
+					.col-md-6
+						.col-md-6
+							label est_costs:
+						.col-md-6
+							input#est_costs
+					.col-md-6
+						.col-md-6
+							label(style='color:grey') Disease_id:
+						.col-md-6
+							input#disease_id
+					.col-md-6
+						.col-md-6
+							label(style='color:grey') organ_id:
+						.col-md-6
+							input#organ_id
+					.col-md-6
+						.col-md-6
+							label(style='color:grey') process_id:
+						.col-md-6
+							input#process_id
+					.col-md-6
+						.col-md-6
+							label(style='color:red') mouse_id:
+						.col-md-6
+							input#mouse_id
+					.col-md-6
+						.col-md-6
+							label(style='color:grey') probe_id:
+						.col-md-6
+							input#probe_id
+					.col-md-6
+						.col-md-6
+							label suggested_funding:
+						.col-md-6
+							input#suggested_funding
+					.col-md-6
+						.col-md-6
+							label miportal_id:
+						.col-md-6
+							input#miportal_id
+					.col-md-6
+						.col-md-6
+							label permissions:
+						.col-md-6
+							input#permissions
+
+		.modal-footer
+			button(style='color:black') cancel
+			button#creat_project(style='color:black') submit

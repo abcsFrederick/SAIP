@@ -1,0 +1,32 @@
+{
+	"version":"1.4.1",
+  "mode":"development",
+  "debugMode":true,
+	"dbConfig":{
+		"postgres":"postgres://miaot2:luying0325@ivg-webdev:5432/miaot2",
+		// "postgres":"postgres://scippy_readonly:cardio372@fr-s-ivg-mip-s:5432/scippy",
+		"mysql":{
+		  	"host":"ivg-webdev",
+		    "port":3306,
+		    "user": "miaot2",
+		    "password": "luying0325",
+		    "database":"SAIP"
+		}
+		// "mysql":{
+  //       "host": "fr-s-mysql-4.ncifcrf.gov",
+  //       "port":3306,
+  //       "user": "miaot2",
+  //       "password": "Luying_0325",
+  //       "database":"nci_production"
+  //   }
+	},
+	"filesystemConfig":{
+		"doc_root":"/mnt/scippy_docs/experiments/",
+		"archive_root":"/mnt/scippy_images/"
+	},
+	"adConfig":{
+		"url":"https://services-staging.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc?singleWsdl",
+		"account":"ncifivgSvc",
+		"password":"555=Google=yahoo"
+	},
+}

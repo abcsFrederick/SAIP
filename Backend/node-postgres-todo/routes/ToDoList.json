@@ -1,0 +1,136 @@
+# ALL Backend API
+Phase 1:
+	# Query result by date range
+	/api/v1/scippy/date=:from.:to/patient=:name
+
+	# Download all studies
+	/api/v1/scippy/downloadAllStudies/:patientPath/:studyPath/:patientName/:study_description
+
+	# Download particular series
+	/api/v1/scippy/downloadSeries/:patientPath/:studyPath/:seriePath/:patientName/:Modality
+
+Phase 2:
+	/**************
+	*	Project   *
+	*			  *
+	***************/
+	# Projects overview
+	/api/v1/projects_overview
+
+	# Particular Project
+	/api/v1/project/:project_id
+
+	# Users under particular project
+	/api/v1/project_users/:project_id
+
+	# Add project
+	/api/v1/project_add
+
+	# Change project status
+	/api/v1/project_status
+
+	# Add users under project
+	/api/v1/project_add_users
+	
+	# Change project users' permissions
+	/api/v1/project_permissions
+	/*******************
+	*	Experiements   *
+	*			  	   *
+	********************/
+	# Experiments overview under project
+	/api/v1/experiments/:project_id
+
+	# Add experiment
+	/api/v1/experiment_add
+
+	# Remove(Flag) experiment
+	/api/v1/experiment_remove
+
+	# Participants under experiment
+	/api/v1/imaging_participants/:experiment_id
+
+	# Download particular experiment
+	/api/v1/experiment_download/:experiment_id
+
+	/*******************
+	*	Participants   *
+	*			  	   *
+	********************/
+
+	# Download particular study
+	/api/v1/study_download/:pat_path/:study_path/:pat_name/:study_description
+
+	# Download particular series
+	/api/v1/series_download/:pat_path/:study_path/:series_path/:series_description
+	
+	/*******************
+	*	    Users      *
+	*			  	   *
+	********************/
+	# Users overview
+	/api/v1/users_overview
+
+	# Change User status
+	/api/v1/user_status
+
+	# Add new user in whitelist
+	/api/v1/whitelist
+
+	# Edit user in whitelist
+	/api/v1/user_edit
+	/*******************
+	*	   Mapping     *
+	*			  	   *
+	********************/
+	# ALL patients
+	/api/v1/mappingAll
+
+	# Mapping differences
+	/api/v1/mapping
+
+	# Link unmapped to experiment
+	/api/v1/mapping/linkToExp
+
+	# Delink mapped From experiment
+	/api/v1/mapping/delinkFromExp
+
+	/*******************
+	*	   Protocol    *
+	*			  	   *
+	********************/
+	# All Protocols
+	/api/v1/protocols_overview
+
+	# Protocol Groups
+	/api/v1/protocol_groups
+
+	# Protocol categories
+	/api/v1/protocol/:protocol_group_id
+
+	# Projects under protocol category
+	/api/v1/project_protocol/:protocol_category_id
+
+	/*******************
+	*	   Probe       *
+	*			  	   *
+	********************/
+	# Probes overview
+	/api/v1/probes_overview
+
+	/*******************
+	*	 Statistic     *
+	*			  	   *
+	********************/
+	# Statistics overview
+	/api/v1/Statistics_overview
+
+	/*******************
+	*	 Access Request *
+	*			  	   *
+	********************/
+	# Access Request for SAIP
+	/authRequest
+
+	# Access requests overview
+	/api/v1/accessRequests_overview

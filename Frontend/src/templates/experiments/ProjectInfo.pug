@@ -1,0 +1,60 @@
+.col-md-6
+	label Project ID
+	p #{project_id}
+.col-md-6
+	label Name
+	p #{nci_project_name}
+.col-md-6
+	label PI
+	p #{PI_last_name},#{PI_first_name}
+//.col-md-6
+	p #{nci_project_name}
+//.col-md-6
+	p #{PI_first_name},#{PI_last_name}
+//.col-md-6
+	label Requester
+	p #{requester}
+//.col-md-6
+	label Funding
+	p #{fund_project_id}
+//.col-md-6
+	p #{requester}
+//.col-md-6
+	p #{fund_project_id}
+//.col-md-6
+	label Collaborator
+	p #{collaborator}
+//.col-md-6
+	label Collaborator Grant #
+	p #{collab_grant_num}
+//.col-md-6
+	p #{collaborator}
+//.col-md-6
+	p #{collab_grant_num}
+//.col-md-6
+	label ASP #
+	p #{SRAC_number}
+//.col-md-6
+	label ASP File
+	p
+		if SRAC_file
+			a(href=domain+'api/v1/document_download/'+project_id) #{SRAC_file}
+		else if admin
+			input#upload(type='file' name='file')
+//.col-md-6
+	p #{SRAC_number}
+//.col-md-6
+	p #{SRAC_file}
+//.col-md-6
+	label Authors
+	p #{authors}
+.col-md-6
+	label Status
+	p #{status}
+.col-md-6
+	label Category
+	p #{category}
+//.col-md-6
+	p #{authors}
+//.col-md-6
+	p #{status}

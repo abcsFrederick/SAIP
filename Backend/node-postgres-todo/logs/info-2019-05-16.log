@@ -1,0 +1,97 @@
+INFO: 2019-05-16T19:36:05.105Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:36:17.264Z Tianyi Miao(250) GET `/api/v1/project/14`
+INFO: 2019-05-16T19:36:17.268Z Tianyi Miao(250) GET `/api/v1/project_users/14`
+INFO: 2019-05-16T19:36:26.153Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:36:27.342Z Tianyi Miao(250) GET `/api/v1/project/18`
+INFO: 2019-05-16T19:36:27.351Z Tianyi Miao(250) GET `/api/v1/project_users/18`
+INFO: 2019-05-16T19:36:53.007Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:37:03.335Z Tianyi Miao(250) POST `/api/v1/project_add`
+INFO: 2019-05-16T19:37:03.429Z Tianyi Miao(250) successfully insert 504 row in `nci_projects` table
+INFO: 2019-05-16T19:37:03.453Z Tianyi Miao(250) successfully insert 514 row in `nci_protocols` table
+INFO: 2019-05-16T19:37:03.477Z Tianyi Miao(250) successfully insert 1944 row in `nci_project_users` table
+INFO: 2019-05-16T19:37:03.501Z Tianyi Miao(250) successfully insert 1945 row in `nci_project_users` table
+INFO: 2019-05-16T19:37:03.551Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:37:36.786Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:37:39.165Z Tianyi Miao(250) GET `/api/v1/project/504`
+INFO: 2019-05-16T19:37:39.171Z Tianyi Miao(250) GET `/api/v1/project_users/504`
+INFO: 2019-05-16T19:37:44.520Z Tianyi Miao(250) POST `/api/v1/project_add_users`
+INFO: 2019-05-16T19:37:44.549Z Tianyi Miao(250) successfully insert 1946 row in `nci_project_users` table
+INFO: 2019-05-16T19:37:44.559Z Tianyi Miao(250) GET `/api/v1/project_users/504`
+INFO: 2019-05-16T19:38:35.575Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:38:39.662Z Tianyi Miao(250) POST `/api/v1/project_status`
+INFO: 2019-05-16T19:40:03.723Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:40:11.142Z Tianyi Miao(250) POST `/api/v1/project_status`
+INFO: 2019-05-16T19:40:20.229Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:40:24.701Z Tianyi Miao(250) POST `/api/v1/project_status`
+INFO: 2019-05-16T19:40:24.740Z Tianyi Miao(250) successfully update undefined row in `nci_projects` table
+INFO: 2019-05-16T19:42:25.749Z Tianyi Miao(250) POST `/api/v1/project_status`
+INFO: 2019-05-16T19:42:25.804Z Tianyi Miao(250) successfully update status="A" WHERE id="13" row in `nci_projects` table
+INFO: 2019-05-16T19:44:51.823Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T19:44:53.402Z Tianyi Miao(250) GET `/api/v1/project/13`
+INFO: 2019-05-16T19:44:53.412Z Tianyi Miao(250) GET `/api/v1/project_users/13`
+INFO: 2019-05-16T19:45:06.266Z Tianyi Miao(250) POST `/api/v1/project_permissions`
+INFO: 2019-05-16T19:45:06.302Z Tianyi Miao(250) successfully update permissions="R",updated_at=NOW() WHERE project_id="13" AND user_id="23" in `nci_project_users` table
+INFO: 2019-05-16T19:51:07.592Z Tianyi Miao(250) POST `/api/v1/project_permissions`
+INFO: 2019-05-16T19:51:07.620Z Tianyi Miao(250) successfully update permissions="RW",updated_at=NOW() WHERE project_id="13" AND user_id="23" in `nci_project_users` table
+INFO: 2019-05-16T20:02:38.415Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T20:02:41.630Z Tianyi Miao(250) GET `/api/v1/project/13`
+INFO: 2019-05-16T20:02:41.632Z Tianyi Miao(250) GET `/api/v1/experiments/13`
+INFO: 2019-05-16T20:02:41.637Z Tianyi Miao(250) GET `/api/v1/project_users/13`
+INFO: 2019-05-16T20:02:52.567Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T20:02:53.374Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T20:02:56.050Z Tianyi Miao(250) GET `/api/v1/project/504`
+INFO: 2019-05-16T20:02:56.057Z Tianyi Miao(250) GET `/api/v1/experiments/504`
+INFO: 2019-05-16T20:02:56.058Z Tianyi Miao(250) GET `/api/v1/project_users/504`
+INFO: 2019-05-16T20:03:01.500Z Tianyi Miao(250) POST `/api/v1/experiment_add`
+INFO: 2019-05-16T20:03:01.533Z Tianyi Miao(250) successfully insert 1491 row in `imaging_experiments` table
+INFO: 2019-05-16T20:03:01.551Z Tianyi Miao(250) successfully update 0 row in `nci_projects` table
+INFO: 2019-05-16T20:03:01.564Z Tianyi Miao(250) GET `/api/v1/experiments/504`
+WARN: 2019-05-16T20:05:01.081Z Tianyi Miao(250) DELETE `/api/v1/experiment_remove/1491`
+INFO: 2019-05-16T20:05:01.103Z Tianyi Miao(250) successfully DELETE 0 row from `imaging_experiments` table
+INFO: 2019-05-16T20:05:01.112Z Tianyi Miao(250) GET `/api/v1/experiments/504`
+INFO: 2019-05-16T20:14:24.254Z Tianyi Miao(250) GET `/api/v1/users_overview`
+INFO: 2019-05-16T20:14:41.206Z Tianyi Miao(250) POST `/api/v1/user_status`
+INFO: 2019-05-16T20:14:41.245Z Tianyi Miao(250) successfully UPDATE site_users SET active=0 WHERE id=223
+INFO: 2019-05-16T20:14:51.818Z Tianyi Miao(250) POST `/api/v1/user_status`
+INFO: 2019-05-16T20:14:51.848Z Tianyi Miao(250) successfully UPDATE site_users SET active=1 WHERE id=223
+INFO: 2019-05-16T20:15:03.804Z Tianyi Miao(250) POST `/api/v1/usersChangePermission`
+INFO: 2019-05-16T20:15:03.831Z Tianyi Miao(250) successfully UPDATE site_group_memberships SET group_id = 7 WHERE person_id =223
+INFO: 2019-05-16T20:15:03.849Z Tianyi Miao(250) GET `/api/v1/users_overview`
+INFO: 2019-05-16T20:15:26.732Z Tianyi Miao(250) POST `/api/v1/usersChangePermission`
+INFO: 2019-05-16T20:15:26.762Z Tianyi Miao(250) successfully UPDATE site_group_memberships SET group_id = 8 WHERE person_id =223
+INFO: 2019-05-16T20:15:26.774Z Tianyi Miao(250) GET `/api/v1/users_overview`
+INFO: 2019-05-16T20:15:32.825Z Tianyi Miao(250) POST `/api/v1/user_status`
+INFO: 2019-05-16T20:15:32.853Z Tianyi Miao(250) successfully UPDATE site_users SET active=0 WHERE id=223
+INFO: 2019-05-16T20:15:35.582Z Tianyi Miao(250) POST `/api/v1/user_status`
+INFO: 2019-05-16T20:15:35.607Z Tianyi Miao(250) successfully UPDATE site_users SET active=1 WHERE id=223
+INFO: 2019-05-16T20:15:43.952Z Tianyi Miao(250) PUT `/api/v1/user_edit`
+INFO: 2019-05-16T20:15:43.985Z Tianyi Miao(250) successfully UPDATE site_users SET last_name="Acharya", first_name="Jairaj", position="Investigator", is_pi=1, email="acharyaj@mail.nih.gov", phone_office="301-846-7051", userID="acharyaj", status="Employee" WHERE id=223
+INFO: 2019-05-16T20:15:44.013Z Tianyi Miao(250) GET `/api/v1/users_overview`
+INFO: 2019-05-16T20:23:32.144Z Tianyi Miao(250) GET `/api/v1/mapping`
+INFO: 2019-05-16T20:23:32.167Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T20:23:32.176Z Tianyi Miao(250) GET `/api/v1/mappingAll`
+INFO: 2019-05-16T20:23:32.788Z Tianyi Miao(250) GET `/api/v1/experiments/504`
+INFO: 2019-05-16T20:24:09.783Z Tianyi Miao(250) POST `/api/v1/experiment_add`
+INFO: 2019-05-16T20:24:09.815Z Tianyi Miao(250) successfully insert 1492 row in `imaging_experiments` table
+INFO: 2019-05-16T20:24:09.833Z Tianyi Miao(250) successfully update 504 project in `nci_projects` table
+INFO: 2019-05-16T20:24:09.846Z Tianyi Miao(250) GET `/api/v1/experiments/504`
+WARN: 2019-05-16T20:24:18.268Z Tianyi Miao(250) POST `/api/v1/mapping/linkToExp`
+INFO: 2019-05-16T20:24:18.294Z Tianyi Miao(250) successfully insert 27860 row in `imaging_participants` table`
+INFO: 2019-05-16T20:24:18.372Z Tianyi Miao(250) successfully UPDATE imaging_experiments SET number_of_studies=number_of_studies+1,number_of_series=number_of_series+2,number_of_images=number_of_images+387 WHERE id=1492
+INFO: 2019-05-16T20:24:18.392Z Tianyi Miao(250) GET `/api/v1/mapping`
+WARN: 2019-05-16T20:25:55.562Z Tianyi Miao(250) POST `/api/v1/mapping/delinkFromExp`
+WARN: 2019-05-16T20:25:55.585Z Tianyi Miao(250) successfully DELETE FROM imaging_participants WHERE experiment_id=1492 AND patient_id in ([14501,14500]);
+WARN: 2019-05-16T20:25:55.615Z Tianyi Miao(250) successfully UPDATE imaging_experiments SET number_of_studies=number_of_studies-1,number_of_series=number_of_series-2,number_of_images=number_of_images-387 WHERE id=1492
+INFO: 2019-05-16T20:25:55.628Z Tianyi Miao(250) GET `/api/v1/mapping`
+INFO: 2019-05-16T20:28:27.725Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T20:28:29.839Z Tianyi Miao(250) GET `/api/v1/project/14`
+INFO: 2019-05-16T20:28:29.849Z Tianyi Miao(250) GET `/api/v1/experiments/14`
+INFO: 2019-05-16T20:28:29.854Z Tianyi Miao(250) GET `/api/v1/project_users/14`
+INFO: 2019-05-16T20:28:32.405Z Tianyi Miao(250) GET `/api/v1/imaging_participants/675`
+INFO: 2019-05-16T20:28:32.407Z Tianyi Miao(250) GET `/api/v1/experiment_doc/675`
+INFO: 2019-05-16T20:28:37.288Z Tianyi Miao(250) GET `/api/v1/projects_overview`
+INFO: 2019-05-16T20:28:38.646Z Tianyi Miao(250) GET `/api/v1/project/13`
+INFO: 2019-05-16T20:28:38.652Z Tianyi Miao(250) GET `/api/v1/experiments/13`
+INFO: 2019-05-16T20:28:38.654Z Tianyi Miao(250) GET `/api/v1/project_users/13`
+INFO: 2019-05-16T20:28:39.714Z Tianyi Miao(250) GET `/api/v1/imaging_participants/24`
+INFO: 2019-05-16T20:28:39.715Z Tianyi Miao(250) GET `/api/v1/experiment_doc/24`

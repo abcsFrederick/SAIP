@@ -1,0 +1,31 @@
+.panel
+	if admin
+		ul.nav.nav-pills.nav-stacked
+			li
+				a.projects(href="#projects") Projects
+			li
+				a.mapping(href="#mapping") Mapping
+			li
+				a.users(href="#users") Users
+			//li
+			//	a.group(href="#Group") Group
+			li
+				a.protocol(href="#Protocol") Protocols
+			li
+				a.probe(href="#Probe") Probes
+			li
+				a.statistics(href="#statistics") Statistics
+			li
+				a.accessRequest(href="#accessRequest") Access
+				span.badge.badge-notify #{numberOfRequest}
+			li
+				a.about(href="#about" style='border-color: #4cae4c;    background-color: darkseagreen;color: #fff;') Tutorial
+			
+	else
+		ul.nav.nav-pills.nav-stacked
+			li
+				a.projects(href="#projects") Projects
+			li
+				a.about(href="#about" style='border-color: #4cae4c;    background-color: darkseagreen;color: #fff;') Tutorial
+.main
+	#PUMA.container

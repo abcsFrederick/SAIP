@@ -1,0 +1,10 @@
+
+#patientsCollapseHeader.active
+	a#patientsCollapseTitle(href='#patientsCollapse' style='font-size: 15px;display: block;cursor:pointer;padding: 5px;background:lightgray;text-decoration:none;font-weight:bold;color:#000;border-radius:5px;' data-toggle="collapse" aria-expanded="true" class="dropdown-toggle") Projects Patients under selected Exp.
+	.col-md-12.collapse.in#patientsCollapse(style='padding: 5px;height:60%')
+		#delinkErr(style='margin-bottom: 25px;' data-toggle="tooltip" data-placement="right" title="At Least select one to delink")
+			table#selectedExperimentParticipants.table.table-hover
+				thead
+					tr
+						th Name
+						th Mrn

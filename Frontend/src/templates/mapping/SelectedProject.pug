@@ -1,0 +1,48 @@
+//label(style='font-size: 15px;')  Experiments
+#experimentsCollapseHeader.active
+	a#experimentsCollapseTitle(href='#experimentsCollapse' style='font-size: 15px;display: block;cursor:pointer;background:lightgray;padding: 5px;text-decoration:none;font-weight:bold;color:#000;border-radius:5px;' data-toggle="collapse" aria-expanded="true" class="dropdown-toggle") Experiments
+	.col-md-12#experimentsCollapse.collapse.in(style='padding: 0px;height:60%')
+		button#NewExperiments.btn.btn-primary New Experiment
+		table#selectedExperiment.table.table-hover
+			thead
+				tr
+					th Id
+					th Name
+
+#createExperiment_mapping.modal
+	.modal-content(style='width:50%;left:25%')
+		.modal-header
+			span.close &times;
+			h2 Create a new Experiments
+		.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-5.control-label Experiment Title:
+						.col-md-7.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-flask
+								input#experiment_name_mapping.form-control(type="text" required)
+
+						.col-md-12
+							.seperation(style='height:2px;background-color:#337ab7;font-size:10px;margin-top: 15px;')
+							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Option fields
+
+						label.col-md-5.control-label Probe:
+						.col-md-7.inputGroupContainer
+							.input-group(style='width:100%')
+								select#probe_id_mapping.form-control
+									option 
+									each probe in Probes
+										option(value=probe.id) #{probe.name}
+										
+						label.col-md-5.control-label Description:
+						.col-md-7.inputGroupContainer
+							.input-group(style='width:100%')
+								textarea#description_mapping.form-control(style='height:100px' required)
+
+		.modal-footer
+			button.cancel.btn.btn-default Cancel
+			button#create_experiment_mapping.btn.btn-success Submit

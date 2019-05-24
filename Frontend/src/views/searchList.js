@@ -18,7 +18,7 @@ var searchList = Backbone.View.extend({
 		}
 	
 	},
-	initialize(){
+	initialize(setting){
 	//	this.event = _.extend({},Backbone.Events);
 		this.today = new Date();
 		this.month = this.today.getMonth() + 1; 
@@ -35,9 +35,9 @@ var searchList = Backbone.View.extend({
 		if (this.weekAgoMonth < 10) 
 		    this.weekAgoMonth = "0" + this.weekAgoMonth;
 		this.weekAgoYear = this.weekAgo.getFullYear();
-		this.weekAgoDate = this.weekAgo.getDate();
+		this.weekAgoDate = this.weekAgo.getDate()+1;
 
-		console.log(this.weekAgoYear+'-'+this.weekAgoMonth+'-'+this.weekAgoDate);
+	//	console.log(this.weekAgoYear+'-'+this.weekAgoMonth+'-'+this.weekAgoDate);
 		if (this.date < 10) 
 		    this.date = "0" + this.date;
 		if (this.weekAgoDate < 10) 
@@ -48,13 +48,51 @@ var searchList = Backbone.View.extend({
 				dateFrom: this.weekAgoYear+'-'+this.weekAgoMonth+'-'+this.weekAgoDate,
 				dateTo: this.year + '-' + this.month + '-' + this.date
 			}));*/
+		console.log(setting.testingRes);
 		this.$el.html(UpdateAndSelect({
 				dateFrom: this.weekAgoYear+'-'+this.weekAgoMonth+'-'+this.weekAgoDate,
-				dateTo: this.year + '-' + this.month + '-' + this.date
+				dateTo: this.year + '-' + this.month + '-' + this.date,
+				project: setting.testingRes||null
 			}));
 		this.router = new Router();
 		this.listenTo(event,'loading',this.loading);
 		this.listenTo(event,'loadingFinish',this.loadingFinish);
+
+		$('#project').append('<thead>\
+										<tr>\
+									      		<th> Project</th>\
+									      		<th> Created</th>\
+												<th> Updated</th>\
+										 </tr>\
+									 </thead>')
+		this.table = $('#project').DataTable({
+					language: {
+				        searchPlaceholder: "project"
+				    },
+					"data": setting.testingRes,
+					"columns" : [
+						{ "data" : "nci_projects_name","width": "10%"},
+						{ 	"width": "10%",
+							target:-2,
+							"render": function ( data, type, full, meta ) {
+						        	return full.nci_projects_created_at.substring(0,10);
+							    }
+						},
+						{ 	"width": "10%",
+							target:-1,
+							"render": function ( data, type, full, meta ) {
+						        	return full.nci_projects_updated_at.substring(0,10);
+							    }
+						}
+					],
+					destroy: true,
+					rowGroup: {dataSrc: 0},
+					"autoWidth": false,
+					"lengthMenu":[[/*25,50,100,200,*/-1],[/*25,50,100,200,*/'ALL']],
+					"scrollY": "80px",
+					"scrollCollapse": true,
+					"dom":'rt'//<"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
+					});
 	//	this.listenTo(this.showList,'s:searchAgain',function(){
 	//		console.log('should render');
 	//	});
@@ -63,6 +101,7 @@ var searchList = Backbone.View.extend({
 	//	});
 
 	//	this.showList.trigger('s:searchAgain');
+
 	},
 	rangeSelect(e){
 		this.today = new Date();
@@ -80,9 +119,9 @@ var searchList = Backbone.View.extend({
 		if (this.weekAgoMonth < 10) 
 		    this.weekAgoMonth = "0" + this.weekAgoMonth;
 		this.weekAgoYear = this.weekAgo.getFullYear();
-		this.weekAgoDate = this.weekAgo.getDate();
+		this.weekAgoDate = this.weekAgo.getDate()+1;
 
-		console.log(this.weekAgoYear+'-'+this.weekAgoMonth+'-'+this.weekAgoDate);
+	//	console.log(this.weekAgoYear+'-'+this.weekAgoMonth+'-'+this.weekAgoDate);
 		if (this.date < 10) 
 		    this.date = "0" + this.date;
 		if (this.weekAgoDate < 10) 
@@ -97,11 +136,27 @@ var searchList = Backbone.View.extend({
 	},
 	render(){
 	//	console.log("render");
+		//includes lasted date
+		var date = new Date($('#dateTo').val())
+		var includeToday = new Date(date);
+		var includeTodayDate = date.getDate()+1;
+		includeToday.setDate(includeTodayDate);
+		
+		var dd = includeToday.getDate();
+    	var mm = includeToday.getMonth() + 1;
+    	var y = includeToday.getFullYear();
+
+    	if (dd < 10) 
+		    dd = "0" + dd;
+		if (mm < 10) 
+		    mm = "0" + mm;
+    	console.log(y+'-'+mm+'-'+dd);
+    	this.includeTodayTo = y+'-'+mm+'-'+dd
 		this.showList = new ShowList({
 
 			searchName: 'none'||$('.searchByName').val(),
-			dateFrom:$('#dateFrom').val(),
-			dateTo:$('#dateTo').val()
+			dateFrom:$('#dateFrom').val(),		//includes the from date
+			dateTo:this.includeTodayTo				//includes lasted date
 		});
 
 		this.$('.showList').empty();

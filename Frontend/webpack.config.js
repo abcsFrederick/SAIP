@@ -12,7 +12,7 @@ module.exports = {
     },
     module:{
         rules:[
-		{
+            {
       		    test: /\.js$/,
       		    exclude: /(node_modules|bower_components)/,
       		    use: {
@@ -22,20 +22,20 @@ module.exports = {
         		    }
       			 }
     		},
-                {
-                    test:/\.pug$/,use:'pug-loader'
-                },
-                {
-                    test: /\.styl$/,
-                    loader: 'style-loader!css-loader!stylus-loader'
-                },
-                {
-                    test: /\.css$/,
-                    loader:'style-loader!css-loader'
-                },
-                { 
-                    test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' 
-                },
+            {
+                test:/\.pug$/,use:'pug-loader'
+            },
+            {
+                test: /\.styl$/,
+                loader: 'style-loader!css-loader!stylus-loader'
+            },
+            {
+                test: /\.css$/,
+                loader:'style-loader!css-loader'
+            },
+            { 
+                test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' 
+            },
         ]
     },
     plugins:[
@@ -44,11 +44,11 @@ module.exports = {
             $: 'jquery',
             'window.jQuery': 'jquery'
     }),
-new UglifyJsPlugin({
-    test: /\.js($|\?)/i,
-	uglifyOptions: {drop_console:true}
-  })
-    ],
+/*    new UglifyJsPlugin({
+        test: /\.js($|\?)/i,
+    	uglifyOptions: {drop_console:true}
+      })
+*/    ],
     devServer: {
         host: '0.0.0.0',
         port:8888,

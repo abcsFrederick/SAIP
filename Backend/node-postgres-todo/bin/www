@@ -3,11 +3,24 @@
 /**
  * Module dependencies.
  */
+var fs = require('fs');
+var rimraf = require('rimraf');
 
+var path = __dirname+'/../routes/'
+fs.readdir(path, function(err, items) {
+  for(let a=0;a<items.length;a++){
+    let isdir = fs.lstatSync(path+items[a]).isDirectory();
+    if(isdir){
+      rimraf(path+items[a], function () {
+        console.log('rm -rf ' + items[a])
+      })
+    }
+  }
+});
 var app = require('../app');
 var debug = require('debug')('node-postgres-todo:server');
 var http = require('http');
-
+var expressWs = require('express-ws');
 /**
  * Get port from environment and store in Express.
  */
@@ -20,7 +33,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-
+expressWs = expressWs(app, server);
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -32,6 +45,11 @@ server.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
+
+// process.on('uncaughtException', function (err) {
+//   console.log(err);
+//   process.exit(1);
+// })
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -54,6 +72,7 @@ function normalizePort(val) {
  */
 
 function onError(error) {
+  console.log(error)
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -70,6 +89,10 @@ function onError(error) {
       break;
     case 'EADDRINUSE':
       console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    case 'ENOSPC':
+      console.error(bind + ' disk is fully');
       process.exit(1);
       break;
     default:

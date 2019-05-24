@@ -1,0 +1,17 @@
+
+thead
+	tr
+		th Name
+		th Creator
+		th Date Modified 
+		th # of images
+		th 
+tbody
+	for val in data
+		tr 
+			td #{val.title}
+			td #{val.first_name},#{val.last_name}
+			td #{val.updated_at.substr(0,10)}
+			td #{val.number_of_images}
+			td 
+				i.fa.fa-download

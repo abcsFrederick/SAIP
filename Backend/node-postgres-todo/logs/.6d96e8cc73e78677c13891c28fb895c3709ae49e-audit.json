@@ -1,0 +1,14 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/.6d96e8cc73e78677c13891c28fb895c3709ae49e-audit.json",
+    "files": [
+        {
+            "date": 1558031201081,
+            "name": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/exceptions-2019-05-16.log",
+            "hash": "053fbb73c55585975b0165592500289a"
+        }
+    ]
+}

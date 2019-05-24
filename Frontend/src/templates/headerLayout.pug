@@ -1,45 +1,41 @@
+
 .container
 	.row
-		h1.title(style='color:white;') Scippy Web (BETA)
+		h1.title(style='color:#1b3b88;') SAIP Image Portal
+			p#appVersion(style='display:inline;font-size:15px')
 			//-h3.sub(style='display:inline-block')
-			p#NCIuser(style='display:inline;font-size:20px;color:gray')
+			p#NCIAdminUser(style='display:inline;font-size:15px;color:red;')
+			p#NCIEndUser(style='display:inline;font-size:15px;color:gray;')
+			//- button.btn.btn-success.tutorial Tutorial 
+		#navigation(style='height:2px;background-color:#1b3b88;font-size:10px;margin-bottom:15px')
 			//button.loginButton.btn.btn-primary.sub Login
 			//button#NCILogin.btn.btn-primary.sub NCILogin
 			//buttom.logout.btn.btn-danger.sub2(style='display:none') Logout
 			//h3.sub2(style='display:inline-block')
 		.Title.col-md-8
-			
+			//button.btn.btn-secondary(data-toggle="collapse" data-target="#description" style='padding:0px 4px;border: 2px;border-style: solid;border-width: 1px;border-color: #6c757d;background-color:#6c757d;color:white') Basic Usage
+			//#description.collapse
+				br
+				ul(style='font-size: 20px;color:black') 
+					li 
+						| Select time period (last one week by default) and then click 
+						span.fa.icon-search(style='color:black')
+						|  to search
+					li 
+						| In the "Studies" table, click  
+						span.fa.fa-folder(style='color:black')
+						|  at the end of a study to display study details
+					li
+						| Click   
+						span.fa.fa-download(style='color:black')
+						|  will download a zipped archive for the selected study or patient/series
 		
 		.info.col-md-4 
 	.row
 		.searchList
+.playground(style='padding-top: 10px;')
+.footerAlert.alert.alert-danger(role='alert' style='z-index:1000') 
+.footerAlert.alert.alert-success(role='alert') 
 
-.footerAlter.alert-warning 
-
-#loginDialog.modal.fade(role="dialog")
-	.modal-dialog.modal-sm
-		.modal-content
-			.modal-header
-				h4.modal-title Login 
-			.modal-body.row
-				div.col-md-12
-					label(style='color:black') User Name
-					div.input-group
-						span.input-group-addon
-							i.icon-user
-						input#name.form-control(type='text' name='name')
-				div.col-md-12
-					label(style='color:black') Password
-					div.input-group
-						span.input-group-addon
-							i.icon-key-1
-						input#password.form-control(type='password' name='password')
-				div.col-md-12
-					div.input-group
-
-						span.input-group-addon
-							i.icon-login
-						button#login.btn.btn-default.form-control( value='login') Login
-					span.noUser(style="visibility:hidden")
-						p(style='color:red') Wrong Username or Password
-p.footer Scippy Web Tool(BETA),  Imaging and Visualization Group, ABCC
+.progressAlert(role='alert' style='z-index:1000')  
+p.footer &copy; Imaging and Visualization Group, ABCS - 2018

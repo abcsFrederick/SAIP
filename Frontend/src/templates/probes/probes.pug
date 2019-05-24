@@ -1,0 +1,32 @@
+.col-md-12.probestemp(style="width:100hv;border: solid 2px;padding: 20px;border-color:lightgray;border-radius:5px")
+	table#probesTable.table.table-hover
+		thead
+			tr
+				th Probe
+				th Description
+
+if admin
+	#addNewProbe.modal
+		.modal-content(style='width:40%;left:30%;top:20%')
+			.modal-header
+				span.close &times;
+				h2 Add a new probe
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-5.control-label Probe Name:
+						.col-md-7.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon
+									i.fas.fa-flask
+								input#newProbeName.form-control(type="text" required)
+						label.col-md-5.control-label Description:
+						.col-md-7.inputGroupContainer
+							.input-group(style='width:100%')
+								textarea#probeDescription.form-control(style='height:100px')
+
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#add_New_Probe.btn.btn-success Submit

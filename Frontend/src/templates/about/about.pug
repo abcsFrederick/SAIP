@@ -1,0 +1,164 @@
+.aboutContainer
+	if admin
+		.aboutHeader
+			ul
+				li#Projects-instruction
+					a Projects
+				li#Mapping-instruction 
+					a Mapping
+				li#Users-instruction 
+					a Users
+				li#Protocols-instruction 
+					a Protocols
+				li#Probes-instruction 
+					a Probes
+	.aboutContent
+		.projectsContent
+			ul
+				li
+					p
+					p Project Level:
+						ul
+							if admin
+								li
+									| 1. Create a new project by clicking 
+									span
+										button.btn.btn-primary New Project
+									| filling required field, and then clicking 
+									button.btn.btn-success Submit
+								li
+									| 2. Active/Inactive project by selecting 
+									select
+										option Active
+										option Inactive
+							else
+								li
+									| 1. Search and select project
+				if admin
+					img.project_1(src="./dom/project_1.gif" style='width: 50%;')
+				li
+					p
+					p Experiment Level:
+						ul
+							li  
+								| 1. Click particular project row to choose project
+							li  
+								| 2. Project details and existing experiment will show up
+							li 
+								| 3. Switch to Users tab will show users who have permission for that project
+							if admin
+								li
+									| 4.a Add more users to this project by clicking 
+									button.btn.btn-primary Add Users
+									| check box to change their permissions and then clicking
+									button.btn.btn-success Submit
+								li
+									| 4.b Create a new experiment by clicking
+									button.btn.btn-primary New Experiment
+									| filling required field, and then clicking
+									button.btn.btn-success Submit
+								li  
+									| 5. Delete a experiment by clicking
+									a.fa.icon-trash(style='color:red')
+									| but before deleting experiment, all patients under it need to be removed first
+				if admin
+					img.experiment_1(src="./dom/experiment_1.gif" style='width: 50%;')
+					img.experiment_3(src="./dom/experiment_3.gif" style='width: 50%;')
+				else
+					img.experiment_enduser_1(src="./dom/experiment_enduser_1.gif" style='width: 50%;')
+				li
+					p
+					p Participants Level:
+						ul
+							li  
+								| 1. Click particular experiment row to choose experiment
+							li  
+								| 2. Patients under this experiment will show up
+							li  
+								| 3. Click patient experiment row to choose patient
+							li  
+								| 4. Series under this patient will show up
+							li  
+								| 5. Download series/patients/experiment by clicking
+								a.fa.fa-download
+				if admin
+					img.experiment_2(src="./dom/experiment_2.gif" style='width: 50%;')
+				else
+					img.experiment_enduser_2(src="./dom/experiment_enduser_2.gif" style='width: 50%;')
+
+		if admin
+			.mappingContent
+				ul
+					li
+						p
+						p One way:
+							ul
+								li
+									| 1. Search and select project from left project table, experiments under this project table will show up in the middle
+								li
+									| 2. Select or make experiment from middle experiment table, participants under this experiment will show up on the top right
+								img.mapping_1(src="./dom/mapping_1.gif" style='width: 50%;')
+					li
+						p Another way:
+							ul
+								li
+									| 1. Search and select project and experiment from project panel, and then click 
+									a.nav-pill(style='background:#808080;color:#fff;padding:10px 15px;border-radius:4px') Mapping panel 
+									| will lead you to this project/experiment for adding patients
+								img.mapping_1(src="./dom/mapping_2.gif" style='width: 50%;')
+					li
+						p Add patients:
+							ul
+								li
+									| 3.a Select unmapped participants from bottom left table (You can switch to all patients as well), and add patients to particular experiment by clicking
+									button.btn.btn-primary Link
+								li
+									| 3.b Select existing participants from top left table (experiment table), and remove patients from particular experiment by clicking
+									button.btn.btn-danger Unlink
+						
+
+			.usersContent
+				ul
+					li
+						p
+						p Active/Inactive:
+							ul
+								li
+									| 1. Active/Inactive user by selecting  
+									select
+										option Active
+										option Inactive
+								li
+									| 2. Add new user by clicking 
+									span
+										button.btn.btn-primary Add New User
+									| provides necessary information, UserID needs to be user NIH Id and then clicking 
+									button.btn.btn-success Submit
+										
+								img.user_1(src="./dom/user_1.gif" style='width: 50%;')
+			.protocolsContent
+				ul
+					li
+						p
+						p Protocols:
+							ul
+								li
+									| 1. Display all protocols
+								li
+									| 2. Select particular project under protocol will jump to this project
+								img.protocol_1(src="./dom/protocol_1.gif" style='width: 50%;')
+			.probesContent
+				ul
+					li
+						p
+						p Probes:
+							ul
+								li
+									| 1. Display all probes
+								li
+									| 2. Add new probe by clicking 
+									span
+										button.btn.btn-primary Add New Probe
+									| provides necessary information and then clicking 
+									button.btn.btn-success Submit
+								img.probe_1(src="./dom/probe_1.gif" style='width: 50%;')

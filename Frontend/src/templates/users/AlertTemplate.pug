@@ -1,0 +1,15 @@
+.modal-content(style='width:25%;left:37%;top:20%')
+	.modal-header(style='background:#df3434')
+		span.close &times;
+		h2 Caution!!
+	.modal-body
+		.container(style='width:100%;margin-bottom: 15px;')
+			h2 You are about to change User:
+			h4 #{selectUserName} 
+			h2 From Group:
+			h4 #{previousPermission}
+			h2 To Group: 
+			h4 #{newPermission}
+	.modal-footer(style='background:#df3434')
+		button.cancel.btn.btn-default Cancel
+		button#changeUserPermissionSubmit.btn.btn-warning Confirm

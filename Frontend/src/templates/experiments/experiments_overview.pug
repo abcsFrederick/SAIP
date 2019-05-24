@@ -1,0 +1,109 @@
+.col-md-3.projectInfo
+	.projectInfoHeader
+		ul.nav.nav-tabs
+			li.nav-item
+				a.nav-link.active#ProjectInfo Project
+			li.nav-item
+				a.nav-link#UsersInfo Users
+	.col-md-12.projectInfoContent
+	.col-md-12.usersInfoContent(style='display:none')
+		table#userUnderProject.table.table-hover
+			thead
+				tr
+					th Name
+					th Permissions(RW)
+.col-md-6.experimentsInfo
+	.experimentsInfoHeader
+		ul.nav.nav-tabs
+			li.nav-item
+				a.nav-link.active#ExperimentInfo Experiment
+			//- li.nav-item
+			//- 	a.nav-link#ExperimentDoc ExperimentDoc
+	.removeErr(data-toggle='tooltip' data-placement='right' title='Please delink all participants under this experiment first')
+	.col-md-12.experimentInfoContent
+		table#experimentsUnderProject.table-hover.table-striped
+			thead(style="width:100%")
+				tr
+					th Name
+					th Creator
+					th Date Modified
+					th # Images
+					th Options
+.col-md-3.experimentInfoDetails
+	.experimentsInfoDetailsHeader
+		ul.nav.nav-tabs
+			li.nav-item
+				a.nav-link.active#experimentInfoDetails More
+	.col-md-12.experimentInfoDetailsContent(style='padding-left:0px;padding-right:0px')
+.col-md-12.experimentDoc
+	.experimentDocHeader
+		ul.nav.nav-tabs
+			li.nav-item
+				a.nav-link.active#ParticipantsContent Studies
+			li.nav-item
+				a.nav-link#ExperimentDoc ExperimentDoc
+.col-md-12#PUMA_Participants(style='margin-top: 20px;')
+.col-md-12.experimentDocContent(style='display:none')
+if admin
+	#createExperiment.modal
+		.modal-content(style='width:40%;left:30%;top:20%')
+			.modal-header
+				span.close &times;
+				h2 Create a new Experiments
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-5.control-label Experiment Title:
+						.col-md-7.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-flask
+								input#experiment_name.form-control(type="text" required)
+
+						.col-md-12
+							.seperation(style='height:2px;background-color:#337ab7;font-size:10px;margin-top: 15px;')
+							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Option fields
+
+						label.col-md-5.control-label Probe:
+						.col-md-7.inputGroupContainer
+							.input-group(style='width:100%')
+								select#probe_id.form-control
+									option 
+									each probe in Probes
+										option(value=probe.id) #{probe.name}
+										
+						label.col-md-5.control-label Description:
+						.col-md-7.inputGroupContainer
+							.input-group(style='width:100%')
+								textarea#description.form-control(style='height:100px' required)
+						
+						
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#create_experiment.btn.btn-success Submit
+
+	#addUsersToProject.modal
+		.modal-content(style='width:40%;left:30%;top:20%')
+			.modal-header
+				span.close &times;
+				h2 Add users for this project
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;margin-top: 15px;')
+					table#addUsersToProjectTable.table.table-hover
+						thead
+							tr
+								th Name
+								th Premission
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#add_users.btn.btn-success Submit
+
+#doNotRefreshAlert.modal
+	.modal-content(style='width:25%;left:37%;top:20%')
+		.modal-header(style='background:#df3434')
+			h2 Caution!!
+		.modal-body
+			.container(style='width:100%;margin-bottom: 15px;')
+				h2 Do not refresh Page Until download finished

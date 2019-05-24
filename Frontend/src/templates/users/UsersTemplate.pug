@@ -1,0 +1,212 @@
+.col-md-12.userstemp(style="width:100hv;border: solid 2px;padding: 20px;border-color:lightgray;border-radius:5px")
+	table#usersTable.table.table-hover
+		thead
+			tr
+				th User Name
+				th Group(s)
+				th Status
+				th
+if admin
+	#addNewUser.modal
+		.modal-content
+			.modal-header
+				span.close &times;
+				h2 Add a new user
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-3.control-label First name:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-user-tag
+								input#newUser_firstName.form-control(type="text" required)
+						label.col-md-3.control-label Last name:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-user-tag
+								input#newUser_lastName.form-control(type="text" required)
+									
+
+						label.col-md-3.control-label UserID (Needs to match with NIH login ID): 
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-id-card
+								input#newUser_userID.form-control(type="text" required)
+						
+							
+						//.col-md-3.inputGroupContainer
+						
+
+						label.col-md-3.control-label Status:
+						.col-md-3.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon(style='font-size:15px')
+									i.fas.fa-users-cog
+								select#newUser_status.form-control(required)
+									option(value='Employee') Employee
+									option(value='External') External
+									option(value='FormerEmployee') FormerEmployee
+								
+
+						.col-md-12
+							.seperation(style='height:2px;background-color:#337ab7;font-size:10px;margin-top: 15px;')
+							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Option fields
+
+						label.col-md-3.control-label PI:
+						.col-md-3.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon(style='font-size:15px')
+									i.fas.fa-user-tie
+								select#newUser_pi.form-control
+									option(value='1') True
+									option(value='0') False
+
+						label.col-md-3.control-label Group:
+						.col-md-3.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon(style='font-size:15px')
+									i.fas.fa-user-tag
+								select#newUser_group.form-control(required)
+									//option(value='0') 
+									//- option(value='3') NCI_PI
+									//- option(value='1') SYSTEM Admin
+									//- option(value='2') NCI
+									//- //option(value='3') NCI_PI
+									//- option(value='4') SAIP
+									//- option(value='5') MIP
+									//- option(value='6') Commitee
+									option(value='8') User
+									option(value='7') SAIP_Admin
+						label.col-md-3.control-label Position:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fa.fa-flag
+								input#newUser_position.form-control(type="text")
+
+						label.col-md-3.control-label Phone_office:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-phone
+								input#newUser_phone_office.form-control(type="text")
+
+						label.col-md-3.control-label Email:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-envelope
+								input#newUser_email.form-control(type="text")
+
+
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#add_New_User.btn.btn-success Submit
+	#EditUser.modal
+		.modal-content
+			.modal-header
+				span.close &times;
+				h2 Edit current user
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-3.control-label First name:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-user-tag
+								input#editUser_firstName.form-control(type="text" required)
+						label.col-md-3.control-label Last name:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-user-tag
+								input#editUser_lastName.form-control(type="text" required)
+									
+
+						label.col-md-3.control-label UserID (Needs to match with NIH login ID): 
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-id-card
+								input#editUser_userID.form-control(type="text" required)
+						
+							
+						//.col-md-3.inputGroupContainer
+						
+
+						label.col-md-3.control-label Status:
+						.col-md-3.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon(style='font-size:15px')
+									i.fas.fa-users-cog
+								select#editUser_status.form-control(required)
+									option(value='Employee') Employee
+									option(value='External') External
+									option(value='FormerEmployee') FormerEmployee
+								
+
+						.col-md-12
+							.seperation(style='height:2px;background-color:#337ab7;font-size:10px;margin-top: 15px;')
+							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Option fields
+
+						label.col-md-3.control-label PI:
+						.col-md-3.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon(style='font-size:15px')
+									i.fas.fa-user-tie
+								select#editUser_pi.form-control
+									option(value='1') True
+									option(value='0') False
+
+						//- label.col-md-3.control-label Group:
+						//- .col-md-3.inputGroupContainer
+						//- 	.input-group(style='width:100%')
+						//- 		span.input-group-addon(style='font-size:15px')
+						//- 			i.fas.fa-user-tag
+						//- 		select#newUser_group.form-control(required)
+						//- 			//option(value='0') 
+						//- 			//- option(value='3') NCI_PI
+						//- 			//- option(value='1') SYSTEM Admin
+						//- 			//- option(value='2') NCI
+						//- 			//- //option(value='3') NCI_PI
+						//- 			//- option(value='4') SAIP
+						//- 			//- option(value='5') MIP
+						//- 			//- option(value='6') Commitee
+						//- 			option(value='8') User
+						//- 			option(value='7') SAIP_Admin
+						label.col-md-3.control-label Position:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fa.fa-flag
+								input#editUser_position.form-control(type="text")
+
+						label.col-md-3.control-label Phone_office:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-phone
+								input#editUser_phone_office.form-control(type="text")
+
+						label.col-md-3.control-label Email:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-envelope
+								input#editUser_email.form-control(type="text")
+
+
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#edit_User.btn.btn-success Save
+if admin
+	#changeUserPermissionAlert.modal
+					

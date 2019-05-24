@@ -1,0 +1,48 @@
+ERROR: 2019-05-16T18:44:27.596Z uncaughtException: authResults is not defined
+ReferenceError: authResults is not defined
+    at Query.query.on (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/app.js:352:19)
+    at Query.emit (events.js:194:15)
+    at Query.Sequence.end (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Sequence.js:91:12)
+    at Query._handleFinalResultPacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Query.js:139:8)
+    at Query.EofPacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Query.js:123:8)
+    at Protocol._parsePacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Protocol.js:279:23)
+    at Parser.write (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Protocol.js:39:16)
+    at Socket.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/Connection.js:103:28)
+    at Socket.emit (events.js:189:13)
+ERROR: 2019-05-16T19:03:06.203Z uncaughtException: Cannot find module './loggerConfig'
+Error: Cannot find module './loggerConfig'
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:582:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:508:25)
+    at Module.require (internal/modules/cjs/loader.js:637:17)
+    at require (internal/modules/cjs/helpers.js:22:18)
+    at Object.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/routes/index.js:1:76)
+    at Module._compile (internal/modules/cjs/loader.js:701:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:712:10)
+    at Module.load (internal/modules/cjs/loader.js:600:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:539:12)
+    at Function.Module._load (internal/modules/cjs/loader.js:531:3)
+ERROR: 2019-05-16T19:38:39.687Z uncaughtException: result is not defined
+ReferenceError: result is not defined
+    at Query.query.on (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/routes/index.js:1015:79)
+    at Query.emit (events.js:194:15)
+    at Query.Sequence.end (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Sequence.js:91:12)
+    at Query._handleFinalResultPacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Query.js:139:8)
+    at Query.OkPacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Query.js:72:10)
+    at Protocol._parsePacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Protocol.js:279:23)
+    at Parser.write (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Protocol.js:39:16)
+    at Socket.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/Connection.js:103:28)
+    at Socket.emit (events.js:189:13)
+ERROR: 2019-05-16T19:40:11.161Z uncaughtException: result is not defined
+ReferenceError: result is not defined
+    at Query.query.on (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/routes/index.js:1015:79)
+    at Query.emit (events.js:194:15)
+    at Query.Sequence.end (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Sequence.js:91:12)
+    at Query._handleFinalResultPacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Query.js:139:8)
+    at Query.OkPacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/sequences/Query.js:72:10)
+    at Protocol._parsePacket (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Protocol.js:279:23)
+    at Parser.write (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/protocol/Protocol.js:39:16)
+    at Socket.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/mysql/lib/Connection.js:103:28)
+    at Socket.emit (events.js:189:13)

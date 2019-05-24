@@ -28,6 +28,7 @@ var showList = Backbone.View.extend({
 			this.table2.destroy();
 			this.table2.clear();
 			$('#showList2').empty();
+			$('#showList2').html('No study selected');
 		},
 	},
 	initialize(setting){
@@ -36,7 +37,7 @@ var showList = Backbone.View.extend({
 		this.event = setting.event;
 		this.router = new Router();
 		this.searchName = setting.searchName || 'none';
-		this.urlBase = VM+'api/v1/scippy';
+		this.urlBase = domain+'api/v1/scippy';
 		this.dateFrom = setting.dateFrom ; //for now a year 
 		this.dateTo = setting.dateTo ; //for now a year 
 		this.table;
@@ -53,16 +54,22 @@ var showList = Backbone.View.extend({
 	},
 	render(){ 
 		this.$el.html(TableListHeader());
-		
+	//	$('#table-wrapper2').html('No study selected');
+	
 		return this;
 
 	},
 	patientStudyFetch(){
 		event.trigger('loading');
 		this.patientCollectionSave = new Patient_studyCollection();
-
+		var search_params = {
+		  'key1': 'value1',
+		  'key2': 'value2',
+		  'key3': 'value3',
+		  'keyN': 'valueN',
+		};
 		this.patientCollection.fetch({
-		//	parse:false,
+			data:$.param(search_params),
 			xhrFields: {
 				  withCredentials: true							// override ajax to send with credential
 			},
@@ -156,84 +163,7 @@ var showList = Backbone.View.extend({
 					}
 				}.bind(this));
 
-				/*let mergedParentArr = [];
-				res.toJSON().forEach(function(sourceRow){
-				  let image_name=sourceRow.image_name;
-				  let modality=sourceRow.modality;
-
-				  let patient=sourceRow.patient;
-				  let patient_id=sourceRow.patient_id;
-				  let patient_path=sourceRow.patient_path;
-
-				  let serie_description=sourceRow.serie_description;
-				  let serie_id=sourceRow.serie_id;
-				  let serie_uid=sourceRow.serie_uid;
-				  let serie_path=sourceRow.serie_path;
-				  
-				  let study_id=sourceRow.study_id;
-				  let study_path=sourceRow.study_path;
-				  
-				  if(!mergedParentArr.some(function(row) { return row['parent'] == sourceRow['parent']; })) {
-
-				    sourceRow.image_name=[];
-				    sourceRow.modality=[];
-
-				    sourceRow.patient_id=[];
-				    sourceRow.patient_path=[];
-
-				    sourceRow.serie_description=[];
-				    sourceRow.serie_id=[];
-				    sourceRow.serie_uid=[];
-				    sourceRow.serie_path=[];
-				    
-				    sourceRow.study_description=[];
-				    sourceRow.study_id=[];
-				    sourceRow.study_path=[];
-
-				    sourceRow.parentLevelDownload=[];
-
-					sourceRow.image_name.push(image_name);
-					sourceRow.modality.push(modality);
-
-				    sourceRow.patient_id.push(patient_id);
-				    sourceRow.patient_path.push(patient_path);
-
-				    sourceRow.serie_description.push(serie_description);
-				    sourceRow.serie_id.push(serie_id);
-				    sourceRow.serie_uid.push(serie_uid);
-				    sourceRow.serie_path.push(serie_path);
-				    
-				    sourceRow.study_id.push(study_id);
-				    sourceRow.study_path.push(study_path);
-
-				    let parentLevelDownload = patient_path;
-				    sourceRow.parentLevelDownload.push(parentLevelDownload);
-
-				    mergedParentArr.push(sourceRow);
-
-				  } else {
-				    var targetRow = mergedParentArr.filter(function(targetRow) { return targetRow['patient'] == sourceRow['patient'] })[0];
-				   	targetRow.serie_description.push(serie_description);
-		
-				    targetRow.image_name.push(image_name);
-					targetRow.modality.push(modality);
-
-				    targetRow.patient_id.push(patient_id);
-				    targetRow.patient_path.push(patient_path);
-
-				    targetRow.serie_description.push(serie_description);
-				    targetRow.serie_id.push(serie_id);
-				    targetRow.serie_uid.push(serie_uid);
-				    targetRow.serie_path.push(serie_path);
-
-				    targetRow.study_id.push(study_id);
-				    targetRow.study_path.push(study_path);
-
-				    let parentLevelDownload = patient_path;
-				    targetRow.parentLevelDownload.push(parentLevelDownload);
-				  }
-				});
-				*/
+				
 				//remove duplicate download url
 				
 				this.mergedStudyDescriptionArr.forEach(function(row) {
@@ -272,6 +202,8 @@ var showList = Backbone.View.extend({
 					}));
 				},this));
 
+				$('#showList2').html('No study selected');
+				
 				this.table = $('#showList').DataTable({
 					language: {
 				        searchPlaceholder: "Search study"
@@ -283,7 +215,7 @@ var showList = Backbone.View.extend({
 			            	"orderable":false,
 				            "targets": -1,
 				            "render": _.bind(function ( data, type, full, meta ) {
-				            	let urlBase = VM+'api/v1/scippy';
+				            	let urlBase = domain+'api/v1/scippy';
 				            	let patient_path = full.patient_path;
 				            	let study_path = full.study_path;
 				            	let study_description = full.study_description||'Non_study_description';
@@ -295,14 +227,22 @@ var showList = Backbone.View.extend({
 							},this),
 				        }
 			        ],
+			        columnDefs : [{
+					   targets: '_all',
+					   render: function(data, type, row, meta) {
+					     return '<pre>' + data + '</pre>'
+					   }
+					}],
+
 			        destroy: true,
 					rowGroup: {dataSrc: 0},
 					"lengthMenu":[[/*25,50,100,200,*/-1],[/*25,50,100,200,*/'ALL']],
 					"scrollY": "500px",
         			"scrollCollapse": true,
-					"dom":' <"datatable_Information col-md-6"i><"datatable_search col-md-6"f>t'//<"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
+					"dom":' <"datatable_search col-md-12"f>t<"datatable_Information col-md-6"i>'//<"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
 				});
 
+				$('.dataTables_filter').css('float:none;text-align:none')
 			//	var filterOr = createFilter(this.table, [0]);
 
 				function createFilter(table, columns) {
@@ -387,11 +327,12 @@ var showList = Backbone.View.extend({
 	},
 
 	showChild(e){
+		$('#showList2').empty();
 		$('.fa-folder-open').addClass('fa-folder');
 		$('.fa-folder-open').removeClass('fa-folder-open');
 		$(e.target).addClass('fa-folder-open');
 		$(e.target).removeClass('fa-folder');
-		let studyDes = $(e.target).closest( "tr" )[0].cells[0].innerText;
+		let studyDes = $(e.target).closest( "tr" )[0].cells[0].firstElementChild.innerText;
 
 		let study = this.mergedStudyDescriptionArr.find(e=>e['study_description']==studyDes)
 
@@ -497,7 +438,7 @@ var showList = Backbone.View.extend({
 		              	"orderable":false,
 			            "targets": -2,
 			            "render": function ( data, type, full, meta ) {
-			            	let urlBase = VM+'api/v1/scippy';
+			            	let urlBase = domain+'api/v1/scippy';
 			            	let patient_path = full.patient_path;
 			            	let study_path = full.study_path;
 							let study_id = full.study_id||'none';
@@ -517,7 +458,7 @@ var showList = Backbone.View.extend({
 		            	"orderable":false,
 			            "targets": -1,
 			            "render": function ( data, type, full, meta ) {
-			            	let urlBase = VM+'api/v1/scippy';
+			            	let urlBase = domain+'api/v1/scippy';
 			            	let patient_path = full.patient_path;
 			            	let study_path = full.study_path;
 							let study_id = full.study_id||'none';
@@ -537,7 +478,7 @@ var showList = Backbone.View.extend({
 				"lengthMenu":[[/*25,50,100,200,*/-1],[/*25,50,100,200,*/'ALL']],
 				"scrollY": "500px",
 				"scrollCollapse": true,
-				"dom":' <"datatable_Information col-md-6"i><"datatable_search_patient col-md-6"f>rt'//<"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
+				"dom":' <"datatable_search_patient col-md-12"f>rt<"datatable_Information col-md-12"i>'//<"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
 			});
 			$('.seriesDownloadProgress').on('click',function(e){
 			    let progressIcon=$(e.target).prev('.progress');
