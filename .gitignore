@@ -1,0 +1,6 @@
+nci.sql
+npm-debug.log
+Frontend/node_modules
+Backend/node_modules
+AuthFrontend/node_modules
+.DS_Store

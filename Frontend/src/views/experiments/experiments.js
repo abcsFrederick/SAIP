@@ -404,7 +404,7 @@ var experiments = View.extend({
 			       
 			        	let zipFileLocation = JSON.parse(ev.data).filePath
 			        	var xhr = new XMLHttpRequest();
-								xhr.open("GET", this.domain + 'api/v1/downloadZip?absolutePath='+zipFileLocation);
+								xhr.open("GET", this.domain + 'api/v1/downloadZip?absolutePath='+encodeURIComponent(zipFileLocation));
 								xhr.responseType = "blob";
 								xhr.withCredentials = true;
 
@@ -706,7 +706,7 @@ var experiments = View.extend({
 			       
 			        	let zipFileLocation = JSON.parse(ev.data).filePath
 			        	var xhr = new XMLHttpRequest();
-								xhr.open("GET", this.domain + 'api/v1/downloadZip?absolutePath='+zipFileLocation);
+								xhr.open("GET", this.domain + 'api/v1/downloadZip?absolutePath='+encodeURIComponent(zipFileLocation));
 								xhr.responseType = "blob";
 								xhr.withCredentials = true;
 

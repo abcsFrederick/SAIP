@@ -177,7 +177,9 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               });
           }
       ], function (err, res) {
-        // console.log(res)
+        console.log(res);
+        console.log(username);
+        console.log(password);
         authResults = {
           "status" : ""
           ,"error" : null

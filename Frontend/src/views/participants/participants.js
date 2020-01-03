@@ -84,9 +84,9 @@ var participants = View.extend({
 					            	full.study_description = full.study_description||'None';
 							//console.log(full.series_description);
 					            	for(let i=0; i < full.series_description.length; i++) {
-								full.series_description[i] = full.series_description[i].replace(/[%/]/g,'_');
+								full.series_description[i] = full.series_description[i].replace(/[%/]/g,'_').replace(/[#]/g,'No.');
 							}
-							return "<a class='fa fa-download studyDownloadProgress' style='cursor:pointer' stu_id='"+full.study_id+"' stu_name='"+full.study_description.replace(/[%/]/g,'_')+"' title='"+full.pat_path+'/'+full.study_path+'/'+full.pat_name+'/'+full.study_description.replace(/[%/]/g,'_')+'?series_path='+full.series_path+'&series_description='+full.series_description+'&modality='+full.modality+"'></a><a class='fa fa-spinner fa-spin' style='display:none;'></a><progress class=' progress' value='0' style='display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px'></progress>"
+							return "<a class='fa fa-download studyDownloadProgress' style='cursor:pointer' stu_id='"+full.study_id+"' stu_name='"+full.study_description.replace(/[%/]/g,'_').replace(/[#]/g,'No.')+"' title='"+full.pat_path+'/'+full.study_path+'/'+full.pat_name+'/'+full.study_description.replace(/[%/]/g,'_').replace(/[#]/g,'No.')+'?series_path='+full.series_path+'&series_description='+full.series_description+'&modality='+full.modality+"'></a><a class='fa fa-spinner fa-spin' style='display:none;'></a><progress class=' progress' value='0' style='display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px'></progress>"
 					            },this)
 					    	},
 					    ],
@@ -270,7 +270,7 @@ var participants = View.extend({
 					            "targets": -1,
 					            "render": _.bind(function ( data, type, full, meta ) {
 					            	full.series_description = full.series_description||'None';
-					            	return "<a class='fa fa-download seriesDownloadProgress' style='cursor:pointer' ser_id='"+full.series_path+"' ser_name='"+full.series_description.replace(/[%/]/g,'_')+"' title='"+this.patient_path+'/'+this.study_path+'/'+full.series_path+'/'+full.series_description.replace(/[%/]/g,'_')+'/'+full.modality +"'></a><a class='fa fa-spinner fa-spin' style='display:none;'></a><progress class=' progress' value='0' style='display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px'></progress>"
+					            	return "<a class='fa fa-download seriesDownloadProgress' style='cursor:pointer' ser_id='"+full.series_path+"' ser_name='"+full.series_description.replace(/[%/]/g,'_').replace(/[#]/g,'No.')+"' title='"+this.patient_path+'/'+this.study_path+'/'+full.series_path+'/'+full.series_description.replace(/[%/]/g,'_').replace(/[#]/g,'No.')+'/'+full.modality +"'></a><a class='fa fa-spinner fa-spin' style='display:none;'></a><progress class=' progress' value='0' style='display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px'></progress>"
 					            },this)
 					    	},
 					    ],

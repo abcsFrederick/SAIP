@@ -6,14 +6,14 @@
     "auditLog": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/.9264b6d482f9fcd773619788fc6970ed77f77f67-audit.json",
     "files": [
         {
-            "date": 1558032175898,
-            "name": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/exceptions-2019-05-16.log",
-            "hash": "fda1c2424aac8042bba94fd733cb2561"
+            "date": 1566844824696,
+            "name": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/exceptions-2019-08-26.log",
+            "hash": "8c084575c614162574b0c8da45770b06"
         },
         {
-            "date": 1558104884258,
-            "name": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/exceptions-2019-05-17.log",
-            "hash": "fed0b69f0b94e8d3cd1f8b6bfaa32775"
+            "date": 1568734208268,
+            "name": "/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/logs/exceptions-2019-09-17.log",
+            "hash": "833c6288bd603019a3ba6e2dc9fa9777"
         }
     ]
 }
