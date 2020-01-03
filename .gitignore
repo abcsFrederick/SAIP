@@ -1,7 +1,7 @@
 nci.sql
 npm-debug.log
 Frontend/node_modules
-Frontend/public/test/
+Frontend/public/test/*
 Backend/node_modules
 AuthFrontend/node_modules
 .DS_Store
