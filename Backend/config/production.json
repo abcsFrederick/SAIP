@@ -1,5 +1,5 @@
 {
-	"version":"1.3.1",
+	"version":"1.4.0",
 	"mode":"production",
 	"debugMode":false,
 	"dbConfig":{
@@ -19,6 +19,6 @@
 	"adConfig":{
 		"url":"https://services.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc?wsdl",
 		"account":"ncifivgSvc",
-		"password":"555=Google=yahoo"
+		"password":"+vYg<^Y|#4w:r9)"
 	}
 }

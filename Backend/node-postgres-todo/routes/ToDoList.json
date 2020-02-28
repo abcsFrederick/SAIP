@@ -26,6 +26,12 @@ Phase 2:
 	# Add project
 	/api/v1/project_add
 
+	# Edit project
+	PUT /api/v1/projects/edit
+
+	# Delete project
+	DELETE /api/v1/projects/delete/:project_id
+
 	# Change project status
 	/api/v1/project_status
 
@@ -43,6 +49,9 @@ Phase 2:
 
 	# Add experiment
 	/api/v1/experiment_add
+
+	# Edit experiment
+	PUT /api/v1/experiments/edit
 
 	# Remove(Flag) experiment
 	/api/v1/experiment_remove

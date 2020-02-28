@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 var View = Backbone.View.extend({
 	close:function () {
-	    console.log('Unbinding events for ' + this.cid);
+	    // console.log('Unbinding events for ' + this.cid);
 	    this.remove();
 	    this.unbind();
 

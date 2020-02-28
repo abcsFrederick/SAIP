@@ -52,34 +52,33 @@ var controlPanel = View.extend({
 				}));
 			},this))
 		});
-		eventsBus.on('addNewProject',this.projects,this);
-		eventsBus.on('addNewUserEvent',this.usersRender,this);
-		eventsBus.on('addNewUserEvent_access',this.accessRequest,this);
-		eventsBus.on('addNewProbeEvent',this.probesRender,this);
+		eventsBus.on('addNewProject', this.projects, this);
+		eventsBus.on('addNewUserEvent', this.usersRender, this);
+		eventsBus.on('addNewUserEvent_access', this.accessRequest, this);
+		eventsBus.on('addNewProbeEvent', this.probesRender, this);
 		//eventsBus.on('goAbout',this.about,this);
 	},
-	projects(e){
-		if(e!=undefined){
+	projects(e) {
+		if (e !==undefined) {
 			$(e.currentTarget).parent().parent().children().children().removeClass('active');
 			$(e.currentTarget).addClass('active');
 		}
 	//	window.test=$(e.currentTarget);
-		if(this.projectsView){
+		if (this.projectsView) {
 			this.projectsView.close()	//prevent from zombie view
 		}
-		
 		this.projectsView = new Projects_overview({
-			admin:this.is_admin,
-			domain:this.domain,
-			domain_ws:this.domain_ws,
-			user_id:this.user_id,
-			users:this.users,
-			probes:this.probes,
-			LoginAdminUser:this.LoginAdminUser,
-			protocols:this.protocols,
-			mappingAttrReserve:$('.mapping')
+			admin: this.is_admin,
+			domain: this.domain,
+			domain_ws: this.domain_ws,
+			user_id: this.user_id,
+			users: this.users,
+			probes: this.probes,
+			LoginAdminUser: this.LoginAdminUser,
+			protocols: this.protocols,
+			mappingAttrReserve: $('.mapping')
 		});
-		$('#PUMA').html(this.projectsView.el)
+		$('#PUMA').html(this.projectsView.el);
 	},
 	mapping(e){
 		$(e.currentTarget).parent().parent().children().children().removeClass('active');

@@ -8,7 +8,9 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var FileStore = require("session-file-store")(session);
 var routes = require('./routes/index');
-//var users = require('./routes/users');
+var projectsRoutes = require('./routes/projects');
+var experimentsRoutes = require('./routes/experiments');
+
 var compression = require('compression');  
 var fs = require('fs-extra');
 var rimraf = require('rimraf');
@@ -621,7 +623,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, './public')));
 
 app.use('/', routes);
-//app.use('/users', users);
+app.use('/api/v1/projects', projectsRoutes);
+app.use('/api/v1/experiments', experimentsRoutes);
 
 
 app.get('/mysql',function(req,res,next){
