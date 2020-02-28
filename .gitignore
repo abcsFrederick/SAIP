@@ -9,5 +9,6 @@ Backend/node-postgres-todo/node_modules
 Backend/node-postgres-todo/package-lock.json
 Backend/node-postgres-todo/logs/*
 AuthFrontend/node_modules
+AuthFrontend/package-lock.json
 .DS_Store
 sessions
