@@ -5,11 +5,11 @@ var patient = Backbone.Collection.extend({
 	resoucePatient:'patient=',
 	resouceDate:'date=',
 	url: function(){
-		return this.setting.urlBase+'/'+this.resouceDate+this.setting.from+'.'+this.setting.to
-		+'/'+this.resoucePatient+this.setting.patientName
+		return this.setting.urlBase + '/' + this.resouceDate + this.setting.from + '.' + this.setting.to
+		+ '/' + this.resoucePatient + this.setting.patientName;
 	},
 	initialize(setting){
-		this.setting = setting
+		this.setting = setting;
 	}
 });
 

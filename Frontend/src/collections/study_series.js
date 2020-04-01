@@ -5,10 +5,10 @@ var study_series = Backbone.Collection.extend({
 	rescoureStudy:'study=',
 
 	url:function(){
-		return this.setting.urlBase+"/"+this.rescoureStudy+this.setting.study_id
+		return this.setting.urlBase + '/' + this.rescoureStudy + this.setting.study_id;
 	},
 	initialize(setting){
-		this.setting = setting
+		this.setting = setting;
 	}
 });
 

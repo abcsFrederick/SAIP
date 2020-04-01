@@ -1,4 +1,4 @@
-import Backbone from "backbone";
+import Backbone from 'backbone';
 import unmap_model from '../../models/mapping/unmap';
 var unmap = Backbone.Collection.extend({
 	model:unmap_model,
@@ -6,7 +6,7 @@ var unmap = Backbone.Collection.extend({
 		this.domain = setting.domain;
 	},
 	url:function(){
-		return this.domain+'api/v1/mapping';
+		return this.domain + 'api/v1/mapping';
 	}
 });
 
