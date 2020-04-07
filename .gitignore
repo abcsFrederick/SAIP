@@ -3,5 +3,6 @@ npm-debug.log
 Frontend/node_modules
 Frontend/public/test
 Backend/node_modules
+Backend/node-postgres-todo/node_modules
 AuthFrontend/node_modules
 .DS_Store
