@@ -7,6 +7,7 @@ import Projects_overview_collection from '../../collections/projects/projects_ov
 import Projects_overview_model from '../../collections/projects/projects_overview'
 import Projects_overview_templates from '../../templates/projects/projects_overview.pug'
 import FieldsTemplates from '../../templates/projects/projects_overview_pi.pug'
+import AlertTemplate from '../../templates/projects/deleteProjectAlert.pug';
 // import Project_add_model from '../../models/projects/project_add';
 
 import Experiments from '../experiments/experiments'
@@ -19,8 +20,9 @@ var projects = View.extend({
   events: {
     'click #create_project': 'create_project',
     'click #edit_project': '_edit_project',
-    'click .icon-trash': 'removeProject',
-    'click .project_edit': 'editProject'
+    'click .icon-trash': 'renderDeletionAlert',
+    'click .project_edit': 'editProject',
+    'click #deleteProjectSubmit': 'removeProject'
   },
   initialize (setting) {
     this.is_admin = setting.admin
@@ -343,7 +345,6 @@ var projects = View.extend({
     return this
   },
   selectedUserTableRender (selectedUser) {
-    console.log(selectedUser)
     const selectedUserId = parseInt(selectedUser.substr(2))
     // if(!this.selectedUserTable){
     // 	this.selectedUserTable = $('#ProjectSelectedUsersTable').DataTable({
@@ -538,27 +539,41 @@ var projects = View.extend({
     })
     return this
   },
+  renderDeletionAlert: function (e) {
+    $('#deleteProjectAlert').html(AlertTemplate({
+      deleteProject: e.currentTarget.parentElement.parentElement.id
+    }))
+    $('#deleteProjectAlert').show();
+    $('.close').on('click', _.bind(function () {
+      $('#deleteProjectAlert').hide();
+    }, this));
+    $('.cancel').on('click', _.bind(function () {
+      $('#deleteProjectAlert').hide();
+    }, this));
+  },
   removeProject: function (e) {
     $.ajax({
       url: this.domain + 'api/v1/projects/delete/' +
-			     e.currentTarget.parentElement.parentElement.id,
+			     e.currentTarget.getAttribute('project-id'),
       type: 'DELETE',
       xhrFields: {
 			    withCredentials: true
       },
-		    success: _.bind(function (res) {
-		    	if (!res.err) {
-		    		this.render()
-		    	} else {
-		    		console.log(this.$('.removeErr'))
-		    		this.$('.removeErr').tooltip('enable')
+	    success: _.bind(function (res) {
+	    	if (!res.err) {
+          $('.alert-success').empty();
+          $('.alert-success').append('<li>' + res.msg + '</li>');
+          $('.alert-success').fadeTo('slow', 0.8).delay(5000).slideUp(500)
+	    		this.render();
+	    	} else {
+	    		this.$('.removeErr').tooltip('enable')
           this.$('.removeErr').tooltip('show')
           setTimeout(_.bind(function () {
             this.$('.removeErr').tooltip('hide')
           }, this), 3000)
           this.$('.removeErr').tooltip('disable')
-		    	}
-		    }, this)
+	    	}
+	    }, this)
     })
   },
   editProject: function (e) {

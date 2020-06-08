@@ -33,14 +33,14 @@ var experiments = View.extend({
     'click #edit_experiment': '_edit_experiment'
   },
   initialize (setting) {
-    this.probes = setting.probes
-    this.users = setting.users
-    this.pi_id = setting.pi_id
-    this.is_admin = setting.admin
-    this.domain = setting.domain
-    this.domain_ws = setting.domain_ws
-    this.mappingAttrReserve = setting.mappingAttrReserve
-    this.project_id = setting.project_id
+    this.probes = setting.probes;
+    this.users = setting.users;
+    this.pi_id = setting.pi_id;
+    this.is_admin = setting.admin;
+    this.domain = setting.domain;
+    this.domain_ws = setting.domain_ws;
+    this.mappingAttrReserve = setting.mappingAttrReserve;
+    this.project_id = setting.project_id;
     this.projectCollection = new ProjectCollection({
       domain: this.domain,
       project_id: this.project_id

@@ -12,7 +12,7 @@
 		    "password": "luying0325",
 		    "database":"SAIP"
 		}
-		// "mysql":{
+  // "mysql":{
   //       "host": "fr-s-mysql-4.ncifcrf.gov",
   //       "port":3306,
   //       "user": "miaot2",
