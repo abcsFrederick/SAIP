@@ -566,12 +566,14 @@ var projects = View.extend({
           $('.alert-success').fadeTo('slow', 0.8).delay(5000).slideUp(500)
 	    		this.render();
 	    	} else {
-	    		this.$('.removeErr').tooltip('enable')
-          this.$('.removeErr').tooltip('show')
-          setTimeout(_.bind(function () {
-            this.$('.removeErr').tooltip('hide')
-          }, this), 3000)
-          this.$('.removeErr').tooltip('disable')
+          $('#deleteProjectAlert .error').empty();
+          $('#deleteProjectAlert .error').append('Please delete all experiments under this project first.');
+	    		// this.$('.removeErr').tooltip('enable')
+       //    this.$('.removeErr').tooltip('show')
+       //    setTimeout(_.bind(function () {
+       //      this.$('.removeErr').tooltip('hide')
+       //    }, this), 3000)
+       //    this.$('.removeErr').tooltip('disable')
 	    	}
 	    }, this)
     })

@@ -5,6 +5,7 @@
   .modal-body
     .container(style='width:100%;margin-bottom: 15px;')
       h2 You are about to delete a Project with Id: #{deleteProject}
+      .error(style='color:red')
   .modal-footer(style='background:#df3434')
     button.cancel.btn.btn-default Cancel
     button#deleteProjectSubmit.btn.btn-warning(project-id=deleteProject) Confirm
