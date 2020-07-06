@@ -160,7 +160,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               }
               authResults.status = "Authenticated";
               authResults.userInfo = userInfo;
-              var auth = 200;
+              // var auth = 200;
               var userFirstName = authResults['userInfo']['FirstName'];
               var userLastName = authResults['userInfo']['LastName'];
               var Email = authResults['userInfo']['Email'];
@@ -194,7 +194,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                           // req.session.Telephone = Telephone;
                           req.session.Email = Email;
                           // req.session.UserPrincipalName = UserPrincipalName;
-                          req.session.status = auth;
+                          req.session.status = authResults.status;
                           req.session.group_id = result_group_id;
                           req.session.user_id = result_user_id;
                           res_1.json({appVersion:version,code:1,status:req.session.status,FirstName:req.session.FirstName,
@@ -223,7 +223,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                             + ' is not on(or not active) the SAIP whitelist'
                           });
                           authResults.status = "Authentication failed";
-                          res_1.json({code:0, status:authResults.status});
+                          res_1.json({code:0, status: authResults.status});
                           next();
                         }
                         
