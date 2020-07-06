@@ -1,3 +1,4 @@
+var URL = require('url').URL;
 var logger = require('./loggerConfig');
 var express = require('express');
 var path = require('path');
