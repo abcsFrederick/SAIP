@@ -131,7 +131,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
             'client_secret': CLIENT_SECRET,
             'redirect_uri': CLIENT_REDIRECT_URL
           }
-      authResults = {
+      var authResults = {
           "status" : ""
           ,"error" : null
           ,"userInfo" : {}
@@ -151,8 +151,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               authResults.status = "Authentication failed";
               authResults.error = error;
               res_1.json({code:0, status:authResults.status});
-            }
-            else {
+            } else {
               var userInfo = {
                 "FirstName": JSON.parse(body).given_name,
                 "LastName": JSON.parse(body).family_name,
