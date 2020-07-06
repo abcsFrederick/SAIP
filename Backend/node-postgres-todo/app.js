@@ -175,7 +175,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                 // console.log(mysqlConfig)
                 mysqlcon.getConnection((err, connection) => {
                   if(err) throw err;
-                  var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
                   
                   // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
                   // console.log('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;')
@@ -445,8 +445,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
       mysqlcon.getConnection((err, connection) => {
         if(err) throw err;
         // console.log('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;')
-        var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.Email.substr(0,req.session.Email.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
-        
+        var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  
         // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
         query.on('result', (row) => {
           result_group_id.push(row['group_id']);
