@@ -30,4 +30,9 @@
 		// "password":"555=Google=yahoo"
     "password":"+vYg<^Y|#4w:r9)"
 	},
+  "Cilogon": {
+    "id": "cilogon:/client_id/1e57b671cfea63d268f67ab07d482a63",
+    "secret": "-woP3t1n5IARXKzpBTLPX-g2jUXfp7WKWzgwiID6BK6_hElQRrqVO-zgr5Hffhi6otJgL2TlDNi5rAY1QVwLlw",
+    "redirect_uri": "https://frsivg-mip01d.ncifcrf.gov/SAIP/"
+  }
 }

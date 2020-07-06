@@ -10,6 +10,7 @@ var FileStore = require("session-file-store")(session);
 var routes = require('./routes/index');
 var projectsRoutes = require('./routes/projects');
 var experimentsRoutes = require('./routes/experiments');
+// var URL = require('url');
 
 var compression = require('compression');  
 var fs = require('fs-extra');
@@ -33,6 +34,11 @@ const postgresConfig = config.get('dbConfig.postgres');
 const ADURL = config.get('adConfig.url');
 const ADServiceAccount = config.get('adConfig.account');
 const ADServicePassword = config.get('adConfig.password');
+
+const CLIENT_ID = config.get('Cilogon.id');
+const CLIENT_SECRET = config.get('Cilogon.secret');
+const CLIENT_REDIRECT_URL = config.get('Cilogon.redirect_uri');
+
 var testUsers = [{name:'test',password:'test123456789'}];
 var mysqlcon = mysql.createPool(mysqlConfig);
 
@@ -113,9 +119,22 @@ var eventTracking=function(type,user){
 function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK) {
   return NIH_Authenticate[SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK] ||
   (NIH_Authenticate[SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK] = function(req, res_1, next) {
-    if(req.session.status!='Authenticated'){
+    if (req.session.status !== 'Authenticated') {
       // console.log('create session');
-       // console.log(ADURL);
+      var refererURL = new URL(req.headers.referer);
+      var code = refererURL.searchParams.get('code');
+
+      // get token
+      var data = {'grant_type': 'authorization_code',
+            'code': code,
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'redirect_uri': CLIENT_REDIRECT_URL
+          }
+      
+      console.log(data);
+
+
       var RETURNED_TOKEN_FROM_LOGIN = req.headers.referer.substr(req.headers.referer.indexOf('?token=')).substring(7);
       var username = SERVICE_ACCOUNT_USERNAME;
       var password = SERVICE_ACCOUNT_PASSWORD;
@@ -304,7 +323,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           next();
         }
       });
-    }else{
+    } else {
       // console.log('has session');
       // console.log('page refresh!!!!!!!!!');
       var workSpace = __dirname+'/routes/'+req.session.UserPrincipalName
