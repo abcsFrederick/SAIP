@@ -156,6 +156,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               res_1.json({code:0, status:authResults.status});
               next();
             } else {
+              console.log(JSON.parse(body));
               var userInfo = {
                 "FirstName": JSON.parse(body).given_name,
                 "LastName": JSON.parse(body).family_name,
@@ -782,31 +783,31 @@ app.get('/accessRequest',request_Access(ADServiceAccount,ADServicePassword,isAut
 
 });
 app.get('/',NIH_Authenticate(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
+});
 
 // Fake session
-/*app.get('/',function(req,res,next){
+// app.get('/',function(req,res,next){
+//   req.session.regenerate(function(err){
+//     if(err){
+//       return res_1.json({msg:err})
+//     }
+//     req.session.FirstName = 'Tianyi';
+//     req.session.LastName = 'Miao';
+//     req.session.NedID = 123;
+//     req.session.Telephone = 123;
+//     req.session.Email = 123;
+//     req.session.UserPrincipalName = 123;
+//     req.session.status = 'Authenticated';
+//     req.session.group_id = [7];
+//     req.session.user_id = [5];
 
-req.session.regenerate(function(err){
-            if(err){
-              return res_1.json({msg:err})
-            }
-            req.session.FirstName = 'Tianyi';
-            req.session.LastName = 'Miao';
-            req.session.NedID = 123;
-            req.session.Telephone = 123;
-            req.session.Email = 123;
-            req.session.UserPrincipalName = 123;
-            req.session.status = 'Authenticated';
-            req.session.group_id = [1];
-            req.session.user_id = [5];
+//     // console.log(req.session);
+//     return res.json({appVersion:version, code:1,status:req.session.status,FirstName:req.session.FirstName,
+//                       LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
+//                       Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id})
+//   });
+// });
 
-            // console.log(req.session);
-            return res.json({code:1,status:req.session.status,FirstName:req.session.FirstName,
-                              LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
-                              Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id})
-});
-*/
-});
 
 // app.post('/mockLogin',function(req,res,next){
 //   var sess = req.session;
