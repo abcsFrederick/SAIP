@@ -143,6 +143,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           authResults.status = "Authentication failed";
           authResults.error = error;
           res_1.json({code:0, status:authResults.status});
+          next();
         } else {
           var id_token = JSON.parse(body).id_token
           var access_token = JSON.parse(body).access_token
@@ -152,6 +153,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               authResults.status = "Authentication failed";
               authResults.error = error;
               res_1.json({code:0, status:authResults.status});
+              next();
             } else {
               var userInfo = {
                 "FirstName": JSON.parse(body).given_name,
@@ -226,7 +228,6 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                           res_1.json({code:0, status: authResults.status});
                           next();
                         }
-                        
                   });
                 });
               });
