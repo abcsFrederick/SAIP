@@ -24,8 +24,8 @@ var VMdev_ws = 'wss://frsivg-mip01d.ncifcrf.gov/w0.1/';
 var App = View.extend({
 	initialize(){
 		this.render();
-		this.domain = VMdev;
-		this.domain_ws = VMdev_ws;
+		this.domain = VMpro;
+		this.domain_ws = VMpro_ws;
 		$.ajax({
 			url: this.domain + '',
 			type: 'GET',
