@@ -227,8 +227,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                           logger.error({
                             level: 'error',
                             message: userFirstName + ' ' + userLastName + ' with userID ' 
-                            // + UserPrincipalName.substr(0,UserPrincipalName.indexOf('@')) 
-                            // + ' or ' 
+                            + UserPrincipalName.substr(0,UserPrincipalName.indexOf('@')) 
+                            + ' or ' 
                             + Email.substr(0,Email.indexOf('@')) 
                             + ' is not on(or not active) the SAIP whitelist'
                           });
