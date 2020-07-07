@@ -136,8 +136,8 @@ var projects = View.extend({
 		            	orderable: false,
 			            targets: -1,
 			            render: _.bind(function (data, type, full, meta) {
-			            	return '<a project_id=' + full.nci_projects_id + ' project_name=' + full.nci_projects_name +
-			            		   ' pi_id=' + full.nci_projects_pi_id + ' protocol_category_id=' + full.protocol_category_id +
+			            	return '<a project_id=' + full.nci_projects_id + ' project_name="' + full.nci_projects_name +
+			            		   '" pi_id=' + full.nci_projects_pi_id + ' protocol_category_id=' + full.protocol_category_id +
 			            		   ' protocol_category_name=' + full.short_name + ' class=\'fa fa-edit project_edit\' style=\'cursor:pointer\'></a>' +
 			            		   '<a class=\'fa icon-trash\' style=\'cursor: pointer;color:red;font-size:18px\'></a>'
 			            }, this)
@@ -579,11 +579,11 @@ var projects = View.extend({
     })
   },
   editProject: function (e) {
-    this.editProject_protocols = []
-    this.editProject_protocols_names = []
-    $('#editProject_name').val($(e.currentTarget).attr('project_name'))
-    $('#editStatus').val($(e.currentTarget).parent().parent().attr('status'))
-    $('#editPi_id').val($(e.currentTarget).attr('pi_id'))
+    this.editProject_protocols = [];
+    this.editProject_protocols_names = [];
+    $('#editProject_name').val($(e.currentTarget).attr('project_name'));
+    $('#editStatus').val($(e.currentTarget).parent().parent().attr('status'));
+    $('#editPi_id').val($(e.currentTarget).attr('pi_id'));
     this.editProjectProtocolsTable = $('#editProjectProtocolsTable').DataTable({
  			drawCallback: function (settings) {
         $('#editProjectProtocolsTable thead').remove()
