@@ -156,11 +156,13 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               res_1.json({code:0, status:authResults.status});
               next();
             } else {
-              console.log(JSON.parse(body));
+              // Validate NIH provider later
               var userInfo = {
+                "Provider": JSON.parse(body).idp,
                 "FirstName": JSON.parse(body).given_name,
                 "LastName": JSON.parse(body).family_name,
-                "Email" :JSON.parse(body).email
+                "Email": JSON.parse(body).email,
+                "UserPrincipalName": JSON.parse(body).eppn
               }
               authResults.status = "Authenticated";
               authResults.userInfo = userInfo;
@@ -168,6 +170,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               var userFirstName = authResults['userInfo']['FirstName'];
               var userLastName = authResults['userInfo']['LastName'];
               var Email = authResults['userInfo']['Email'];
+              var UserPrincipalName = authResults['userInfo']['UserPrincipalName'];
+
               req.session.regenerate(function(err) {
                 if (err) {
                   return res_1.json({msg:err})
@@ -179,9 +183,10 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                 // console.log(mysqlConfig)
                 mysqlcon.getConnection((err, connection) => {
                   if(err) throw err;
-                  var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
                   
-                  // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  
                   // console.log('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;')
                   query.on('result',(row) => {
                         result_group_id.push(row['group_id']);
@@ -197,12 +202,13 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                           // req.session.NedID = NedID;
                           // req.session.Telephone = Telephone;
                           req.session.Email = Email;
-                          // req.session.UserPrincipalName = UserPrincipalName;
+                          req.session.UserPrincipalName = UserPrincipalName;
                           req.session.status = authResults.status;
                           req.session.group_id = result_group_id;
                           req.session.user_id = result_user_id;
-                          res_1.json({appVersion:version,code:1,status:req.session.status,FirstName:req.session.FirstName,
-                                LastName:req.session.LastName, Email:req.session.Email,Group_id:req.session.group_id,User_id:req.session.user_id});
+                          res_1.json({appVersion:version, code:1, status:req.session.status, FirstName:req.session.FirstName,
+                                LastName:req.session.LastName, Email:req.session.Email, UserPrincipalName:req.session.UserPrincipalName, 
+                                Group_id:req.session.group_id, User_id:req.session.user_id});
                           if (req.session.user_id[0]) {
                              eventTracking('Login', req.session.user_id[0]);
                           }
@@ -452,9 +458,10 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
       mysqlcon.getConnection((err, connection) => {
         if(err) throw err;
         // console.log('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;')
-        var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + req.session.LastName + '" AND first_name="' + req.session.FirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+        // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + req.session.LastName + '" AND first_name="' + req.session.FirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
                   
-        // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+        var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'", "'+ req.session.Email.substr(0,req.session.Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+
         query.on('result', (row) => {
           result_group_id.push(row['group_id']);
           result_user_id.push(row['id']);
@@ -466,7 +473,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
             req.session.group_id = result_group_id;
             req.session.user_id = result_user_id;
             res_1.json({appVersion:version,code:1,status:req.session.status,FirstName:req.session.FirstName,
-                        LastName:req.session.LastName,
+                        LastName:req.session.LastName, UserPrincipalName:req.session.UserPrincipalName,
                         Email:req.session.Email,Group_id:req.session.group_id,User_id:req.session.user_id});
             next();
           } else {
