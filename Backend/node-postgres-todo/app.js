@@ -144,7 +144,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           authResults.error = error;
           res_1.json({code:0, status:authResults.status});
           next();
-        } else {
+        }
+        if (response.statusCode == "200") {
           var id_token = JSON.parse(body).id_token
           var access_token = JSON.parse(body).access_token
           var data = {'access_token': access_token}
@@ -233,7 +234,11 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               });
             }
           })
-        }    
+        } else {
+          authResults.status = "Authentication failed";
+          res_1.json({code:0,status:authResults.status});
+          next();
+        }   
       });
 /*
       var RETURNED_TOKEN_FROM_LOGIN = req.headers.referer.substr(req.headers.referer.indexOf('?token=')).substring(7);
