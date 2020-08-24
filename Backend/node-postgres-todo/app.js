@@ -30,6 +30,8 @@ var identityKey = 'skey';
 const version = config.get('version');
 const doc_root = config.get('filesystemConfig.doc_root');
 const archive_root = config.get('filesystemConfig.doc_root');
+const intermediate_storage = config.get('filesystemConfig.intermediate_storage');
+
 const mysqlConfig = config.get('dbConfig.mysql');
 const postgresConfig = config.get('dbConfig.postgres');
 const ADURL = config.get('adConfig.url');
@@ -213,7 +215,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                              eventTracking('Login', req.session.user_id[0]);
                           }
                           // console.log('page refresh!!!!!!!!!');
-                          var workSpace = __dirname + '/routes/' + req.session.Email;
+                          var workSpace = intermediate_storage + req.session.Email;
                           if (fs.existsSync(workSpace)) {
                             rimraf(workSpace, function () { 
                               // console.log('rm -rf '+workSpace); 
@@ -440,7 +442,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
     } else {
       // console.log('has session');
       // console.log('page refresh!!!!!!!!!');
-      var workSpace = __dirname + '/routes/' + req.session.Email;
+      var workSpace = intermediate_storage + req.session.Email;
       // console.log(workSpace)
       if (fs.existsSync(workSpace)) {
         // console.log('remove workSpace')

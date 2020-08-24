@@ -9,12 +9,14 @@
 		    "port":3306,
 		    "user": "MIPortal",
 		    "password": "MIPortal_20181220",
-		    "database":"nci_production"
+		    "database":"nci_production",
+		    "timezone": "utc"
 		}
 	},
 	"filesystemConfig":{
 		"doc_root":"/mnt/scippy_docs/experiments/",
-		"archive_root":"/mnt/scippy_images/"
+		"archive_root":"/mnt/scippy_images/",
+		"intermediate_storage":"/mnt/downloads/"
 	},
 	"adConfig":{
 		"url":"https://services.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc?wsdl",

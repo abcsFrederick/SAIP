@@ -34,6 +34,8 @@ app.use(function(req, res, next) {
 
 const doc_root = config.get('filesystemConfig.doc_root');
 const archive_root = config.get('filesystemConfig.archive_root');
+const intermediate_storage = config.get('filesystemConfig.intermediate_storage');
+
 const mysqlConfig = config.get('dbConfig.mysql');
 const postgresConfig = config.get('dbConfig.postgres');
 
@@ -2378,7 +2380,7 @@ router.get('/api/v1/series_download/:pat_path/:study_path/:series_path/:series_d
         Validation is need to auth user who does not have access to particular project
     */
 
-    var workSpace = __dirname +'/'+req.session.UserPrincipalName;
+  var workSpace = intermediate_storage + req.session.UserPrincipalName;
   async.waterfall([
         function(callback){
             if (!fs.existsSync(workSpace+"/"+req.params.series_description+ ' ' +req.params.modality)){
@@ -3012,7 +3014,7 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
         let experiment_id=req.params.experiment_id
         let results=[];
         let allPatientsPath_result=[];
-        var workSpace = __dirname+'/'+req.session.UserPrincipalName;
+        var workSpace = intermediate_storage + req.session.UserPrincipalName;
         // console.log('in download')
         // console.log(mysqlcon)
         async.waterfall([
@@ -3478,7 +3480,7 @@ router.ws('/api/v1/study_download/:pat_path/:study_path/:pat_name/:study_descrip
             message: req.session.FirstName + ' ' + req.session.LastName
             + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/study_download` study: '+ req.params.study_description
         });
-        var workSpace = __dirname+'/'+req.session.UserPrincipalName;
+        var workSpace = intermediate_storage + req.session.UserPrincipalName;
         var series_pathArr= req.query.series_path.split(",");
         var series_descriptionArr= req.query.series_description.split(",");
         var modalityArr= req.query.modality.split(",");
@@ -3753,7 +3755,7 @@ router.ws('/api/v1/series_download/:pat_path/:study_path/:series_path/:series_de
             message: req.session.FirstName + ' ' + req.session.LastName
             + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/series_download` series: '+ req.params.series_description
         });
-        var workSpace = __dirname +'/'+req.session.UserPrincipalName;
+        var workSpace = intermediate_storage + req.session.UserPrincipalName;
         async.waterfall([
             function(callback){
                 logger.info({
