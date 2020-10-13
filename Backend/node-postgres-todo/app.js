@@ -1,14 +1,18 @@
+var URL = require('url').URL;
 var logger = require('./loggerConfig');
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
+// var favicon = require('serve-favicon');
 // var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var FileStore = require("session-file-store")(session);
 var routes = require('./routes/index');
-//var users = require('./routes/users');
+var projectsRoutes = require('./routes/projects');
+var experimentsRoutes = require('./routes/experiments');
+var request = require('request');
+
 var compression = require('compression');  
 var fs = require('fs-extra');
 var rimraf = require('rimraf');
@@ -26,11 +30,18 @@ var identityKey = 'skey';
 const version = config.get('version');
 const doc_root = config.get('filesystemConfig.doc_root');
 const archive_root = config.get('filesystemConfig.doc_root');
+const intermediate_storage = config.get('filesystemConfig.intermediate_storage');
+
 const mysqlConfig = config.get('dbConfig.mysql');
 const postgresConfig = config.get('dbConfig.postgres');
 const ADURL = config.get('adConfig.url');
 const ADServiceAccount = config.get('adConfig.account');
 const ADServicePassword = config.get('adConfig.password');
+
+const CLIENT_ID = config.get('Cilogon.id');
+const CLIENT_SECRET = config.get('Cilogon.secret');
+const CLIENT_REDIRECT_URL = config.get('Cilogon.redirect_uri');
+
 var testUsers = [{name:'test',password:'test123456789'}];
 var mysqlcon = mysql.createPool(mysqlConfig);
 
@@ -111,9 +122,134 @@ var eventTracking=function(type,user){
 function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK) {
   return NIH_Authenticate[SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK] ||
   (NIH_Authenticate[SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK] = function(req, res_1, next) {
-    if(req.session.status!='Authenticated'){
+    if (req.session.status !== 'Authenticated') {
       // console.log('create session');
-       // console.log(ADURL);
+      var refererURL = new URL(req.headers.referer);
+      var code = refererURL.searchParams.get('code');
+
+      // get token
+      var data = {'grant_type': 'authorization_code',
+            'code': code,
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'redirect_uri': CLIENT_REDIRECT_URL
+          }
+      var authResults = {
+          "status" : ""
+          ,"error" : null
+          ,"userInfo" : {}
+      }
+      // CILogon:
+      request.post({url: 'https://cilogon.org/oauth2/token', form: data}, function(error, response, body) {
+        if (error) {
+          authResults.status = "Authentication failed";
+          authResults.error = error;
+          res_1.json({code:0, status:authResults.status});
+          next();
+        }
+        if (response.statusCode == "200") {
+          var id_token = JSON.parse(body).id_token
+          var access_token = JSON.parse(body).access_token
+          var data = {'access_token': access_token}
+          request.post({url: 'https://cilogon.org/oauth2/userinfo', form: data}, function(error, response, body) {
+            if (error) {
+              authResults.status = "Authentication failed";
+              authResults.error = error;
+              res_1.json({code:0, status:authResults.status});
+              next();
+            } else {
+              // Validate NIH provider later
+              var userInfo = {
+                "Provider": JSON.parse(body).idp,
+                "FirstName": JSON.parse(body).given_name,
+                "LastName": JSON.parse(body).family_name,
+                "Email": JSON.parse(body).email,
+                "UserPrincipalName": JSON.parse(body).eppn
+              }
+              authResults.status = "Authenticated";
+              authResults.userInfo = userInfo;
+              // var auth = 200;
+              var userFirstName = authResults['userInfo']['FirstName'];
+              var userLastName = authResults['userInfo']['LastName'];
+              var Email = authResults['userInfo']['Email'];
+              var UserPrincipalName = authResults['userInfo']['UserPrincipalName'];
+
+              req.session.regenerate(function(err) {
+                if (err) {
+                  return res_1.json({msg:err})
+                }
+
+                var result_group_id = [];
+                var result_user_id = [];
+                var active;
+                // console.log(mysqlConfig)
+                mysqlcon.getConnection((err, connection) => {
+                  if(err) throw err;
+                  // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  
+                  var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  
+                  // console.log('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;')
+                  query.on('result',(row) => {
+                        result_group_id.push(row['group_id']);
+                        result_user_id.push(row['id']);
+                        active = row['active'];
+                  });
+                  query.on('end',() => {
+                        // console.log(active)
+                        connection.release();
+                        if (result_user_id.length && active) {
+                          req.session.FirstName = userFirstName;
+                          req.session.LastName = userLastName;
+                          // req.session.NedID = NedID;
+                          // req.session.Telephone = Telephone;
+                          req.session.Email = Email;
+                          req.session.UserPrincipalName = UserPrincipalName;
+                          req.session.status = authResults.status;
+                          req.session.group_id = result_group_id;
+                          req.session.user_id = result_user_id;
+                          res_1.json({appVersion:version, code:1, status:req.session.status, FirstName:req.session.FirstName,
+                                LastName:req.session.LastName, Email:req.session.Email, UserPrincipalName:req.session.UserPrincipalName, 
+                                Group_id:req.session.group_id, User_id:req.session.user_id});
+                          if (req.session.user_id[0]) {
+                             eventTracking('Login', req.session.user_id[0]);
+                          }
+                          // console.log('page refresh!!!!!!!!!');
+                          var workSpace = intermediate_storage + req.session.Email;
+                          if (fs.existsSync(workSpace)) {
+                            rimraf(workSpace, function () { 
+                              // console.log('rm -rf '+workSpace); 
+                              fs.mkdir(workSpace, 0o755);
+                            });
+                          } else {
+                            fs.mkdir(workSpace, 0o755);
+                          }
+                          next();
+                        } else {
+                          logger.error({
+                            level: 'error',
+                            message: userFirstName + ' ' + userLastName + ' with userID ' 
+                            + UserPrincipalName.substr(0,UserPrincipalName.indexOf('@')) 
+                            + ' or ' 
+                            + Email.substr(0,Email.indexOf('@')) 
+                            + ' is not on(or not active) the SAIP whitelist'
+                          });
+                          authResults.status = "Authentication failed";
+                          res_1.json({code:0, status: authResults.status});
+                          next();
+                        }
+                  });
+                });
+              });
+            }
+          })
+        } else {
+          authResults.status = "Authentication failed";
+          res_1.json({code:0,status:authResults.status});
+          next();
+        }   
+      });
+/*
       var RETURNED_TOKEN_FROM_LOGIN = req.headers.referer.substr(req.headers.referer.indexOf('?token=')).substring(7);
       var username = SERVICE_ACCOUNT_USERNAME;
       var password = SERVICE_ACCOUNT_PASSWORD;
@@ -155,12 +291,12 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               // console.log(type2msg);
               // console.log('149')
               var type3msg = ntlmclient.createType3Message(type2msg,options.username,options.password);
-          //    // console.log(token);
-          var data = '<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">' 
-          + '<s:Header><a:Action s:mustUnderstand="1">http://tempuri.org/ITokenConsumer/ConsumeToken</a:Action><a:MessageID>' 
-          + 'urn:uuid:urn:uuid:</a:MessageID><a:ReplyTo><a:Address>http://www.w3.org/2005/08/addressing/anonymous</a:Address></a:ReplyTo>' 
-          + '<a:To s:mustUnderstand="1">https://services.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc</a:To></s:Header>' 
-          + '<s:Body><ConsumeToken xmlns="http://tempuri.org/"><token>' + token + '</token></ConsumeToken></s:Body></s:Envelope>';
+              //    // console.log(token);
+              var data = '<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">' 
+              + '<s:Header><a:Action s:mustUnderstand="1">http://tempuri.org/ITokenConsumer/ConsumeToken</a:Action><a:MessageID>' 
+              + 'urn:uuid:urn:uuid:</a:MessageID><a:ReplyTo><a:Address>http://www.w3.org/2005/08/addressing/anonymous</a:Address></a:ReplyTo>' 
+              + '<a:To s:mustUnderstand="1">https://services.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc</a:To></s:Header>' 
+              + '<s:Body><ConsumeToken xmlns="http://tempuri.org/"><token>' + token + '</token></ConsumeToken></s:Body></s:Envelope>';
               setImmediate(function() {
                   httpreq.post(options.url, {
                       body: data,
@@ -302,51 +438,51 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           next();
         }
       });
-    }else{
+      */
+    } else {
       // console.log('has session');
       // console.log('page refresh!!!!!!!!!');
-      var workSpace = __dirname+'/routes/'+req.session.UserPrincipalName
+      var workSpace = intermediate_storage + req.session.Email;
       // console.log(workSpace)
-      if (fs.existsSync(workSpace)){
+      if (fs.existsSync(workSpace)) {
         // console.log('remove workSpace')
         // console.log(workSpace)
         rimraf(workSpace, function (err) { 
           // console.log('rm -rf '+workSpace); 
-          fs.mkdir(workSpace,0o755)
+          fs.mkdir(workSpace, 0o755);
         });
+      } else {
+        fs.mkdir(workSpace, 0o755);
       }
-      else{
-        fs.mkdir(workSpace,0o755)
-      }
-      let result_group_id=[];
-      let result_user_id=[];
+      let result_group_id = [];
+      let result_user_id = [];
       let active;
-      mysqlcon.getConnection((err,connection)=>{
+      mysqlcon.getConnection((err, connection) => {
         if(err) throw err;
         // console.log('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;')
-        var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID = "'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'")as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
-        query.on('result',(row)=>{
+        // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + req.session.LastName + '" AND first_name="' + req.session.FirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+                  
+        var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+req.session.UserPrincipalName.substr(0,req.session.UserPrincipalName.indexOf('@'))+'", "'+ req.session.Email.substr(0,req.session.Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
 
-              result_group_id.push(row['group_id']);
-              result_user_id.push(row['id']);
-              active = row['active'];
-
+        query.on('result', (row) => {
+          result_group_id.push(row['group_id']);
+          result_user_id.push(row['id']);
+          active = row['active'];
         });
-        query.on('end',()=>{
-              // console.log(active)
-              connection.release();
-              if(result_user_id.length&&active){
-                req.session.group_id = result_group_id;
-                req.session.user_id = result_user_id;
-                res_1.json({appVersion:version,code:1,status:req.session.status,FirstName:req.session.FirstName,
-                            LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
-                            Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id});
-                next();
-                }else{
-                  authResults.status = "User Inactived";
-                  res_1.json({code:2,status:authResults.status});
-                  next();
-                }
+        query.on('end', () => {
+          connection.release();
+          if (result_user_id.length && active) {
+            req.session.group_id = result_group_id;
+            req.session.user_id = result_user_id;
+            res_1.json({appVersion:version,code:1,status:req.session.status,FirstName:req.session.FirstName,
+                        LastName:req.session.LastName, UserPrincipalName:req.session.UserPrincipalName,
+                        Email:req.session.Email,Group_id:req.session.group_id,User_id:req.session.user_id});
+            next();
+          } else {
+            authResults.status = "User Inactived";
+            res_1.json({code:2, status:authResults.status});
+            next();
+          }
         });
       });
     }
@@ -621,7 +757,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, './public')));
 
 app.use('/', routes);
-//app.use('/users', users);
+app.use('/api/v1/projects', projectsRoutes);
+app.use('/api/v1/experiments', experimentsRoutes);
 
 
 app.get('/mysql',function(req,res,next){
@@ -655,31 +792,31 @@ app.get('/accessRequest',request_Access(ADServiceAccount,ADServicePassword,isAut
 
 });
 app.get('/',NIH_Authenticate(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
+});
 
 // Fake session
-/*app.get('/',function(req,res,next){
+// app.get('/',function(req,res,next){
+//   req.session.regenerate(function(err){
+//     if(err){
+//       return res_1.json({msg:err})
+//     }
+//     req.session.FirstName = 'Tianyi';
+//     req.session.LastName = 'Miao';
+//     req.session.NedID = 123;
+//     req.session.Telephone = 123;
+//     req.session.Email = 123;
+//     req.session.UserPrincipalName = 123;
+//     req.session.status = 'Authenticated';
+//     req.session.group_id = [7];
+//     req.session.user_id = [5];
 
-req.session.regenerate(function(err){
-            if(err){
-              return res_1.json({msg:err})
-            }
-            req.session.FirstName = 'Tianyi';
-            req.session.LastName = 'Miao';
-            req.session.NedID = 123;
-            req.session.Telephone = 123;
-            req.session.Email = 123;
-            req.session.UserPrincipalName = 123;
-            req.session.status = 'Authenticated';
-            req.session.group_id = [1];
-            req.session.user_id = [5];
+//     // console.log(req.session);
+//     return res.json({appVersion:version, code:1,status:req.session.status,FirstName:req.session.FirstName,
+//                       LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
+//                       Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id})
+//   });
+// });
 
-            // console.log(req.session);
-            return res.json({code:1,status:req.session.status,FirstName:req.session.FirstName,
-                              LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
-                              Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id})
-});
-*/
-});
 
 // app.post('/mockLogin',function(req,res,next){
 //   var sess = req.session;

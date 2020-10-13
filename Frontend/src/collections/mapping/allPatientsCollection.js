@@ -1,4 +1,4 @@
-import Backbone from "backbone";
+import Backbone from 'backbone';
 import allPatients_model from '../../models/mapping/allPatients';
 var allPatients = Backbone.Collection.extend({
 	model:allPatients_model,
@@ -6,7 +6,7 @@ var allPatients = Backbone.Collection.extend({
 		this.domain = setting.domain;
 	},
 	url:function(){
-		return this.domain+'api/v1/mappingAll';
+		return this.domain + 'api/v1/mappingAll';
 	}
 });
 

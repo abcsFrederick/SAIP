@@ -11,6 +11,8 @@ if admin
 					th Protocal(s)
 					th Created
 					th Project Status
+					th Options
+	//- .removeErr(data-toggle='tooltip' data-placement='right' title='Please delete all experiments under this project first')
 else
 	#table-wrapper(style="width:100hv;border: solid 2px;padding: 20px;border-color:lightgray;border-radius:5px").col-md-12
 		table#projects_overview.table.table-hover
@@ -60,97 +62,15 @@ if admin
 											option 
 											each pi in PI
 												option(value=pi.id) #{pi.first_name},#{pi.last_name}
-									//- 	.input-group
-									//- 		Label#pi_id(piid=LoginAdminUser.User_id[0]) #{LoginAdminUser.FirstName},#{LoginAdminUser.LastName}
-									//- select#pi_id.form-control(required)
-									//- 	option 
-									//- 	each pi in PI
-									//- 		option(value=pi.id) #{pi.first_name},#{pi.last_name}
 								.col-md-12(style='margin: 5px;')
 									label.col-md-5.control-label Protocols:
 									.col-md-7.inputGroupContainer
 										table#ProjectProtocolsTable.table.table-hover
-						
-							
-						//.col-md-3.inputGroupContainer
-						
-
-						//- label.col-md-3.control-label Requester:
-						//- .col-md-3.inputGroupContainer
-						//- 	.input-group
-						//- 		span.input-group-addon(style='font-size:15px')
-						//- 			i.fas.fa-user-tag
-						//- 		input#requester.form-control(required)
-
-						//- label.col-md-3.control-label Proposal:
-						//- .col-md-3.inputGroupContainer
-						//- 	.input-group(style='width:100%')
-						//- 		textarea#proposal.form-control(style='height:100px' required)
-							
-								
 
 						.col-md-6
 							//.seperation(style='height:2px;background-color:#337ab7;font-size:10px;margin-top: 15px;')
 							label(style='font-size: 20px;margin-top: 15px;margin-bottom: 15px;') Option fields
 
-						//- .col-md-6
-						//- 	label.col-md-6.control-label Authors:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			span.input-group-addon
-						//- 				i.fas.fa-user-edit
-						//- 			input#authors.form-control
-						//- 	label.col-md-6.control-label Collaborator:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			span.input-group-addon
-						//- 				i.fa.fa-users
-						//- 			input#collaborator.form-control
-							
-						//- 	label.col-md-6.control-label Collab Grant Num:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			span.input-group-addon
-						//- 				i.fab.fa-slack-hash
-						//- 			input#collab_grant_num.form-control
-						//- 	label.col-md-6.control-label Fund Project Id:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			span.input-group-addon
-						//- 				i.fab.fa-slack-hash
-						//- 			input#fund_project_id.form-control
-
-						//- 	label.col-md-6.control-label SRAC Number:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			span.input-group-addon
-						//- 				i.fab.fa-slack-hash
-						//- 			input#SRAC_number.form-control
-						//- 	label.col-md-6.control-label SRAC File:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			input#SRAC_file.form-control(type='file' name='SRAC_file' multiple)
-
-						//- 	label.col-md-6.control-label Est costs:
-						//- 	.col-md-6.inputGroupContainer
-						//- 		.input-group
-						//- 			span.input-group-addon
-						//- 				i.fas.fa-dollar-sign
-						//- 			input#est_costs.form-control
-						//- 	//label.col-md-3.control-label Probe:
-						//- 	//.col-md-3.inputGroupContainer
-						//- 	//	.input-group(style='width=100%')
-						//- 	//		select#probe_id.form-control
-						//- 	//			option 
-						//- 	//			each probe in Probes
-						//- 	//				option(value=probe.id) #{probe.name}
-
-						//- 	//label.col-md-3.control-label Miportal Id:
-						//- 	//.col-md-3.inputGroupContainer
-						//- 	//	.input-group
-						//- 	//		span.input-group-addon
-						//- 	//			i.fab.fa-slack-hash
-						//- 	//		input#miportal_id.form-control
 						.col-md-6
 							.col-md-12
 								label.col-md-2.control-label Selected Users:
@@ -170,7 +90,51 @@ if admin
 												th Premission
 
 
-
 			.modal-footer
 				button.cancel.btn.btn-default Cancel
 				button#create_project.btn.btn-success Submit
+
+
+	#editProject.modal
+		.modal-content(style='width:60%;left:20%;top:10%')
+			.modal-header
+				span.close &times;
+				h2 Edit a project
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						.col-md-12
+							.col-md-12(style='margin: 5px;')
+								label.col-md-5.control-label Project name:
+								.col-md-7.inputGroupContainer
+									.input-group(style='width: 100%;')
+										span.input-group-addon
+											i.fas.fa-archive
+										input#editProject_name.form-control(type="text" style='font-size:25px' required)
+							.col-md-12(style='margin: 5px;')
+								label.col-md-5.control-label Status:
+								.col-md-7.inputGroupContainer
+									.input-group(style='width: 60%;')
+										span.input-group-addon
+											i.fa.fa-flag
+										select#editStatus.form-control(required)
+											option(value='A') Active
+											option(value='I') Inactive
+							.col-md-12(style='margin: 5px;')
+								label.col-md-5.control-label PI name:
+								.col-md-7.inputGroupContainer
+									select#editPi_id.form-control(required)(style='width: 60%;')
+										option 
+										each pi in PI
+											option(value=pi.id) #{pi.first_name},#{pi.last_name}
+							.col-md-12(style='margin: 5px;')
+								label.col-md-5.control-label Protocols:
+								.col-md-7.inputGroupContainer
+									table#editProjectProtocolsTable.table.table-hover
+
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#edit_project.btn.btn-success Update
+	#deleteProjectAlert.modal
