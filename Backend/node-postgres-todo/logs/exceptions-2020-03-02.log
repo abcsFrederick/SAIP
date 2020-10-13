@@ -1,0 +1,48 @@
+ERROR: 2020-03-02T14:48:54.209Z uncaughtException: Cannot read property 'statusCode' of undefined
+TypeError: Cannot read property 'statusCode' of undefined
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/app.js:192:17
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:473:16
+    at next (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:5329:29)
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:969:16
+    at finalCallback (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:98:7)
+    at ClientRequest.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:428:5)
+    at ClientRequest.emit (events.js:321:20)
+    at TLSSocket.socketErrorListener (_http_client.js:424:9)
+    at TLSSocket.emit (events.js:321:20)
+    at emitErrorNT (internal/streams/destroy.js:84:8)
+ERROR: 2020-03-02T14:49:14.382Z uncaughtException: Cannot read property 'statusCode' of undefined
+TypeError: Cannot read property 'statusCode' of undefined
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/app.js:192:17
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:473:16
+    at next (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:5329:29)
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:969:16
+    at finalCallback (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:98:7)
+    at ClientRequest.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:428:5)
+    at ClientRequest.emit (events.js:321:20)
+    at TLSSocket.socketErrorListener (_http_client.js:424:9)
+    at TLSSocket.emit (events.js:321:20)
+    at emitErrorNT (internal/streams/destroy.js:84:8)
+ERROR: 2020-03-02T14:49:54.193Z uncaughtException: Cannot read property 'statusCode' of undefined
+TypeError: Cannot read property 'statusCode' of undefined
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/app.js:192:17
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:473:16
+    at next (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:5329:29)
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:969:16
+    at finalCallback (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:98:7)
+    at ClientRequest.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:428:5)
+    at ClientRequest.emit (events.js:321:20)
+    at TLSSocket.socketErrorListener (_http_client.js:424:9)
+    at TLSSocket.emit (events.js:321:20)
+    at emitErrorNT (internal/streams/destroy.js:84:8)
+ERROR: 2020-03-02T14:50:15.167Z uncaughtException: Cannot read property 'statusCode' of undefined
+TypeError: Cannot read property 'statusCode' of undefined
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node-postgres-todo/app.js:192:17
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:473:16
+    at next (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:5329:29)
+    at /Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/async/dist/async.js:969:16
+    at finalCallback (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:98:7)
+    at ClientRequest.<anonymous> (/Users/miaot2/html_learning/SAIP/SAIP_pro/Backend/node_modules/httpreq/lib/httpreq.js:428:5)
+    at ClientRequest.emit (events.js:321:20)
+    at TLSSocket.socketErrorListener (_http_client.js:424:9)
+    at TLSSocket.emit (events.js:321:20)
+    at emitErrorNT (internal/streams/destroy.js:84:8)
