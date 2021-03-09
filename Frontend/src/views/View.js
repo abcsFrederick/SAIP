@@ -9,6 +9,9 @@ var View = Backbone.View.extend({
     if (this.onClose) {
       this.onClose()
     }
+  },
+  stringFilter: function (str) {
+    return str.replace(/[%/^]/g, '_').replace(/[#]/g, 'No.');
   }
 })
 
