@@ -1,9 +1,9 @@
 {
-	"version":"1.5.1",
+	"version":"1.5.2",
   "mode":"development",
   "debugMode":true,
 	"dbConfig":{
-		"postgres":"postgres://miaot2:luying0325@ivg-webdev:5432/miaot2",
+		"postgres":"postgres://scippy_dev:scippy_dev_20210308@frsivg-mip01d:5432/scippy",
 		// "postgres":"postgres://scippy_readonly:cardio372@fr-s-ivg-mip-s:5432/scippy",
 		// "mysql":{
 		//   	"host":"ivg-webdev",
@@ -13,10 +13,10 @@
 		//     "database":"SAIP"
 		// }
   "mysql":{
-        "host": "fr-s-mysql-4.ncifcrf.gov",
+        "host": "fsitgl-mysql01d.ncifcrf.gov", // "fr-s-mysql-4.ncifcrf.gov" retired
         "port":3306,
-        "user": "miaot2",
-        "password": "Luying_0325",
+        "user": "MIPortal",
+        "password": "MIPortal_20181220",
         "database":"nci_production",
         "timezone": "utc"
     }
