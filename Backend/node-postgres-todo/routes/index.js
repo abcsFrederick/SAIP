@@ -150,7 +150,13 @@ var zipFolderWithProgress = function(webSocket, srcFolder, zipFilePath, totalSiz
     zipArchive.on('progress', function() {
         let prettyCurrentSize = bytesToSize(zipArchive.pointer());
         var percent = 100 - ((totalSize - zipArchive.pointer()) / totalSize) * 100;
-        webSocket.send(JSON.stringify({'err':'2','msg':' ' + prettyCurrentSize + '/' + prettyTotalSize + '('+parseInt(percent)+'%)'}));
+        // check if webSocket is alive
+        if (webSocket.readyState === 1) {
+            webSocket.send(JSON.stringify({'err':'2','msg':' ' + prettyCurrentSize + '/' + prettyTotalSize + '('+parseInt(percent)+'%)'}));  
+        } else {
+            fs.unlink(zipFilePath);
+            callback();
+        }
     });
     zipArchive.pipe(output);
 
@@ -2772,117 +2778,97 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                         callback(null,allPatientsPath_result)
                     });
                 });
-            }],function(err,results){
-                // console.log(results)
-                // let cleanUp = false;
-                                logger.info({
-                                    level: 'info',
-                                    message: req.session.FirstName + ' ' + req.session.LastName
-                                    + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                    +'\n[STEP 1]: copy files from scippy image archive'
-                                });
+            }],function(err, results) {
+                logger.info({
+                    level: 'info',
+                    message: req.session.FirstName + ' ' + req.session.LastName
+                             + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                             +'\n[STEP 1]: copy files from scippy image archive'
+                });
                 async.waterfall([
                   function(callback){
                     if (!fs.existsSync(workSpace)){
-                      fs.mkdir(workSpace,0o755,function(){
-                        if (!fs.existsSync(workSpace+"/"+req.params.experiments_name)){
-                          // console.log('-------------------in if------------------')
-                          fs.mkdir(workSpace+"/"+req.params.experiments_name,0o755, function(err){
-                            // console.log('start cp')
-
-                            let ifAllCopied=[];
-                            let notExistFolder = 0;
-                            for(let a=0;a<results.length;a++){
-                              if (fs.existsSync(archive_root+results[a][1])){
-                                // console.log(results[a][1])
-                                ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
-                                  ifAllCopied.push(a)
-                                  if (err) {
-                                    // ifAllCopied.push(a)
-                                    if(err[0].code === 'ENOSPC'){
-                                      ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
-                                      ws.close();
-                                                                            logger.error({
-                                                                                level: 'error',
-                                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                                + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                            });
-                                      throw err;
+                        fs.mkdir(workSpace, 0o755, function() {
+                            if (!fs.existsSync(workSpace + "/" + req.params.experiments_name)) {
+                                // console.log('-------------------in if------------------')
+                                fs.mkdir(workSpace + "/" + req.params.experiments_name, 0o755, function(err) {
+                                    let ifAllCopied = [];
+                                    let notExistFolder = 0;
+                                    for (let a = 0; a < results.length; a++) {
+                                        if (fs.existsSync(archive_root+results[a][1])){
+                                            ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
+                                                ifAllCopied.push(a)
+                                                if (err) {
+                                                    // ifAllCopied.push(a)
+                                                    if(err[0].code === 'ENOSPC'){
+                                                        ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
+                                                        ws.close();
+                                                        logger.error({
+                                                            level: 'error',
+                                                            message: req.session.FirstName + ' ' + req.session.LastName
+                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                                        });
+                                                        throw err;
+                                                    }
+                                                }
+                                                if ((ifAllCopied.length + notExistFolder) == results.length) {
+                                                    callback(null, results);
+                                                }
+                                            });
+                                        } else {
+                                            logger.warn({
+                                                level: 'warn',
+                                                message: req.session.FirstName + ' ' + req.session.LastName
+                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                                + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                            });
+                                            /*There is a chance that folder in scippy_image does not exist*/
+                                            notExistFolder++;
+                                        }
                                     }
-                                  }
-                                  // else{
-                                  //     ifAllCopied.push(a);
-                                  // }
-                                  
-                                  // console.log(archive_root+results[a][1]+ 'copies done!');
-                                  // console.log(results.length-1);
-                                  // console.log(a);
-                                  if((ifAllCopied.length+notExistFolder)==results.length){
-
-                                    callback(null,results);
-                                  }
-                                });
-                              }else{
-                                                                logger.warn({
-                                                                    level: 'warn',
-                                                                    message: req.session.FirstName + ' ' + req.session.LastName
-                                                                    + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                    + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                                });
-                                /*There is a chance that folder in scippy_image does not exist*/
-                                notExistFolder++;
-                              }
-                            }
-                          })
-                        }else{
-                          let ifAllCopied=[];
-                          let notExistFolder = 0;
-                          // console.log('-------------------in else------------------')
-                          for(let a=0;a<results.length;a++){
-                            if (fs.existsSync(archive_root+results[a][1])){
-                              ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
-                                ifAllCopied.push(a)
-                                if (err) {
-                                    // ifAllCopied.push(a)
-                                //  rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name); });
-                                  if(err[0].code === 'ENOSPC'){
-                                    rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name);
-                                      ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
-                                      ws.close();
-                                                                            logger.error({
-                                                                                level: 'error',
-                                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                                + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                            });
-                                      throw err
-                                    });
-                                  }
+                                })
+                            } else {
+                                let ifAllCopied = [];
+                                let notExistFolder = 0;
+                                // console.log('-------------------in else------------------')
+                                for (let a = 0; a < results.length; a++) {
+                                    if (fs.existsSync(archive_root+results[a][1])) {
+                                        ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
+                                            ifAllCopied.push(a)
+                                            if (err) {
+                                                if (err[0].code === 'ENOSPC') {
+                                                    rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name);
+                                                        ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
+                                                        ws.close();
+                                                        logger.error({
+                                                            level: 'error',
+                                                            message: req.session.FirstName + ' ' + req.session.LastName
+                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                                        });
+                                                        throw err
+                                                    });
+                                                }
+                                            }
+                                            if ((ifAllCopied.length + notExistFolder) == results.length) {
+                                                callback(null, results);
+                                            }
+                                        });
+                                    } else {
+                                        logger.warn({
+                                            level: 'warn',
+                                            message: req.session.FirstName + ' ' + req.session.LastName
+                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                            + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                        });
+                                        /*There is a chance that folder in scippy_image does not exist*/
+                                        notExistFolder++;
+                                    }
                                 }
-                                // else{
-                                //     ifAllCopied.push(a);
-                                // }
-                                // console.log(archive_root+results[a][1]+ ' copies done!');
-                                if((ifAllCopied.length+notExistFolder)==results.length){
-                                  callback(null,results);
-                                }
-                              });
-                            }else{
-                                                            logger.warn({
-                                                                level: 'warn',
-                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                            });
-                              /*There is a chance that folder in scippy_image does not exist*/
-                              notExistFolder++;
-                            }
-                          }
-                        }  
-                      })
-                        
-                    }else{
+                            }  
+                        }) 
+                    } else {
                       if (!fs.existsSync(workSpace+"/"+req.params.experiments_name)){
                        // console.log('-------------------in if within else------------------')
                         fs.mkdir(workSpace+"/"+req.params.experiments_name,0o755, function(err){
@@ -2900,12 +2886,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                   if(err[0].code === 'ENOSPC'){
                                     ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
                                     ws.close();
-                                                                        logger.error({
-                                                                            level: 'error',
-                                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                        });
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                        + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                    });
                                     throw err;
                                   }
                                 }
@@ -2917,12 +2903,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                 }
                               });
                             }else{
-                                                            logger.warn({
-                                                                level: 'warn',
-                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                            });
+                                logger.warn({
+                                    level: 'warn',
+                                    message: req.session.FirstName + ' ' + req.session.LastName
+                                    + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                    + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                });
                               /*There is a chance that folder in scippy_image does not exist*/
                               notExistFolder++;
                             }
@@ -2943,12 +2929,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                   rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name);
                                     ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
                                     ws.close();
-                                                                        logger.error({
-                                                                            level: 'error',
-                                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                        });
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                        + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                    });
                                     throw err
                                   });
                                 }
@@ -2962,12 +2948,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                               }
                             });
                           }else{
-                                                        logger.warn({
-                                                            level: 'warn',
-                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                            + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                        });
+                            logger.warn({
+                                level: 'warn',
+                                message: req.session.FirstName + ' ' + req.session.LastName
+                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                + ' \n' + archive_root+results[a][1] + 'is not exist'
+                            });
                             /*There is a chance that folder in scippy_image does not exist*/
                             notExistFolder++;
                           }
@@ -2975,30 +2961,29 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                       }  
                     }
                   },function(arg,callback){
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                            +'\n[STEP 2]: change experiment/patients/studies/series folder name'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                        +'\n[STEP 2]: change experiment/patients/studies/series folder name'
+                    });
                     // console.log('-----------------in change folders name-----------------')
                     // console.log(arg);
-                    let pat_nameDisplay=[];
-                    let pat_pathDisplay=[];
-                    let study_nameDisplay=[];
-                    let study_pathDisplay=[];
-                    let series_nameDisplay=[];
-                    let series_pathDisplay=[];
-                    let modalityDisplay=[];
-                    for(let a=0;a<arg.length;a++)
-                    {
-                      pat_nameDisplay.push(arg[a][0])
-                      pat_pathDisplay.push(arg[a][1])
-                      study_nameDisplay.push(arg[a][2])
-                      study_pathDisplay.push(arg[a][3])
-                      series_nameDisplay.push(arg[a][4])
-                      series_pathDisplay.push(arg[a][5])
-                      modalityDisplay.push(arg[a][6])
+                    let pat_nameDisplay = [];
+                    let pat_pathDisplay = [];
+                    let study_nameDisplay = [];
+                    let study_pathDisplay = [];
+                    let series_nameDisplay = [];
+                    let series_pathDisplay = [];
+                    let modalityDisplay = [];
+                    for(let a = 0; a < arg.length; a++) {
+                      pat_nameDisplay.push(arg[a][0]);
+                      pat_pathDisplay.push(arg[a][1]);
+                      study_nameDisplay.push(arg[a][2]);
+                      study_pathDisplay.push(arg[a][3]);
+                      series_nameDisplay.push(arg[a][4]);
+                      series_pathDisplay.push(arg[a][5]);
+                      modalityDisplay.push(arg[a][6]);
                     }
                     let total=0;
                     function changeFoldersName(currentPath) {
@@ -3024,15 +3009,15 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                               // console.log(study_nameDisplay[study_pathDisplay.indexOf(study_path_str)])
                               fs.moveSync(curFile,curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)], function (err) {
                                 if (err) {
-                                                                    logger.error({
-                                                                        level: 'error',
-                                                                        message: req.session.FirstName + ' ' + req.session.LastName
-                                                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
-                                                                        + curFile + ' to: ' + curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)]
-                                                                        + '\n' + err
-                                                                    });
-                                                                    throw err;
-                                                                }
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
+                                        + curFile + ' to: ' + curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)]
+                                        + '\n' + err
+                                    });
+                                    throw err;
+                                }
                                   
                               });
                               newFile = curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)];
@@ -3048,51 +3033,36 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                               fs.moveSync(curFile,curFile + ' '+ series_nameDisplay[series_pathDisplay.indexOf(series_path_str)]
                                 + ' ' +modalityDisplay[series_pathDisplay.indexOf(series_path_str)], function (err) {
                                 if (err) {
-                                                                    logger.error({
-                                                                        level: 'error',
-                                                                        message: req.session.FirstName + ' ' + req.session.LastName
-                                                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
-                                                                        + curFile + ' to: ' + curFile + ' '+ series_nameDisplay[series_pathDisplay.indexOf(series_path_str)]
-                                                                        + ' ' +modalityDisplay[series_pathDisplay.indexOf(series_path_str)]
-                                                                        + '\n' + err
-                                                                    });
-                                                                    throw err;
-                                                                }
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
+                                        + curFile + ' to: ' + curFile + ' '+ series_nameDisplay[series_pathDisplay.indexOf(series_path_str)]
+                                        + ' ' +modalityDisplay[series_pathDisplay.indexOf(series_path_str)]
+                                        + '\n' + err
+                                    });
+                                    throw err;
+                                }
                               });
                             }
-                            
-                            // let series_path_str = curFile.substring(curFile.lastIndexOf('/')+1);
-                            // console.log(series_descriptionArr[series_pathArr.indexOf(series_path_str)]);
-                            // console.log(modalityArr[series_pathArr.indexOf(series_path_str)]);
-                            // console.log(series_descriptionArr[series_pathArr.indexOf(series_path_str)]+' '+modalityArr[series_pathArr.indexOf(series_path_str)]);
-                            // fs.moveSync(curFile,curFile + ' '+ series_descriptionArr[series_pathArr.indexOf(series_path_str)]+' '+modalityArr[series_pathArr.indexOf(series_path_str)], function (err) {
-                            //     if (err) throw err;
-                            // });
-                            // total+=1;
-                            // // console.log(files.length)
-                            // // console.log(total)
-                            // // if (total === files.length){
-                            // //     callback(null,total);
-                            // // }
-                            // curFile = curFile + ' '+ series_descriptionArr[series_pathArr.indexOf(series_path_str)]+' '+modalityArr[series_pathArr.indexOf(series_path_str)];
                           }
                         }
                       }
                     }
                     changeFoldersName(workSpace+'/'+req.params.experiments_name);
                     logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') successfully change all folders name'
-                                        });
-                                        callback(null,total);
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') successfully change all folders name'
+                    });
+                    callback(null,total);
                   },function(arg,callback){
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                            +'\n[STEP 3]: add .dcm extension'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                        +'\n[STEP 3]: add .dcm extension'
+                    });
                     let total=0;
                     function walkDir(currentPath) {
                       let files = fs.readdirSync(currentPath);
@@ -3114,42 +3084,45 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                       }
                     };
                     walkDir(workSpace+'/'+req.params.experiments_name);
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') successfully add all .dcm extension'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') successfully add all .dcm extension'
+                    });
                     callback(null,total);
                   }],function(err,results){
                     // console.log('start zip');
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                            +'\n[STEP 4]: zip experiment folder'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                        +'\n[STEP 4]: zip experiment folder'
+                    });
                     directorySize(workSpace+"/"+req.params.experiments_name,
                       function(err, size){
                         zipFolderWithProgress(ws, workSpace+"/"+req.params.experiments_name, workSpace+"/"+req.params.experiments_name+".zip", size/2, function(err) {
                           if(err) {
                             rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name); });
                             // console.log(err);
-                                                        logger.error({
-                                                            level: 'error',
-                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                            + '(' + req.session.user_id[0] + ') unsuccessfully zip experiment folder to '
-                                                            + workSpace+"/"+req.params.experiments_name+".zip"
-                                                            + '\n' + err
-                                                        });
+                            logger.error({
+                                level: 'error',
+                                message: req.session.FirstName + ' ' + req.session.LastName
+                                + '(' + req.session.user_id[0] + ') unsuccessfully zip experiment folder to '
+                                + workSpace+"/"+req.params.experiments_name+".zip"
+                                + '\n' + err
+                            });
                           } else {
                             // console.log('EXCELLENT, zip done');
-                                                        logger.info({
-                                                            level: 'info',
-                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                            + '(' + req.session.user_id[0] + ') successfully zip experiment folder to '
-                                                            + workSpace+"/"+req.params.experiments_name+".zip"
-                                                        });
-                            ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.experiments_name+".zip"}));
+                            logger.info({
+                                level: 'info',
+                                message: req.session.FirstName + ' ' + req.session.LastName
+                                + '(' + req.session.user_id[0] + ') successfully zip experiment folder to '
+                                + workSpace+"/"+req.params.experiments_name+".zip"
+                            });
+                            // Check if websocket is still alive
+                            if (ws.readyState === 1) { 
+                                ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.experiments_name+".zip"}));
+                            }
                             rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name); });
                             // eventTracking('Experiment',req.session.user_id[0]);
                             ws.close();
@@ -3421,7 +3394,10 @@ router.ws('/api/v1/study_download/:pat_path/:study_path/:pat_name/:study_descrip
                                     + '(' + req.session.user_id[0] + ') successfully zip study folder to '
                                     + workSpace+"/"+req.params.pat_name+".zip"
                                 });
-                                ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.pat_name+".zip"}));
+                                // Check if websocket is still alive
+                                if (ws.readyState === 1) { 
+                                    ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.pat_name+".zip"}));
+                                }
                                 rimraf(workSpace+"/"+req.params.pat_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.pat_name); });
                                 // callback(null,workSpace+'/'+req.params.pat_name);
                                 ws.close();
@@ -3634,7 +3610,10 @@ router.ws('/api/v1/series_download/:pat_path/:study_path/:series_path/:series_de
                                     + workSpace+"/"+req.params.series_description+ ' ' +req.params.modality+".zip"
                                 });
                                 // console.log('EXCELLENT, zip done');
-                                ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.series_description+ ' ' +req.params.modality+".zip"}));
+                                // Check if websocket is still alive
+                                if (ws.readyState === 1) { 
+                                    ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.series_description+ ' ' +req.params.modality+".zip"}));
+                                }
                                 rimraf(workSpace+"/"+req.params.series_description+ ' ' +req.params.modality, function () { console.log('rm -rf '+workSpace+"/"+req.params.series_description+ ' ' +req.params.modality); });
                                 // callback(null,workSpace+'/'+req.params.pat_name);
                                 ws.close();
