@@ -28,7 +28,8 @@ var controlPanel = View.extend({
     'click .probe': 'probesRender',
     'click .statistics': 'statistics',
     'click .accessRequest': 'accessRequest',
-    'click .about': 'about'
+    'click .about': 'about',
+    'click .TESTWS': 'TESTWS'
   },
   initialize (setting) {
     this.is_admin = setting.admin
@@ -200,7 +201,16 @@ var controlPanel = View.extend({
       domain: this.domain
     })
     $('#PUMA').html(this.aboutView.el)
-  }
+  },
+  // TESTWS (e) {
+  //   var ws = new WebSocket(this.domain_ws + 'api/v1/testWS');
+  //   ws.onopen = function () {
+  //     console.log('websocket is connected ...');
+  //   }
+  //   ws.onmessage = function (ev) {
+  //     console.log(ev.data);
+  //   }
+  // }
 })
 
 export default controlPanel

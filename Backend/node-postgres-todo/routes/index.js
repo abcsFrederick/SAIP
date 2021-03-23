@@ -23,14 +23,6 @@ var config = require('config');
 
 
 require('express-ws')(router);
-// var ws = require('./ws')
-/*
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-*/
 
 const doc_root = config.get('filesystemConfig.doc_root');
 const archive_root = config.get('filesystemConfig.archive_root');
@@ -42,19 +34,17 @@ const postgresConfig = config.get('dbConfig.postgres');
 router.use(fileUpload());
 router.use(validator({
     customValidators: {
-     isArrayOfInt: function(value) {
-        return Array.isArray(value)&&Number.isInteger(parseInt(value[0]));
-     }}
+        isArrayOfInt: function (value) {
+            return Array.isArray(value) && Number.isInteger(parseInt(value[0]));
+        }}
 }));
-router.use( cors({credentials:true,origin:['http://fr-s-ivg-ssr-d1:8080',
+router.use(cors({credentials:true,origin:['http://fr-s-ivg-ssr-d1:8080',
                                            'http://ivg-boxx:8082',
-                                           'http://localhost:8888',
+                                           'http://localhost:8000',
                                            'http://localhost:9876',                     //for jasmine testing
                                  'http://localhost:8889',
                                            'http://frsivg-mip01p:8888',
                                            'https://frsivg-mip01p.ncifcrf.gov/']}));  //for cross domin with cookie credientials
-
-//router.all('*', cors());
 /* GET home page. */
 router.get('/api/v1/scippy/', function(req, res) {
   res.render('index', { title: 'Express' });
@@ -62,299 +52,52 @@ router.get('/api/v1/scippy/', function(req, res) {
 
 
 const pg = require('pg');
-//const connectionString = process.env.DATABASE_URL || 'postgres://scippy_readonly:cardio372@fr-s-ivg-mip-s:5432/scippy';
-//const connectionString = process.env.DATABASE_URL || 'postgres://miaot2:luying0325@localhost:5432/miaot2';
-//const connectionString = process.env.DATABASE_URL || 'postgres://miaot2:luying0325@ivg-boxx:5432/miaot2';
+
+pg.types.setTypeParser(1114, function(stringValue) {
+  return new Date(Date.parse(stringValue + "+0000"));
+});
+
 connectionString = process.env.DATABASE_URL || postgresConfig;
 var session = require('express-session');
 var identityKey = 'skey';
 var FileStore = require("session-file-store")(session);
 
 router.use(session({
-  name:identityKey,
-  secret:'tymiao',
-  store:new FileStore,
-  saveUninitialized:false,
-  resave:false,
-  cookie:{
-    maxAge:2*60*60*1000,
-    httpOnly: true,
-    secure: true
-  }
+    name: identityKey,
+    secret: 'tymiao',
+    store: new FileStore,
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        maxAge: 2*60*60*1000,
+        httpOnly: true,
+        secure: true
+    }
 }));
 
-var isAdmin = function(req,res,next){
-//    console.log('in isAuth');
-    if(req.session.group_id.includes(7))
-    {
+var isAdmin = function(req, res, next) {
+    if(req.session.group_id.includes(7)) {
         return next();
-    }else{
-        return res.json({'err':'1','msg':'Contact Admin user to gain permission'})
+    } else {
+        return res.json({'err': '1', 'msg': 'Contact Admin user to gain permission.'});
     }
-    //res.redirect('/')
-  //  'https://ncifrederick.cancer.gov/SignIn/NihLoginIntegration.axd?returnUrl=https://frsivg-mip01p.ncifcrf.gov/Scippy/'
-  //  res.redirect('https%3a%2f%2fncifrederick%2Ecancer%2Egov%2fSignIn%2fNihLoginIntegration%2Eaxd%3FreturnUrl=https%3a%2f%2ffrsivg-mip01p%2Encifcrf%2Egov%2fScippy%2f')
 }
 
 
-var isAuth = function(req,res,next){
-   // console.log('in isAuth');
-   // console.log(req);
-//    console.log(req.session.status);
-    if(req.session.status=='Authenticated')
-    {
- //       console.log('true?');
+var isAuth = function (req, res, next) {
+    if (req.session.status === 'Authenticated') {
         return next();
-    }else{
-        return res.json({'err':'1','msg':'Please login first or contact admin user to whitelist you'})
+    } else {
+        return res.json({'err': '1', 'msg': 'Please login first or contact admin user to whitelist you.'});
     }
-    //res.redirect('/')
-  //  'https://ncifrederick.cancer.gov/SignIn/NihLoginIntegration.axd?returnUrl=https://frsivg-mip01p.ncifcrf.gov/Scippy/'
-  //  res.redirect('https%3a%2f%2fncifrederick%2Ecancer%2Egov%2fSignIn%2fNihLoginIntegration%2Eaxd%3FreturnUrl=https%3a%2f%2ffrsivg-mip01p%2Encifcrf%2Egov%2fScippy%2f')
 }
 
 function stringFilter(str){
     return str.replace(/[^A-Za-z0-9]/g, '');
 }
-// router.get('/api/v1/scippy/date=:from.:to/patient=:name',isAuth,(req,res,next)=>{
-//         //console.log('in query');
-//         const results = [];
-//         //console.log("SELECT * FROM patients WHERE mod_time >= '"+req.params.from+"' and mod_time <= '"+req.params.to+"' and pat_name LIKE '%"+req.params.name+"%'");
-//         pg.connect(connectionString,(err,client,done)=>{
-//                if(err){
-//                         done();
-//                         console.log(err);
-//                         return res.status(500),json({success:false,data:err});
-//                 }
-//         //        console.log('in query 2');
-//                 if(req.params.name == 'none'){
-//         //            console.log('in query 3');
-//                     var dateFrom = stringFilter(req.params.from);
-//                     var dateTo = stringFilter(req.params.to);
-//                 // var query = client.query("SELECT patients.pat_name AS patient, patients.id AS patient_id, studies.pat_id AS pat_id, studies.id AS study_id, studies.study_description AS study_description, patients.pat_path AS patient_path, studies.study_path AS study_path FROM patients LEFT JOIN studies ON patients.id = studies.pat_id WHERE patients.mod_time >= '"+dateFrom+"' and patients.mod_time <= '"+dateTo+"' \
-//                 //                  and patients.pat_name LIKE '%%' ORDER BY patient_id");
-//                     var query = client.query("SELECT DISTINCT ON (t2.serie_id) * FROM(SELECT t1.study_description AS study_description, \
-//                         t1. patient AS patient, t1.patient_id AS patient_id, t1.study_id AS study_id, series.id AS serie_id, t1.patient_path AS patient_path, \
-//                         t1.study_path AS study_path, series.series_path AS serie_path, series.modality AS modality, series.series_description AS serie_description, \
-//                         series.series_uid AS serie_uid, series.mod_time AS series_mod_time, images.filename AS image_name From (SELECT patients.pat_name AS patient, patients.id AS patient_id, \
-//                         studies.pat_id AS pat_id, studies.id AS study_id, studies.study_description AS study_description, patients.pat_path AS patient_path, \
-//                         studies.study_path AS study_path FROM patients LEFT JOIN studies ON patients.id = studies.pat_id \
-//                         WHERE patients.mod_time >= '"+req.params.from+"' and patients.mod_time <= '"+req.params.to+"' and patients.pat_name LIKE '%%') AS t1 \
-//                         LEFT JOIN series ON t1.study_id = series.study_id LEFT JOIN images ON series.id = images.series_id ORDER BY patient_id) AS t2");
-                
-//                 //    var query = client.query("SELECT * FROM patients");
-//                 }
-//                 else{
-//                     queryParams = stringFilter(req.params.name);
-//                     console.log(queryParams);
-//                  var query = client.query("SELECT patients.pat_name AS patient, patients.id AS patient_id, studies.pat_id AS pat_id, studies.id AS study_id, studies.study_description AS study_description, patients.pat_path AS patient_path, studies.study_path AS study_path FROM patients LEFT JOIN studies ON patients.id = studies.pat_id WHERE patients.mod_time >= '"+req.params.from+"' and patients.mod_time <= '"+req.params.to+"' \
-//                                   and (LOWER(patients.pat_name) LIKE LOWER('%"+queryParams+"%') or LOWER(studies.study_description) LIKE LOWER('%"+queryParams+"%')) ORDER BY patient_id");
-//                 }
-                
-//                 query.on('row',(row)=>{
-//                 //        console.log(row);
-//                         results.push(row);
-//                 });
-//                 query.on('end',()=>{
-//                         done();
-//                         return res.json(results);
-//                 });
-//         });
-// });
-
-
-// router.get('/api/v1/scippy/study=:id',isAuth,(req,res,next)=>{
-//         const results = [];
-//         console.log(req.params);
-//         //console.log("SELECT * FROM patients WHERE mod_time >= '"+req.params.from+"' and mod_time <= '"+req.params.to+"' and pat_name LIKE '%"+req.params.name+"%'");
-//         pg.connect(connectionString,(err,client,done)=>{
-//                if(err){
-//                         done();
-//                         console.log(err);
-//                         return res.status(500),json({success:false,data:err});
-//                 }
-
-//                 var query = client.query("SELECT DISTINCT ON (serie_id) * FROM (SELECT studies.id AS study_id, series.study_id AS stu_id, series.modality AS modality, series.series_description AS serie_description, series.series_path AS serie_path, series.series_uid AS serie_uid, series.id AS serie_id, images.filename AS image_name FROM studies LEFT JOIN series ON studies.id = series.study_id LEFT JOIN images ON series.id = images.series_id  WHERE study_id = '"+req.params.id+"' ORDER BY study_id) AS referenceTable");
-               
-//                 query.on('row',(row)=>{
-
-//                         results.push(row);
-//                 });
-//                 query.on('end',()=>{
-//                         done();
-//                         return res.json(results);
-//                 });
-//         });
-// });
-// router.get('/api/v1/scippy/downloadSeries/:patientPath/:studyPath/:seriePath/:patientName/:Modality',isAuth,(req,res,next)=>{
-
-//     var seriePathArr=req.params.seriePath.split(",");
-//     var modalityArr=req.params.Modality.split(",");
-
-
-//     var total=[];
-//     for(let a=0;a < seriePathArr.length;a++){
-//         let index=[];
-//         index.push(seriePathArr[a]);
-//         index.push(modalityArr[a]);
-//         total.push(index);
-//     };
-
-//  console.log(total);
-
-//     var archive = archiver('zip',{
-//           zlib: { level: 1 } // Sets the compression level.
-//         });
-
-//     var output = fs.createWriteStream(__dirname+"/"+req.params.patientName+' '+req.params.Modality+'.zip');
-
-//     output.on('close', function() {
-//         console.log(archive.pointer() + ' total bytes');
-//         console.log('archiver has been finalized and the output file descriptor has closed.');
-//         res.header("Access-Control-Expose-Headers", "Content-Disposition");
-//         res.download(__dirname+"/"+req.params.patientName+' '+req.params.Modality+'.zip',__dirname+"/"+req.params.patientName+'.zip',function(err){
-//                                 //CHECK FOR ERROR
-//                                 fs.unlink(__dirname+"/"+req.params.patientName+' '+req.params.Modality+'.zip');
-//                             });   
-//     });
-
-//     archive.on('error', function(err) {
-//         throw err;
-//     });
-
-//     archive.pipe(output);
-
-//     for(let a=0;a<total.length;a++){
-//         archive.directory(archive_root+req.params.patientPath+'/'+req.params.studyPath+'/'+total[a][0], req.params.patientName+' '+total[a][0] , { date: new Date() });
-//     }
-//     archive.finalize();
-  
-// });
-// router.get('/api/v1/scippy/downloadStudy/:patientPath/:studyPath',isAuth,(req,res,next)=>{
-
-
-//     var filePath = path.join(__dirname,'./empty');
-//     filePath = archive_root+req.params.patientPath+'/'+req.params.studyPath;
-//     console.log(filePath);
-
-//     zipFolder(filePath,__dirname+"/"+req.params.studyPath+'.zip',function(err){
-//             if(err){
-//                 console.log("ops!"+err);
-//             }else{
-//                 console.log("package done");
-//                 var stats = fs.statSync(__dirname+"/"+req.params.studyPath+".zip");
-//                 if(stats.isFile){
-//                     res.download(__dirname+"/"+req.params.studyPath+".zip",req.params.studyPath+".zip")        
-//                 }else
-//                 {
-//                         res.end(404)
-//                 }
-//             }
-//     });
-        
-// });
-// router.get('/api/v1/scippy/downloadAllStudies/:patientPath/:studyPath/:patientName/:study_description/:seriesPath',isAuth,(req,res,next)=>{
-//     var patientPathArr=req.params.patientPath.split(",");
-//     console.log(patientPathArr);
-//     var studyPathArr=req.params.studyPath.split(",");
-//     var seriesPathArr=req.params.seriesPath.split(",");
-//     var patientNameArr=req.params.patientName.split(",");
-//     console.log(studyPathArr);
-//     console.log(seriesPathArr);
-//     console.log(patientNameArr);
-//     var study_description = req.params.study_description;
-//     //Change back to real name
-//     var study_description_realName = req.params.study_description.replace('!@REPlace','%2F');//\\:?
-//     console.log("study_description:"+study_description_realName);
-//     // Clean array To avoid duplicate (comes from multiple series with same study and patient path)
-//    /* uniquepatientPathArr = patientPathArr.filter(function(elem, pos) {
-//         return patientPathArr.indexOf(elem) == pos;
-//     });
-//     uniquestudyPathArr = studyPathArr.filter(function(elem, pos) {
-//         return studyPathArr.indexOf(elem) == pos;
-//     });
-//     uniquepatientNameArr = patientNameArr.filter(function(elem, pos) {
-//         return patientNameArr.indexOf(elem) == pos;
-//     });*/
-//     var total=[];
-//     for(let a=0;a < patientPathArr.length;a++){
-//         let flag=0;
-//         fs.readdirSync(archive_root+patientPathArr[a]+'/'+studyPathArr[a]+'/'+seriesPathArr[a]).forEach(file => {
-//             if(path.extname(archive_root+patientPathArr[a]+'/'+studyPathArr[a]+'/'+seriesPathArr[a]+'/'+file)=='.jpg'){
-//                 flag=1;
-//             }
-//         });
-//         if(!flag){
-//             let index=[];
-//             index.push(patientPathArr[a]);
-//             index.push(studyPathArr[a]);
-//             index.push(patientNameArr[a]);
-//             index.push(seriesPathArr[a]);
-//             total.push(index);
-//         }
-//     }
-//     console.log(total);
-    
-//     for(let a=0;a < studyPathArr.length;a++){
-//         let index=[];
-//         index.push(patientPathArr[a]);
-//         index.push(studyPathArr[a]);
-//         index.push(patientNameArr[a]);
-//         index.push(seriesPathArr[a]);
-//         total.push(index);
-//     };
-    
-//     console.log(total);
-
-//     var archive = archiver('zip',{
-//           zlib: { level: 1 } // Sets the compression level.
-//         });
-
-//     console.log('createWriteStream');
-
-//     var output = fs.createWriteStream(__dirname +"/"+ study_description_realName+'.zip');
-
-//     console.log('createWriteStream done');
-
-//     output.on('close', function() {
-//         console.log(archive.pointer() + ' total bytes');
-//         console.log('archiver has been finalized and the output file descriptor has closed.');
-//     //    fs.createReadStream(__dirname+"/"+req.params.study_description+".zip").pipe(res);
-//     //    fs.unlinkSync(__dirname+"/"+req.params.study_description+".zip");
-//         res.header("Access-Control-Expose-Headers", "Content-Disposition");
-//         res.download(__dirname+"/"+study_description_realName+".zip",study_description_realName+".zip"
-//                             ,function(err){
-//                                 //CHECK FOR ERROR
-//                                 fs.unlink(__dirname+"/"+study_description_realName+".zip");
-//                             });
-//     });
-//     archive.on('error', function(err) {
-//         throw err;
-//     });
-
-//     archive.pipe(output);
-
-//     for(let a=0;a<total.length;a++){
-//         archive.directory( archive_root+total[a][0]+'/'+total[a][1]+'/'+total[a][3], study_description_realName+'/'+total[a][2]+'/'+total[a][2] + ' '+total[a][3], { date: new Date() });
-//     }
-//     archive.finalize();
-  
-// });
-
 
 const mysql = require('mysql');
 var mysqlcon = mysql.createPool(mysqlConfig);
- /* 
-  //FOR mariadb 10.2.8
-  var mysqlcon = mysql.createPool({
-    host: "localhost",
-    port:3306,
-    user: "root",
-    password: "yuAwf-6TwasEgar",
-    database:"nci",
-  //  socketPath: '/var/run/mysqld/mysqld.sock'
-  });
-  */
 
 var directorySize = function(path, callback, size) {
     if (size === undefined) {
@@ -363,27 +106,27 @@ var directorySize = function(path, callback, size) {
 
     fs.stat(path, function(err, stat) {
         if (err) {
-          callback(err);
-          return;
+            callback(err);
+            return;
         }
 
         size += stat.size;
 
         if (!stat.isDirectory()) {
-          callback(null, size);
-          return;
+            callback(null, size);
+            return;
         }
 
         fs.readdir(path, function(err, paths) {
-          if (err) {
-            callback(err);
-            return;
-          }
+            if (err) {
+                callback(err);
+                return;
+            }
 
-          async.map(paths.map(function(p) { return path + '/' + p }), directorySize, function(err, sizes) {
-            size += sizes.reduce(function(a, b) { return a + b }, 0);
-            callback(err, size);
-          })
+            async.map(paths.map(function(p) { return path + '/' + p }), directorySize, function(err, sizes) {
+                size += sizes.reduce(function(a, b) { return a + b }, 0);
+                callback(err, size);
+            });
         })
     })
 }
@@ -404,21 +147,18 @@ var zipFolderWithProgress = function(webSocket, srcFolder, zipFilePath, totalSiz
         console.log('Total '+prettyTotalSize);
         callback();
     });
-    // zipArchive.on('entry', function() {
-    //     console.log('Total around ' + estimateSize + ' bytes');
-    // });
     zipArchive.on('progress', function() {
         let prettyCurrentSize = bytesToSize(zipArchive.pointer());
         var percent = 100 - ((totalSize - zipArchive.pointer()) / totalSize) * 100;
-        // console.log('At ' + prettyCurrentSize + '/' + prettyTotalSize);
-        // console.log('At ' + parseInt(percent));
-        webSocket.send(JSON.stringify({'err':'2','msg':' ' + prettyCurrentSize + '/' + prettyTotalSize + '('+parseInt(percent)+'%)'}));
+        // check if webSocket is alive
+        if (webSocket.readyState === 1) {
+            webSocket.send(JSON.stringify({'err':'2','msg':' ' + prettyCurrentSize + '/' + prettyTotalSize + '('+parseInt(percent)+'%)'}));  
+        } else {
+            fs.unlink(zipFilePath);
+            callback();
+        }
     });
     zipArchive.pipe(output);
-
-    // zipArchive.bulk([
-    //     { cwd: srcFolder, src: ['**/*'], expand: true }
-    // ]);
 
     zipArchive.directory(srcFolder, false);
 
@@ -429,91 +169,75 @@ var zipFolderWithProgress = function(webSocket, srcFolder, zipFilePath, totalSiz
     });
 }
 
-var eventTracking=function(type,user){
-    if(type=='Login')
-    {
+var eventTracking = function(type, user) {
+    if (type === 'Login') {
         let event = 'Login';
         let eventType = 'Site::UserLoginEvent';
-        mysqlcon.getConnection((err,connection)=>{
-            if(err) throw err;
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
             var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
                 VALUES (?,?,?,null,NOW(),NOW(),NOW())",
                 [event,eventType,user],
-                function(err,result){
-                    if(err) throw err;
+                function (err, result) {
+                    if (err) throw err;
                     logger.info({
                         level: 'info',
                         message: 'Record user(' + user + ') login'
                     });
-                    // console.log('successfully insert '+result.insertId+' row in `site_statistics` table');
-                    // console.log('INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at)');
-                    // console.log('VALUES ('+event+', '+eventType+', '+user+', '+'null'+', '+'NOW()'+', '+'NOW()'+', '+'NOW());');
                     connection.release();
                 });
         });
     }
-    if(type=='Study')
-    {
+    if (type === 'Study') {
         let event = 'Study Download';
         let eventType = 'Site::StudyDownloadEvent';
-        mysqlcon.getConnection((err,connection)=>{
-            if(err) throw err;
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
             var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
                 VALUES (?,?,?,null,NOW(),NOW(),NOW())",
                 [event,eventType,user],
-                function(err,result){
-                    if(err) throw err;
+                function (err, result) {
+                    if (err) throw err;
                     logger.info({
                         level: 'info',
                         message: 'Record user(' + user + ') download a study'
                     });
-                    // console.log('successfully insert '+result.insertId+' row in `site_statistics` table');
-                    // console.log('INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at)');
-                    // console.log('VALUES ('+event+', '+eventType+', '+user+', '+'null'+', '+'NOW()'+', '+'NOW()'+', '+'NOW());');
                     connection.release();
                 });
         });
     }
-    if(type=='Experiment')
-    {
+    if (type === 'Experiment') {
         let event = 'Experiment Download';
         let eventType = 'Site::ExperimentDownloadEvent';
-        mysqlcon.getConnection((err,connection)=>{
-            if(err) throw err;
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
             var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
                 VALUES (?,?,?,null,NOW(),NOW(),NOW())",
                 [event,eventType,user],
-                function(err,result){
-                    if(err) throw err;
+                function (err, result) {
+                    if (err) throw err;
                     logger.info({
                         level: 'info',
                         message: 'Record user(' + user + ') download an experiment'
                     });
-                    // console.log('successfully insert '+result.insertId+' row in `site_statistics` table');
-                    // console.log('INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at)');
-                    // console.log('VALUES ('+event+', '+eventType+', '+user+', '+'null'+', '+'NOW()'+', '+'NOW()'+', '+'NOW());');
                     connection.release();
                 });
         });
     }
-    if(type=='Series')
-    {
+    if (type === 'Series') {
         let event = 'Series Download';
         let eventType = 'Site::SeriesDownloadEvent';
-        mysqlcon.getConnection((err,connection)=>{
-            if(err) throw err;
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
             var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
                 VALUES (?,?,?,null,NOW(),NOW(),NOW())",
                 [event,eventType,user],
-                function(err,result){
+                function (err, result) {
                     if(err) throw err;
                     logger.info({
                         level: 'info',
                         message: 'Record user(' + user + ') download a series'
                     });
-                    // console.log('successfully insert '+result.insertId+' row in `site_statistics` table');
-                    // console.log('INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at)');
-                    // console.log('VALUES ('+event+', '+eventType+', '+user+', '+'null'+', '+'NOW()'+', '+'NOW()'+', '+'NOW());');
                     connection.release();
                 });
         });
@@ -521,8 +245,8 @@ var eventTracking=function(type,user){
 }
 
 
-
-router.get('/api/v1/projects_overview',isAuth,(req,res,next)=>{   //isAuth
+// isAuth
+router.get('/api/v1/projects_overview', isAuth, (req, res, next) => {
 
     logger.info({
         level: 'info',
@@ -535,15 +259,11 @@ router.get('/api/v1/projects_overview',isAuth,(req,res,next)=>{   //isAuth
     //var LoginUserId = 4;
     // console.log(req.session);
     var LoginUserId = req.session.user_id[0];
-    // console.log(LoginUserId);
-    /*
-        Query projects
-    */
 
-    var results=[];
-    if(req.session.group_id.includes(7)){
-        mysqlcon.getConnection((err,connection)=>{
-            if(err) throw err;
+    var results = [];
+    if (req.session.group_id.includes(7)) {
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
             //FOR mariadb 10.2.8
             var query = connection.query("SELECT nci_projects_created_at, nci_projects_id, \
                                           nci_projects_name, nci_projects_pi_id, Pi_First_name, \
@@ -567,33 +287,33 @@ router.get('/api/v1/projects_overview',isAuth,(req,res,next)=>{   //isAuth
                                           LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
             //FOR MySQL
             //var query = connection.query("SELECT nci_projects_created_at,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_experiments, number_of_studies, projects_status, number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*,COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id,status AS projects_status, created_at AS nci_projects_created_at  FROM nci_projects) as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");//SELECT nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_studies, number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id FROM nci_projects) as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");            
-            query.on('result',(row)=>{
-                    results.push(row);
+            query.on('result', (row) => {
+                results.push(row);
             });
-            query.on('end',()=>{
-                    connection.release();
-                    return res.json(results);
+            query.on('end', () => {
+                connection.release();
+                return res.json(results);
             });
         });
-    }else{
-        mysqlcon.getConnection((err,connection)=>{
-            if(err) throw err;
+    } else {
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
             //FOR mariadb 10.2.8
             var query = connection.query("SELECT nci_projects_created_at,Login_user, projects_status ,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name,number_of_experiments, number_of_studies, number_of_images, GROUP_CONCAT(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id,nci_projects.created_at AS nci_projects_created_at FROM (SELECT id AS project_users_id,project_id AS project_users_project_id,user_id AS project_users_user_id,permissions AS project_users_permissions FROM nci_project_users WHERE user_id = "+LoginUserId+") as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
             //FOR MySQL
             //var query = connection.query("SELECT nci_projects_created_at,Login_user, projects_status ,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_studies, number_of_experiments,number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id, nci_projects.created_at AS nci_projects_created_at FROM (SELECT id AS project_users_id,project_id AS project_users_project_id,user_id AS project_users_user_id,permissions AS project_users_permissions FROM nci_project_users WHERE user_id = "+LoginUserId+") as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
-            query.on('result',(row)=>{
-                    results.push(row);
+            query.on('result', (row) => {
+                results.push(row);
             });
-            query.on('end',()=>{
-                    connection.release();
-                    return res.json(results);
+            query.on('end', () => {
+                connection.release();
+                return res.json(results);
             });
         });
     }
 });
 
-router.get('/api/v1/project/:project_id',isAuth,(req,res,next)=>{   //isAuth
+router.get('/api/v1/project/:project_id', isAuth, (req, res, next) => {   //isAuth
     logger.info({
         level: 'info',
         message: req.session.FirstName + ' ' + req.session.LastName
@@ -609,19 +329,19 @@ router.get('/api/v1/project/:project_id',isAuth,(req,res,next)=>{   //isAuth
     /*
         validation for random project query is need for user who does not have access to that project
     */
-    var results=[];
-    mysqlcon.getConnection((err,connection)=>{
-        if(err) throw err;
+    var results = [];
+    mysqlcon.getConnection((err, connection) => {
+        if (err) throw err;
         //FOR mariadb10.2.8
         var query = connection.query("SELECT last_name,first_name, nci_project_pi_id,nci_project_id, nci_project_name, authors, requester, collaborator, collab_grant_num, SRAC_number, SRAC_file, status, proposal, est_costs, fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id, GROUP_CONCAT(nci_protocols_number_of_objects) AS number_of_objects, GROUP_CONCAT(nci_protocols_studies_per_object) AS studies_per_object, GROUP_CONCAT(nci_protocols_hours_per_study) AS hours_per_study, GROUP_CONCAT(name) AS name, GROUP_CONCAT(short_name) AS short_name, GROUP_CONCAT(nci_protocols_id) AS protocols_id, GROUP_CONCAT(protocol_category_id) AS protocol_category_id FROM(SELECT t3.*, nci_protocol_categories.name, nci_protocol_categories.short_name FROM(SELECT site_users.last_name, site_users.first_name, t2.* FROM(SELECT t1.*, nci_protocols.id AS nci_protocols_id, nci_protocols.protocol_category_id AS protocol_category_id, nci_protocols.project_id AS nci_protocols_project_id, nci_protocols.number_of_objects AS nci_protocols_number_of_objects, nci_protocols.studies_per_object AS nci_protocols_studies_per_object, nci_protocols.hours_per_study AS nci_protocols_hours_per_study From (SELECT id AS nci_project_id,name AS nci_project_name,pi_id AS nci_project_pi_id,authors,requester,collaborator,collab_grant_num,SRAC_number,SRAC_file,status,proposal,est_costs,fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id FROM nci_projects WHERE id = "+selected_project+") as t1 LEFT JOIN nci_protocols ON t1.nci_project_id=nci_protocols.project_id) as t2 LEFT JOIN site_users ON t2.nci_project_pi_id = site_users.id) AS t3 LEFT JOIN nci_protocol_categories ON t3.protocol_category_id=nci_protocol_categories.id) AS t4 GROUP BY nci_project_id;");
         //FOR MySQL
         //var query = connection.query("SELECT last_name,first_name, nci_project_pi_id,nci_project_id, nci_project_name, authors, requester, collaborator, collab_grant_num, SRAC_number, SRAC_file, status, proposal, est_costs, fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id, JSON_ARRAYAGG(nci_protocols_number_of_objects) AS number_of_objects, JSON_ARRAYAGG(nci_protocols_studies_per_object) AS studies_per_object, JSON_ARRAYAGG(nci_protocols_hours_per_study) AS hours_per_study, JSON_ARRAYAGG(name) AS name, JSON_ARRAYAGG(short_name) AS short_name, JSON_ARRAYAGG(nci_protocols_id) AS protocols_id, JSON_ARRAYAGG(protocol_category_id) AS protocol_category_id FROM(SELECT t3.*, nci_protocol_categories.name, nci_protocol_categories.short_name FROM(SELECT site_users.last_name, site_users.first_name, t2.* FROM(SELECT t1.*, nci_protocols.id AS nci_protocols_id, nci_protocols.protocol_category_id AS protocol_category_id, nci_protocols.project_id AS nci_protocols_project_id, nci_protocols.number_of_objects AS nci_protocols_number_of_objects, nci_protocols.studies_per_object AS nci_protocols_studies_per_object, nci_protocols.hours_per_study AS nci_protocols_hours_per_study From (SELECT id AS nci_project_id,name AS nci_project_name,pi_id AS nci_project_pi_id,authors,requester,collaborator,collab_grant_num,SRAC_number,SRAC_file,status,proposal,est_costs,fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id FROM nci_projects WHERE id = "+selected_project+") as t1 LEFT JOIN nci_protocols ON t1.nci_project_id=nci_protocols.project_id) as t2 LEFT JOIN site_users ON t2.nci_project_pi_id = site_users.id) AS t3 LEFT JOIN nci_protocol_categories ON t3.protocol_category_id=nci_protocol_categories.id) AS t4 GROUP BY nci_project_id;");
-                query.on('result',(row)=>{
-                results.push(row);
+        query.on('result', (row) => {
+            results.push(row);
         });
-        query.on('end',()=>{
-                connection.release();
-                return res.json(results);
+        query.on('end', () => {
+            connection.release();
+            return res.json(results);
         });
     });
 });
@@ -2997,192 +2717,158 @@ router.post('/api/v1/probes_add',isAdmin,(req,res,next)=>{  //isAdmin
 });
 
 router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', function(ws, req) {
-    if(req.session.status!=='Authenticated')
-    {
-        // console.log('true?');
-
-        ws.send(JSON.stringify({'err':'1','msg':'Please login first or contact admin user to whitelist you'}));
-        // console.log(JSON.stringify({'err':'1','msg':'Please login first or contact admin user to whitelist you'}));
+    if (req.session.status !== 'Authenticated') {
+        ws.send(JSON.stringify({'err': '1','msg': 'Please login first or contact admin user to whitelist you'}));
         ws.close();
-        // ws.send('Please login first or contact admin user to whitelist you2');
-    }else{
-                logger.info({
-                        level: 'info',
-                        message: req.session.FirstName + ' ' + req.session.LastName
-                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                });
-        let experiment_id=req.params.experiment_id
-        let results=[];
-        let allPatientsPath_result=[];
+    } else {
+        logger.info({
+            level: 'info',
+            message: req.session.FirstName + ' ' + req.session.LastName
+                     + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+        });
+        let experiment_id = req.params.experiment_id;
+        let results = [];
+        let allPatientsPath_result = [];
         var workSpace = intermediate_storage + req.session.UserPrincipalName;
-        // console.log('in download')
-        // console.log(mysqlcon)
         async.waterfall([
-            function(callback){
-                            logger.info({
-                                level: 'info',
-                                message: req.session.FirstName + ' ' + req.session.LastName
-                                + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                +'\n[PRE-STEP 1]: get all patients id'
-                            });
-              mysqlcon.getConnection((err,connection)=>{
-                if(err) throw err;
-                var query = connection.query("SELECT * FROM imaging_participants WHERE experiment_id=?;",experiment_id);
-                query.on('result',(row)=>{
-                //    console.log(row)
-                    results.push(row['patient_id']);
+            function(callback) {
+                logger.info({
+                    level: 'info',
+                    message: req.session.FirstName + ' ' + req.session.LastName
+                             + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                             +'\n[PRE-STEP 1]: get all patients id'
                 });
-                query.on('end',()=>{
-                    connection.release();
-                    //console.log(results)
-                    callback(null,results)
-                //    return res.json(results);
+                mysqlcon.getConnection((err, connection) => {
+                    if(err) throw err;
+                    var query = connection.query("SELECT * FROM imaging_participants WHERE experiment_id=?;", experiment_id);
+                    query.on('result', (row) => {
+                        results.push(row['patient_id']);
+                    });
+                    query.on('end', () => {
+                        connection.release();
+                        callback(null,results);
+                    });
                 });
-              });
-            },function(arg,callback){
-                            logger.info({
-                                level: 'info',
-                                message: req.session.FirstName + ' ' + req.session.LastName
-                                + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                +'\n[PRE-STEP 2]: get all patients related information'
-                            });
-              pg.connect(connectionString,(err,client,done)=>{
-                if(err) throw err;
-                // console.log(arg)
-                var query = client.query("SELECT t2.*,id AS series_id,series_path,series_description,modality \
-                                        FROM (SELECT  id AS study_id, t1.*, study_description,study_path FROM \
-                                        (SELECT id AS pat_id,pat_path,pat_name FROM patients WHERE id in ("+arg+")) AS t1 LEFT JOIN \
-                                        studies ON t1.pat_id = studies.pat_id) AS t2 LEFT JOIN series ON t2.study_id=series.study_id;");
-                query.on('row',(row)=>{
-                  let eachIndex=[]
-                  eachIndex.push(row['pat_name']);
-                  eachIndex.push(row['pat_path']);
-                  eachIndex.push(row['study_description']);
-                  eachIndex.push(row['study_path']);
-                  eachIndex.push(row['series_description']);
-                  eachIndex.push(row['series_path']);
-                  eachIndex.push(row['modality']);
-                  allPatientsPath_result.push(eachIndex);
+            }, function(arg, callback) {
+                logger.info({
+                    level: 'info',
+                    message: req.session.FirstName + ' ' + req.session.LastName
+                             + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                             +'\n[PRE-STEP 2]: get all patients related information'
                 });
-                query.on('end',()=>{
-                  done();
-                  callback(null,allPatientsPath_result)
-                //        return res.json(allPatientsPath_result);
+                pg.connect(connectionString, (err, client, done) => {
+                    if(err) throw err;
+                    var query = client.query("SELECT t2.*,id AS series_id,series_path,series_description,modality \
+                                            FROM (SELECT  id AS study_id, t1.*, study_description,study_path FROM \
+                                            (SELECT id AS pat_id,pat_path,pat_name FROM patients WHERE id in ("+arg+")) AS t1 LEFT JOIN \
+                                            studies ON t1.pat_id = studies.pat_id) AS t2 LEFT JOIN series ON t2.study_id=series.study_id;");
+                    query.on('row', (row) => {
+                        let eachIndex = [];
+                        eachIndex.push(row['pat_name']);
+                        eachIndex.push(row['pat_path']);
+                        eachIndex.push(row['study_description']);
+                        eachIndex.push(row['study_path']);
+                        eachIndex.push(row['series_description']);
+                        eachIndex.push(row['series_path']);
+                        eachIndex.push(row['modality']);
+                        allPatientsPath_result.push(eachIndex);
+                    });
+                    query.on('end', () => {
+                        done();
+                        callback(null,allPatientsPath_result)
+                    });
                 });
-               // client.end();
-              });
-            }
-            ],function(err,results){
-                // console.log(results)
-                // let cleanUp = false;
-                                logger.info({
-                                    level: 'info',
-                                    message: req.session.FirstName + ' ' + req.session.LastName
-                                    + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                    +'\n[STEP 1]: copy files from scippy image archive'
-                                });
+            }],function(err, results) {
+                logger.info({
+                    level: 'info',
+                    message: req.session.FirstName + ' ' + req.session.LastName
+                             + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                             +'\n[STEP 1]: copy files from scippy image archive'
+                });
                 async.waterfall([
                   function(callback){
                     if (!fs.existsSync(workSpace)){
-                      fs.mkdir(workSpace,0o755,function(){
-                        if (!fs.existsSync(workSpace+"/"+req.params.experiments_name)){
-                          // console.log('-------------------in if------------------')
-                          fs.mkdir(workSpace+"/"+req.params.experiments_name,0o755, function(err){
-                            // console.log('start cp')
-
-                            let ifAllCopied=[];
-                            let notExistFolder = 0;
-                            for(let a=0;a<results.length;a++){
-                              if (fs.existsSync(archive_root+results[a][1])){
-                                // console.log(results[a][1])
-                                ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
-                                  ifAllCopied.push(a)
-                                  if (err) {
-                                    // ifAllCopied.push(a)
-                                    if(err[0].code === 'ENOSPC'){
-                                      ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
-                                      ws.close();
-                                                                            logger.error({
-                                                                                level: 'error',
-                                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                                + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                            });
-                                      throw err;
+                        fs.mkdir(workSpace, 0o755, function() {
+                            if (!fs.existsSync(workSpace + "/" + req.params.experiments_name)) {
+                                // console.log('-------------------in if------------------')
+                                fs.mkdir(workSpace + "/" + req.params.experiments_name, 0o755, function(err) {
+                                    let ifAllCopied = [];
+                                    let notExistFolder = 0;
+                                    for (let a = 0; a < results.length; a++) {
+                                        if (fs.existsSync(archive_root+results[a][1])){
+                                            ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
+                                                ifAllCopied.push(a)
+                                                if (err) {
+                                                    // ifAllCopied.push(a)
+                                                    if(err[0].code === 'ENOSPC'){
+                                                        ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
+                                                        ws.close();
+                                                        logger.error({
+                                                            level: 'error',
+                                                            message: req.session.FirstName + ' ' + req.session.LastName
+                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                                        });
+                                                        throw err;
+                                                    }
+                                                }
+                                                if ((ifAllCopied.length + notExistFolder) == results.length) {
+                                                    callback(null, results);
+                                                }
+                                            });
+                                        } else {
+                                            logger.warn({
+                                                level: 'warn',
+                                                message: req.session.FirstName + ' ' + req.session.LastName
+                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                                + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                            });
+                                            /*There is a chance that folder in scippy_image does not exist*/
+                                            notExistFolder++;
+                                        }
                                     }
-                                  }
-                                  // else{
-                                  //     ifAllCopied.push(a);
-                                  // }
-                                  
-                                  // console.log(archive_root+results[a][1]+ 'copies done!');
-                                  // console.log(results.length-1);
-                                  // console.log(a);
-                                  if((ifAllCopied.length+notExistFolder)==results.length){
-
-                                    callback(null,results);
-                                  }
-                                });
-                              }else{
-                                                                logger.warn({
-                                                                    level: 'warn',
-                                                                    message: req.session.FirstName + ' ' + req.session.LastName
-                                                                    + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                    + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                                });
-                                /*There is a chance that folder in scippy_image does not exist*/
-                                notExistFolder++;
-                              }
-                            }
-                          })
-                        }else{
-                          let ifAllCopied=[];
-                          let notExistFolder = 0;
-                          // console.log('-------------------in else------------------')
-                          for(let a=0;a<results.length;a++){
-                            if (fs.existsSync(archive_root+results[a][1])){
-                              ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
-                                ifAllCopied.push(a)
-                                if (err) {
-                                    // ifAllCopied.push(a)
-                                //  rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name); });
-                                  if(err[0].code === 'ENOSPC'){
-                                    rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name);
-                                      ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
-                                      ws.close();
-                                                                            logger.error({
-                                                                                level: 'error',
-                                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                                + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                            });
-                                      throw err
-                                    });
-                                  }
+                                })
+                            } else {
+                                let ifAllCopied = [];
+                                let notExistFolder = 0;
+                                // console.log('-------------------in else------------------')
+                                for (let a = 0; a < results.length; a++) {
+                                    if (fs.existsSync(archive_root+results[a][1])) {
+                                        ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
+                                            ifAllCopied.push(a)
+                                            if (err) {
+                                                if (err[0].code === 'ENOSPC') {
+                                                    rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name);
+                                                        ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
+                                                        ws.close();
+                                                        logger.error({
+                                                            level: 'error',
+                                                            message: req.session.FirstName + ' ' + req.session.LastName
+                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                                        });
+                                                        throw err
+                                                    });
+                                                }
+                                            }
+                                            if ((ifAllCopied.length + notExistFolder) == results.length) {
+                                                callback(null, results);
+                                            }
+                                        });
+                                    } else {
+                                        logger.warn({
+                                            level: 'warn',
+                                            message: req.session.FirstName + ' ' + req.session.LastName
+                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                            + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                        });
+                                        /*There is a chance that folder in scippy_image does not exist*/
+                                        notExistFolder++;
+                                    }
                                 }
-                                // else{
-                                //     ifAllCopied.push(a);
-                                // }
-                                // console.log(archive_root+results[a][1]+ ' copies done!');
-                                if((ifAllCopied.length+notExistFolder)==results.length){
-                                  callback(null,results);
-                                }
-                              });
-                            }else{
-                                                            logger.warn({
-                                                                level: 'warn',
-                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                            });
-                              /*There is a chance that folder in scippy_image does not exist*/
-                              notExistFolder++;
-                            }
-                          }
-                        }  
-                      })
-                        
-                    }else{
+                            }  
+                        }) 
+                    } else {
                       if (!fs.existsSync(workSpace+"/"+req.params.experiments_name)){
                        // console.log('-------------------in if within else------------------')
                         fs.mkdir(workSpace+"/"+req.params.experiments_name,0o755, function(err){
@@ -3200,12 +2886,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                   if(err[0].code === 'ENOSPC'){
                                     ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
                                     ws.close();
-                                                                        logger.error({
-                                                                            level: 'error',
-                                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                        });
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                        + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                    });
                                     throw err;
                                   }
                                 }
@@ -3217,12 +2903,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                 }
                               });
                             }else{
-                                                            logger.warn({
-                                                                level: 'warn',
-                                                                message: req.session.FirstName + ' ' + req.session.LastName
-                                                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                            });
+                                logger.warn({
+                                    level: 'warn',
+                                    message: req.session.FirstName + ' ' + req.session.LastName
+                                    + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                    + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                });
                               /*There is a chance that folder in scippy_image does not exist*/
                               notExistFolder++;
                             }
@@ -3243,12 +2929,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                   rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name);
                                     ws.send(JSON.stringify({'err':'4', 'msg':'Experiment is too large'}));
                                     ws.close();
-                                                                        logger.error({
-                                                                            level: 'error',
-                                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                                            + 'experiment: '+ req.params.experiments_name+' \n' + err
-                                                                        });
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                        + 'experiment: '+ req.params.experiments_name+' \n' + err
+                                    });
                                     throw err
                                   });
                                 }
@@ -3262,12 +2948,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                               }
                             });
                           }else{
-                                                        logger.warn({
-                                                            level: 'warn',
-                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                            + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                                            + ' \n' + archive_root+results[a][1] + 'is not exist'
-                                                        });
+                            logger.warn({
+                                level: 'warn',
+                                message: req.session.FirstName + ' ' + req.session.LastName
+                                + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
+                                + ' \n' + archive_root+results[a][1] + 'is not exist'
+                            });
                             /*There is a chance that folder in scippy_image does not exist*/
                             notExistFolder++;
                           }
@@ -3275,30 +2961,29 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                       }  
                     }
                   },function(arg,callback){
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                            +'\n[STEP 2]: change experiment/patients/studies/series folder name'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                        +'\n[STEP 2]: change experiment/patients/studies/series folder name'
+                    });
                     // console.log('-----------------in change folders name-----------------')
                     // console.log(arg);
-                    let pat_nameDisplay=[];
-                    let pat_pathDisplay=[];
-                    let study_nameDisplay=[];
-                    let study_pathDisplay=[];
-                    let series_nameDisplay=[];
-                    let series_pathDisplay=[];
-                    let modalityDisplay=[];
-                    for(let a=0;a<arg.length;a++)
-                    {
-                      pat_nameDisplay.push(arg[a][0])
-                      pat_pathDisplay.push(arg[a][1])
-                      study_nameDisplay.push(arg[a][2])
-                      study_pathDisplay.push(arg[a][3])
-                      series_nameDisplay.push(arg[a][4])
-                      series_pathDisplay.push(arg[a][5])
-                      modalityDisplay.push(arg[a][6])
+                    let pat_nameDisplay = [];
+                    let pat_pathDisplay = [];
+                    let study_nameDisplay = [];
+                    let study_pathDisplay = [];
+                    let series_nameDisplay = [];
+                    let series_pathDisplay = [];
+                    let modalityDisplay = [];
+                    for(let a = 0; a < arg.length; a++) {
+                      pat_nameDisplay.push(arg[a][0]);
+                      pat_pathDisplay.push(arg[a][1]);
+                      study_nameDisplay.push(arg[a][2]);
+                      study_pathDisplay.push(arg[a][3]);
+                      series_nameDisplay.push(arg[a][4]);
+                      series_pathDisplay.push(arg[a][5]);
+                      modalityDisplay.push(arg[a][6]);
                     }
                     let total=0;
                     function changeFoldersName(currentPath) {
@@ -3324,15 +3009,15 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                               // console.log(study_nameDisplay[study_pathDisplay.indexOf(study_path_str)])
                               fs.moveSync(curFile,curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)], function (err) {
                                 if (err) {
-                                                                    logger.error({
-                                                                        level: 'error',
-                                                                        message: req.session.FirstName + ' ' + req.session.LastName
-                                                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
-                                                                        + curFile + ' to: ' + curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)]
-                                                                        + '\n' + err
-                                                                    });
-                                                                    throw err;
-                                                                }
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
+                                        + curFile + ' to: ' + curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)]
+                                        + '\n' + err
+                                    });
+                                    throw err;
+                                }
                                   
                               });
                               newFile = curFile + ' '+ study_nameDisplay[study_pathDisplay.indexOf(study_path_str)];
@@ -3348,51 +3033,36 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                               fs.moveSync(curFile,curFile + ' '+ series_nameDisplay[series_pathDisplay.indexOf(series_path_str)]
                                 + ' ' +modalityDisplay[series_pathDisplay.indexOf(series_path_str)], function (err) {
                                 if (err) {
-                                                                    logger.error({
-                                                                        level: 'error',
-                                                                        message: req.session.FirstName + ' ' + req.session.LastName
-                                                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
-                                                                        + curFile + ' to: ' + curFile + ' '+ series_nameDisplay[series_pathDisplay.indexOf(series_path_str)]
-                                                                        + ' ' +modalityDisplay[series_pathDisplay.indexOf(series_path_str)]
-                                                                        + '\n' + err
-                                                                    });
-                                                                    throw err;
-                                                                }
+                                    logger.error({
+                                        level: 'error',
+                                        message: req.session.FirstName + ' ' + req.session.LastName
+                                        + '(' + req.session.user_id[0] + ') unsuccessfully change series folder name from: '
+                                        + curFile + ' to: ' + curFile + ' '+ series_nameDisplay[series_pathDisplay.indexOf(series_path_str)]
+                                        + ' ' +modalityDisplay[series_pathDisplay.indexOf(series_path_str)]
+                                        + '\n' + err
+                                    });
+                                    throw err;
+                                }
                               });
                             }
-                            
-                            // let series_path_str = curFile.substring(curFile.lastIndexOf('/')+1);
-                            // console.log(series_descriptionArr[series_pathArr.indexOf(series_path_str)]);
-                            // console.log(modalityArr[series_pathArr.indexOf(series_path_str)]);
-                            // console.log(series_descriptionArr[series_pathArr.indexOf(series_path_str)]+' '+modalityArr[series_pathArr.indexOf(series_path_str)]);
-                            // fs.moveSync(curFile,curFile + ' '+ series_descriptionArr[series_pathArr.indexOf(series_path_str)]+' '+modalityArr[series_pathArr.indexOf(series_path_str)], function (err) {
-                            //     if (err) throw err;
-                            // });
-                            // total+=1;
-                            // // console.log(files.length)
-                            // // console.log(total)
-                            // // if (total === files.length){
-                            // //     callback(null,total);
-                            // // }
-                            // curFile = curFile + ' '+ series_descriptionArr[series_pathArr.indexOf(series_path_str)]+' '+modalityArr[series_pathArr.indexOf(series_path_str)];
                           }
                         }
                       }
                     }
                     changeFoldersName(workSpace+'/'+req.params.experiments_name);
                     logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') successfully change all folders name'
-                                        });
-                                        callback(null,total);
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') successfully change all folders name'
+                    });
+                    callback(null,total);
                   },function(arg,callback){
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                            +'\n[STEP 3]: add .dcm extension'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                        +'\n[STEP 3]: add .dcm extension'
+                    });
                     let total=0;
                     function walkDir(currentPath) {
                       let files = fs.readdirSync(currentPath);
@@ -3414,42 +3084,45 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                       }
                     };
                     walkDir(workSpace+'/'+req.params.experiments_name);
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') successfully add all .dcm extension'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') successfully add all .dcm extension'
+                    });
                     callback(null,total);
                   }],function(err,results){
                     // console.log('start zip');
-                                        logger.info({
-                                            level: 'info',
-                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                            + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
-                                            +'\n[STEP 4]: zip experiment folder'
-                                        });
+                    logger.info({
+                        level: 'info',
+                        message: req.session.FirstName + ' ' + req.session.LastName
+                        + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/experiment_download` experiment: '+ req.params.experiments_name
+                        +'\n[STEP 4]: zip experiment folder'
+                    });
                     directorySize(workSpace+"/"+req.params.experiments_name,
                       function(err, size){
                         zipFolderWithProgress(ws, workSpace+"/"+req.params.experiments_name, workSpace+"/"+req.params.experiments_name+".zip", size/2, function(err) {
                           if(err) {
                             rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name); });
                             // console.log(err);
-                                                        logger.error({
-                                                            level: 'error',
-                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                            + '(' + req.session.user_id[0] + ') unsuccessfully zip experiment folder to '
-                                                            + workSpace+"/"+req.params.experiments_name+".zip"
-                                                            + '\n' + err
-                                                        });
+                            logger.error({
+                                level: 'error',
+                                message: req.session.FirstName + ' ' + req.session.LastName
+                                + '(' + req.session.user_id[0] + ') unsuccessfully zip experiment folder to '
+                                + workSpace+"/"+req.params.experiments_name+".zip"
+                                + '\n' + err
+                            });
                           } else {
                             // console.log('EXCELLENT, zip done');
-                                                        logger.info({
-                                                            level: 'info',
-                                                            message: req.session.FirstName + ' ' + req.session.LastName
-                                                            + '(' + req.session.user_id[0] + ') successfully zip experiment folder to '
-                                                            + workSpace+"/"+req.params.experiments_name+".zip"
-                                                        });
-                            ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.experiments_name+".zip"}));
+                            logger.info({
+                                level: 'info',
+                                message: req.session.FirstName + ' ' + req.session.LastName
+                                + '(' + req.session.user_id[0] + ') successfully zip experiment folder to '
+                                + workSpace+"/"+req.params.experiments_name+".zip"
+                            });
+                            // Check if websocket is still alive
+                            if (ws.readyState === 1) { 
+                                ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.experiments_name+".zip"}));
+                            }
                             rimraf(workSpace+"/"+req.params.experiments_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.experiments_name); });
                             // eventTracking('Experiment',req.session.user_id[0]);
                             ws.close();
@@ -3721,7 +3394,10 @@ router.ws('/api/v1/study_download/:pat_path/:study_path/:pat_name/:study_descrip
                                     + '(' + req.session.user_id[0] + ') successfully zip study folder to '
                                     + workSpace+"/"+req.params.pat_name+".zip"
                                 });
-                                ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.pat_name+".zip"}));
+                                // Check if websocket is still alive
+                                if (ws.readyState === 1) { 
+                                    ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.pat_name+".zip"}));
+                                }
                                 rimraf(workSpace+"/"+req.params.pat_name, function () { console.log('rm -rf '+workSpace+"/"+req.params.pat_name); });
                                 // callback(null,workSpace+'/'+req.params.pat_name);
                                 ws.close();
@@ -3934,7 +3610,10 @@ router.ws('/api/v1/series_download/:pat_path/:study_path/:series_path/:series_de
                                     + workSpace+"/"+req.params.series_description+ ' ' +req.params.modality+".zip"
                                 });
                                 // console.log('EXCELLENT, zip done');
-                                ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.series_description+ ' ' +req.params.modality+".zip"}));
+                                // Check if websocket is still alive
+                                if (ws.readyState === 1) { 
+                                    ws.send(JSON.stringify({'err':'3','filePath':workSpace+"/"+req.params.series_description+ ' ' +req.params.modality+".zip"}));
+                                }
                                 rimraf(workSpace+"/"+req.params.series_description+ ' ' +req.params.modality, function () { console.log('rm -rf '+workSpace+"/"+req.params.series_description+ ' ' +req.params.modality); });
                                 // callback(null,workSpace+'/'+req.params.pat_name);
                                 ws.close();

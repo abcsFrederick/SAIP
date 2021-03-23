@@ -317,7 +317,7 @@ var experiments = View.extend({
               // http://localhost:3001/api/v1/experiment_download/1/xzs
               if (full.number_of_images) {
                 return '<a experiment_id=' + full.id + ' probe_id=' + full.probe_id + ' class=\'fa fa-edit experiment_edit\' style=\'font-size:16px; cursor:pointer\'></a> \
-                                       <a class=\'fa fa-download expDownloadProgress\' style=\'cursor:pointer\' exp_id=\'' + full.id + '\' exp_name=\'' + full.title.replace(/[%/]/g, '_') + '\' title=\'' + full.id + '/' + full.title.replace(/[%/]/g, '_') + '\'></a><a class=\'fa fa-spinner fa-spin\' style=\'display:none;\'></a><progress class=\' progress\' value=\'0\' style=\'display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px\'></progress>  </a> \
+                                       <a class=\'fa fa-download expDownloadProgress\' style=\'cursor:pointer\' exp_id=\'' + full.id + '\' exp_name=\'' + this.stringFilter(full.title) + '\' title=\'' + full.id + '/' + this.stringFilter(full.title) + '\'></a><a class=\'fa fa-spinner fa-spin\' style=\'display:none;\'></a><progress class=\' progress\' value=\'0\' style=\'display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px\'></progress>  </a> \
                                        <a class=\'fa icon-trash\' style=\'cursor: pointer;color:red;font-size:18px\'></a>'
               } else {
                 return '<a experiment_id=' + full.id + ' probe_id=' + full.probe_id + ' class=\'fa fa-edit experiment_edit\' style=\'font-size:16px; cursor:pointer\'></a> \
@@ -626,7 +626,7 @@ var experiments = View.extend({
               targets: -1,
               render: _.bind(function (data, type, full, meta) {
                 if (full.number_of_images) {
-                  return '<a class=\'fa fa-download expDownloadProgress\' style=\'cursor:pointer\' exp_id=\'' + full.id + '\' exp_name=\'' + full.title.replace(/[%/]/g, '_') + '\' title=\'' + full.id + '/' + full.title.replace(/[%/]/g, '_') + '\'></a><a class=\'fa fa-spinner fa-spin\' style=\'display:none;\'></a><progress class=\' progress\' value=\'0\' style=\'display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px\'></progress>  </a>'
+                  return '<a class=\'fa fa-download expDownloadProgress\' style=\'cursor:pointer\' exp_id=\'' + full.id + '\' exp_name=\'' + this.stringFilter(full.title) + '\' title=\'' + full.id + '/' + this.stringFilter(full.title) + '\'></a><a class=\'fa fa-spinner fa-spin\' style=\'display:none;\'></a><progress class=\' progress\' value=\'0\' style=\'display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px\'></progress>  </a>'
                 } else {
                   return ''
                 }
