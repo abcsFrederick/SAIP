@@ -2873,13 +2873,23 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                        // console.log('-------------------in if within else------------------')
                         fs.mkdir(workSpace+"/"+req.params.experiments_name,0o755, function(err){
                           // console.log('start cp')
+                          let unique_patient_paths = [],
+                              unique_patient_names = [];
 
+                          for (let a = 0; a < results.length; a++) {
+                            if (!unique_patient_paths.includes(results[a][1])) {
+                                unique_patient_paths.push(results[a][1])
+                                unique_patient_names.push(results[a][0])
+                            }
+                          }
                           let ifAllCopied=[];
                           let notExistFolder = 0;
-                          for(let a=0;a<results.length;a++){
-                            if (fs.existsSync(archive_root+results[a][1])){
+                          for(let a=0;a<unique_patient_paths.length;a++){
+                            if (fs.existsSync(archive_root+unique_patient_paths[a])){
                               // console.log(results[a][1])
-                              ncp(archive_root+results[a][1], workSpace+'/'+req.params.experiments_name+'/'+results[a][0]+' '+results[a][1], function (err) {
+                              let dst = workSpace+'/'+req.params.experiments_name+'/'+unique_patient_names[a]+' '+unique_patient_paths[a];
+                              fs.emptyDirSync(dst);
+                              fs.copy(archive_root+unique_patient_paths[a], dst, function (err) {
                                 ifAllCopied.push(a)
                                 if (err) {
                                     
@@ -2898,7 +2908,7 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                 // console.log(archive_root+results[a][1]+ 'copies done!');
                                 // console.log(results.length-1);
                                 // console.log(a);
-                                if((ifAllCopied.length+notExistFolder)==results.length){
+                                if((ifAllCopied.length+notExistFolder)==unique_patient_paths.length){
                                   callback(null,results);
                                 }
                               });
@@ -2907,7 +2917,7 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                     level: 'warn',
                                     message: req.session.FirstName + ' ' + req.session.LastName
                                     + '(' + req.session.user_id[0] + ') unsuccessfully copy files from scippy image archive ' 
-                                    + ' \n' + archive_root+results[a][1] + 'is not exist'
+                                    + ' \n' + archive_root+unique_patient_paths[a] + 'is not exist'
                                 });
                               /*There is a chance that folder in scippy_image does not exist*/
                               notExistFolder++;
@@ -2979,7 +2989,8 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                     for(let a = 0; a < arg.length; a++) {
                       pat_nameDisplay.push(arg[a][0]);
                       pat_pathDisplay.push(arg[a][1]);
-                      study_nameDisplay.push(arg[a][2]);
+                      // replace / to avoid folder hierarchy misunderstanding
+                      study_nameDisplay.push(arg[a][2].replace('/', '_'));
                       study_pathDisplay.push(arg[a][3]);
                       series_nameDisplay.push(arg[a][4]);
                       series_pathDisplay.push(arg[a][5]);
