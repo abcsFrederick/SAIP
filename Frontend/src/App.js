@@ -14,18 +14,18 @@ import './stylesheets/headerLayout.styl';
 import 'bootstrap';
 
 var domain = 'http://localhost:3000/';
-var VMpro = 'https://frsivg-mip01p.ncifcrf.gov/v0.1/';
-var VMdev = 'https://frsivg-mip01d.ncifcrf.gov/v0.1/';
+var VMpro = 'https://frsivg-mip02p.ncifcrf.gov/v0.1/';
+var VMdev = 'https://frsivg-mip02d.ncifcrf.gov/v0.1/';
 var domain_ws = 'ws://localhost:3000/';
-var VMpro_ws = 'wss://frsivg-mip01p.ncifcrf.gov/w0.1/';
-var VMdev_ws = 'wss://frsivg-mip01d.ncifcrf.gov/w0.1/';
+var VMpro_ws = 'wss://frsivg-mip02p.ncifcrf.gov/w0.1/';
+var VMdev_ws = 'wss://frsivg-mip02d.ncifcrf.gov/w0.1/';
 
 
 var App = View.extend({
 	initialize(){
 		this.render();
-		this.domain = VMpro;
-		this.domain_ws = VMpro_ws;
+		this.domain = VMdev;
+		this.domain_ws = VMdev_ws;
 		$.ajax({
 			url: this.domain + '',
 			type: 'GET',
@@ -102,8 +102,8 @@ var App = View.extend({
 					});
 					*/
 				} else {
-					window.location.replace('https://frsivg-mip01p.ncifcrf.gov/');
-					// window.location.replace('file:///Users/miaot2/html_learning/SAIP/Frontend/public/loginPageDev.html');
+					// window.location.replace('https://frsivg-mip01p.ncifcrf.gov/');
+					window.location.replace('C:/Users/miaot2/%7B%7BHome%20Folder%7D%7D/html_learning/SAIP/Frontend/public/loginPageDev.html');
 				}
 			}, this)
 		});

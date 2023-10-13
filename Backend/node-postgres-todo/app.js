@@ -38,9 +38,13 @@ const ADURL = config.get('adConfig.url');
 const ADServiceAccount = config.get('adConfig.account');
 const ADServicePassword = config.get('adConfig.password');
 
-const CLIENT_ID = config.get('Cilogon.id');
-const CLIENT_SECRET = config.get('Cilogon.secret');
-const CLIENT_REDIRECT_URL = config.get('Cilogon.redirect_uri');
+// const CLIENT_ID = config.get('Cilogon.id');
+// const CLIENT_SECRET = config.get('Cilogon.secret');
+// const CLIENT_REDIRECT_URL = config.get('Cilogon.redirect_uri');
+const CLIENT_ISSUER = config.get('ITrust.issuer');
+const CLIENT_ID = config.get('ITrust.id');
+const CLIENT_SECRET = config.get('ITrust.secret');
+const CLIENT_REDIRECT_URL = config.get('ITrust.redirect_uri');
 
 var testUsers = [{name:'test',password:'test123456789'}];
 var mysqlcon = mysql.createPool(mysqlConfig);
@@ -140,7 +144,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           ,"userInfo" : {}
       }
       // CILogon:
-      request.post({url: 'https://cilogon.org/oauth2/token', form: data}, function(error, response, body) {
+      // request.post({url: 'https://cilogon.org/oauth2/token', form: data}, function(error, response, body) {
+      request.post({url: CLIENT_ISSUER + '/auth/oauth/v2/token', form: data}, function(error, response, body) {
         if (error) {
           authResults.status = "Authentication failed";
           authResults.error = error;
@@ -151,7 +156,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           var id_token = JSON.parse(body).id_token
           var access_token = JSON.parse(body).access_token
           var data = {'access_token': access_token}
-          request.post({url: 'https://cilogon.org/oauth2/userinfo', form: data}, function(error, response, body) {
+          // request.post({url: 'https://cilogon.org/oauth2/userinfo', form: data}, function(error, response, body) {
+          request.post({url: CLIENT_ISSUER + '/openid/connect/v1/userinfo', form: data}, function(error, response, body) {
             if (error) {
               authResults.status = "Authentication failed";
               authResults.error = error;
@@ -161,19 +167,24 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               // Validate NIH provider later
               var userInfo = {
                 "Provider": JSON.parse(body).idp,
-                "FirstName": JSON.parse(body).given_name,
-                "LastName": JSON.parse(body).family_name,
+                "FirstName": JSON.parse(body).first_name,
+                "LastName": JSON.parse(body).last_name,
                 "Email": JSON.parse(body).email,
-                "UserPrincipalName": JSON.parse(body).eppn
+                "UserPrincipalName": JSON.parse(body).preferred_username
               }
               authResults.status = "Authenticated";
               authResults.userInfo = userInfo;
               // var auth = 200;
+              // var userFirstName = authResults['userInfo']['FirstName'];
+              // var userLastName = authResults['userInfo']['LastName'];
+              // var Email = authResults['userInfo']['Email'];
+              // var UserPrincipalName = authResults['userInfo']['UserPrincipalName'];
+
+              console.log(authResults['userInfo'])
               var userFirstName = authResults['userInfo']['FirstName'];
               var userLastName = authResults['userInfo']['LastName'];
               var Email = authResults['userInfo']['Email'];
               var UserPrincipalName = authResults['userInfo']['UserPrincipalName'];
-
               req.session.regenerate(function(err) {
                 if (err) {
                   return res_1.json({msg:err})
