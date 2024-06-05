@@ -127,7 +127,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
   return NIH_Authenticate[SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK] ||
   (NIH_Authenticate[SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBACK] = function(req, res_1, next) {
     if (req.session.status !== 'Authenticated') {
-      // console.log('create session');
+      console.log('create session');
       var refererURL = new URL(req.headers.referer);
       var code = refererURL.searchParams.get('code');
 
