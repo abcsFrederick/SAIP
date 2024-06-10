@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --require babel-register node-postgres-todo/tests/*.js --watch",
-    "startBE": "supervisor node-postgres-todo/bin/www"
+    "startBE": "supervisor node-postgres-todo/bin/www",
+    "pm2start": "pm2 restart node-postgres-todo/bin/www"
   },
   "author": "",
   "license": "ISC",
@@ -13,7 +14,8 @@
     "compression": "^1.7.2",
     "cookie-parser": "^1.4.6",
     "jade": "^1.11.0",
-    "pg": "^6.1.0"
+    "pg": "^6.1.0",
+    "pm2": "^5.4.0"
   },
   "devDependencies": {
     "agentkeepalive": "^3.4.1",
