@@ -15,7 +15,7 @@
     "cookie-parser": "^1.4.6",
     "jade": "^1.11.0",
     "pg": "^6.1.0",
-    "pm2": "^5.4.0"
+    "pm2": "^5.4.1"
   },
   "devDependencies": {
     "agentkeepalive": "^3.4.1",

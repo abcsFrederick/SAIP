@@ -14,4 +14,5 @@ AuthFrontend/package-lock.json
 sessions
 Backend/config/*
 SAIP_2021_04_12.sql.gz
+sftp-config.json
 
