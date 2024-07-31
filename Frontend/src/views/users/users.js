@@ -157,7 +157,11 @@ var users = Backbone.View.extend({
     const groupId = e.currentTarget[e.currentTarget.selectedIndex].value
 
     this.selectedUser_id = $(e.currentTarget).attr('user_id')
-    const selectUser = this.users.models.filter(x => x.id === this.selectedUser_id)
+    const selectUser = this.users.models.filter(x => x.id == this.selectedUser_id)
+    window.models = this.users.models
+    window.selectedUser_id = this.selectedUser_id
+
+
     const selectUserName = selectUser[0].get('last_name') + ',' + selectUser[0].get('first_name')
 
     this.newUserPermission.append('user_id', this.selectedUser_id)

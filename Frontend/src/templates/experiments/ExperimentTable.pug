@@ -7,7 +7,7 @@ thead
 		th # of images
 		th 
 tbody
-	for val in data
+	for val in data ? data : [] 
 		tr 
 			td #{val.title}
 			td #{val.first_name},#{val.last_name}

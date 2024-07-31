@@ -51,7 +51,15 @@ var controlPanel = View.extend({
         this.$el.html(ControlPanelTemplate({
           admin: setting.admin,
           numberOfRequest: res.filter((x) => x.get('status') === 'pending').length || ''
-        }))
+        }));
+
+
+
+        
+      this.projects();
+
+
+
       }, this))
     })
     eventsBus.on('addNewProject', this.projects, this)

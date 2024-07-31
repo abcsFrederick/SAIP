@@ -2,12 +2,13 @@ import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'backbone'
 import 'datatables.net'
+// import DataTable from 'datatables.net-dt';
 import 'datatables.net-buttons'
 import Projects_overview_collection from '../../collections/projects/projects_overview'
 import Projects_overview_model from '../../collections/projects/projects_overview'
 import Projects_overview_templates from '../../templates/projects/projects_overview.pug'
 import FieldsTemplates from '../../templates/projects/projects_overview_pi.pug'
-import AlertTemplate from '../../templates/projects/deleteProjectAlert.pug';
+import AlertTemplate from '../../templates/projects/deleteProjectAlert.pug'
 // import Project_add_model from '../../models/projects/project_add';
 
 import Experiments from '../experiments/experiments'
@@ -61,11 +62,9 @@ var projects = View.extend({
     this.projects_overview_collection.fetch({
       data: $.param(this.user_id),
       xhrFields: {
-				  withCredentials: true							// override ajax to send with credential
+        withCredentials: true							// override ajax to send with credential
       },
       success: (_.bind(function (res) {
-        // console.log(this.users.toJSON().sort(this.dynamicSort("first_name")));
-
         if (this.is_admin) {
           this.$el.html(Projects_overview_templates({
             admin: this.is_admin,
@@ -78,225 +77,227 @@ var projects = View.extend({
             admin: this.is_admin
           }))
         }
-        this.projects_overview_table = $('#projects_overview').DataTable({
+        
+        this.projects_overview_table = 
+        // new DataTable('#projects_overview', {
+        $('#projects_overview').DataTable({
           language: {
-				        searchPlaceholder: 'Project/PI/Short name'
-				    },
-				    data: res.toJSON(),
-				    rowId: 'nci_projects_id',
-				    createdRow: function (row, data, dataIndex) {
-            $(row).attr('pid', data.nci_projects_pi_id)
-            $(row).attr('status', data.projects_status)
+            searchPlaceholder: 'Project/PI/Short name'
+          },
+          data: res.toJSON(),
+          rowId: 'nci_projects_id',
+          createdRow: function (row, data, dataIndex) {
+            $(row).attr('pid', data.nci_projects_pi_id);
+            $(row).attr('status', data.projects_status);
             if (data.projects_status === 'I') {
-              $(row).addClass('hide')
+              $(row).css('display', 'none')
             }
           },
-				    columns: [{
-			    		data: 'nci_projects_id'	//	nci_projects_id
-			    	}, {
-			    		data: 'nci_projects_name'	//	nci_projects_name
-			    	}, {
-			    		targets: 2,
-			    		render: function (data, type, full, meta) {
-			            	return full.Pi_Last_name + ',' + full.Pi_First_name
-			            }
-			    	}, {
-			    		data: 'number_of_experiments'	//	number_of_images
-			    	}, {
-			    		data: 'number_of_studies'	//	number_of_studies
-			    	}, {
-			            targets: -4,
-			            render: _.bind(function (data, type, full, meta) {
-			            	if (typeof (full.short_name) === 'string') {
-			            		return full.short_name.replace(/null|[\[\]"]+/g, '')
-			            	} else {
-			            		return full.short_name
-			            	}
-			            }, this)
-			    	}, {
-			            targets: -3,
-			            render: _.bind(function (data, type, full, meta) {
-			            	if (typeof (full.nci_projects_created_at) === 'string') {
-			            		return full.nci_projects_created_at.slice(0, 10)
-			            	} else {
-			            		return full.nci_projects_created_at
-			            	}
-			            }, this)
-			    	}, {
-		            	orderable: false,
-			            targets: -2,
-			            render: _.bind(function (data, type, full, meta) {
-			            	if (full.projects_status == 'I') {
-			            		return '<select id=' + full.nci_projects_id + '><option value=\'I\' selected>Inactive</option><option value=\'A\'>Active</option></select>'
-			            	} else {
-			            		return '<select id=' + full.nci_projects_id + '><option value=\'A\' selected>Active</option><option value=\'I\'>Inactive</option></select>'
-			                }
-			            }, this)
-			    	}, {
-		            	orderable: false,
-			            targets: -1,
-			            render: _.bind(function (data, type, full, meta) {
-			            	return '<a project_id=' + full.nci_projects_id + ' project_name="' + full.nci_projects_name +
-			            		   '" pi_id=' + full.nci_projects_pi_id + ' protocol_category_id=' + full.protocol_category_id +
-			            		   ' protocol_category_name=' + full.short_name + ' class=\'fa fa-edit project_edit\' style=\'cursor:pointer\'></a>' +
-			            		   '<a class=\'fa icon-trash\' style=\'cursor: pointer;color:red;font-size:18px\'></a>'
-			            }, this)
-			    	}],
-				    columnDefs: [
-				        { targets: [-1, 4, 3], searchable: false }
-				    ],
-				    // "columnDefs": [ { "defaultContent": "-", "targets": "_all" } ]
-				   // dom: 'Bfrtip',
-    				buttons: [
-    					{
-    						className: ' btn btn-primary',
-    						text: 'New Project',
-    					 	action: _.bind(function () {
-				 				this.project_protocols = []
-                this.project_protocols_names = []
-    					 		$('#createProject').show()
-    					 		$('#ProjectProtocolsTable').DataTable({
-    					 			drawCallback: function (settings) {
+          columns: [{
+            data: 'nci_projects_id'	//	nci_projects_id
+          }, {
+            data: 'nci_projects_name'	//	nci_projects_name
+          }, {
+            targets: 2,
+            render: function (data, type, full, meta) {
+              return full.Pi_Last_name + ',' + full.Pi_First_name
+            }
+          }, {
+            data: 'number_of_experiments'	//	number_of_images
+          }, {
+            data: 'number_of_studies'	//	number_of_studies
+          }, {
+            targets: -4,
+            render: _.bind(function (data, type, full, meta) {
+              if (typeof (full.short_name) === 'string') {
+                return full.short_name.replace(/null|[\[\]"]+/g, '')
+              } else {
+                return full.short_name
+              }
+            }, this)
+          }, {
+            targets: -3,
+            render: _.bind(function (data, type, full, meta) {
+              if (typeof (full.nci_projects_created_at) === 'string') {
+                return full.nci_projects_created_at.slice(0, 10)
+              } else {
+                return full.nci_projects_created_at
+              }
+            }, this)
+          }, {
+            orderable: false,
+            targets: -2,
+            render: _.bind(function (data, type, full, meta) {
+              if (full.projects_status == 'I') {
+                return '<select id=' + full.nci_projects_id + '><option value=\'I\' selected>Inactive</option><option value=\'A\'>Active</option></select>'
+              } else {
+                return '<select id=' + full.nci_projects_id + '><option value=\'A\' selected>Active</option><option value=\'I\'>Inactive</option></select>'
+                }
+            }, this)
+          }, {
+            orderable: false,
+            targets: -1,
+            render: _.bind(function (data, type, full, meta) {
+              return '<a project_id=' + full.nci_projects_id + ' project_name="' + full.nci_projects_name +
+                    '" pi_id=' + full.nci_projects_pi_id + ' protocol_category_id=' + full.protocol_category_id +
+                    ' protocol_category_name=' + full.short_name + ' class=\'fa fa-edit project_edit\' style=\'cursor:pointer\'></a>' +
+                    '<a class=\'fa icon-trash\' style=\'cursor: pointer;color:red;font-size:18px\'></a>'
+            }, this)
+          }],
+          columnDefs: [
+            { targets: [-1, 4, 3], searchable: false }
+          ],
+          // "columnDefs": [ { "defaultContent": "-", "targets": "_all" } ]
+          // dom: 'Bfrtip',
+          buttons: [
+            {
+              className: ' btn btn-primary',
+              text: 'New Project',
+              action: _.bind(function () {
+              this.project_protocols = []
+              this.project_protocols_names = []
+                $('#createProject').show()
+                $('#ProjectProtocolsTable').DataTable({
+                  drawCallback: function (settings) {
                     $('#ProjectProtocolsTable thead').remove()
                   },
-    					 			data: this.protocols.toJSON(),
-    					 			rowId: 'id',
-								    columns: [
-								    	{
-							            	data: 'name'
-								    	},
-								    	{
-							            	data: 'short_name'
-								    	}
-								    ],
-								    destroy: true,
-                  lengthMenu: [[-1], ['ALL']],
-                  scrollY: '50vh',
-                  scrollCollapse: true,
-                  dom: 'rt'
-    					 		})
-    					 		$('.close').on('click', function () {
-    					 			$('#createProject').hide()
-    					 		})
-    					 		$('.cancel').on('click', function () {
-    					 			$('#createProject').hide()
-    					 		})
-    					 		$('#ProjectProtocolsTable tbody').off()
-    					 		$('#ProjectProtocolsTable tbody').on('click', 'tr', _.bind(function (e) {
-    					 		//	window.test=e.currentTarget;
-                  if ($(e.currentTarget).hasClass('selected')) {
-                    console.log('has selected')
-                    $(e.currentTarget).removeClass('selected')
-                    this.project_protocols.splice(this.project_protocols.indexOf(e.currentTarget.id), 1)
-                    this.project_protocols_names.splice(this.project_protocols_names.indexOf(e.currentTarget.cells[1].textContent), 1)
-                  } else {
-                    console.log('no selected')
-                    $(e.currentTarget).addClass('selected')
-                    this.project_protocols.push(e.currentTarget.id)// make sure parent is not depulicate?
-                    this.project_protocols_names.push(e.currentTarget.cells[1].textContent)
-                  }
-                  console.log(this.project_protocols)
-                  console.log(this.project_protocols_names)
-                }, this))
+                  data: this.protocols.toJSON(),
+                  rowId: 'id',
+                  columns: [
+                    {
+                          data: 'name'
+                    },
+                    {
+                          data: 'short_name'
+                    }
+                  ],
+                  destroy: true,
+                lengthMenu: [[-1], ['ALL']],
+                scrollY: '50vh',
+                scrollCollapse: true,
+                dom: 'rt'
+                })
+                $('.close').on('click', function () {
+                  $('#createProject').hide()
+                })
+                $('.cancel').on('click', function () {
+                  $('#createProject').hide()
+                })
+                $('#ProjectProtocolsTable tbody').off()
+                $('#ProjectProtocolsTable tbody').on('click', 'tr', _.bind(function (e) {
+                //	window.test=e.currentTarget;
+                if ($(e.currentTarget).hasClass('selected')) {
+                  console.log('has selected')
+                  $(e.currentTarget).removeClass('selected')
+                  this.project_protocols.splice(this.project_protocols.indexOf(e.currentTarget.id), 1)
+                  this.project_protocols_names.splice(this.project_protocols_names.indexOf(e.currentTarget.cells[1].textContent), 1)
+                } else {
+                  console.log('no selected')
+                  $(e.currentTarget).addClass('selected')
+                  this.project_protocols.push(e.currentTarget.id)// make sure parent is not depulicate?
+                  this.project_protocols_names.push(e.currentTarget.cells[1].textContent)
+                }
+                console.log(this.project_protocols)
+                console.log(this.project_protocols_names)
+              }, this))
 
-                $('#ProjectUsersTable').DataTable({
-    					 			drawCallback: function (settings) {
-                    $('#ProjectProtocolsTable thead').remove()
+              $('#ProjectUsersTable').DataTable({
+                  drawCallback: function (settings) {
+                  $('#ProjectProtocolsTable thead').remove()
+                },
+                  data: this.users.toJSON(),
+                  rowId: 'id',
+                  language: {
+                      searchPlaceholder: 'Name'
                   },
-    					 			data: this.users.toJSON(),
-    					 			rowId: 'id',
-    					 			language: {
-								        searchPlaceholder: 'Name'
-								    },
-								    columns: [
-								    	{
-							            	targets: 0,
-							            	render: _.bind(function (data, type, full, meta) {
-							            		return full.last_name + ',' + full.first_name
-							            	})
-								    	},
-								    	{
-							            	targets: 1,
-							            	orderable: false,
-							            	render: _.bind(function (data, type, full, meta) {
-							            		return '<input type=\'checkbox\' id=\'R_' + full.id + '\'><a> </a>'// <input type='checkbox' id='W_"+full.id+"'>"	only give read premission
-							            	})
-								    	}
-								    ],
-								    columnDefs: [
-								        { targets: [1], searchable: false }
-								    ],
-								    destroy: true,
-                  lengthMenu: [[-1], ['ALL']],
-                  scrollY: '35vh',
-                  scrollCollapse: true,
-                  dom: '<"datatable_search_userName col-md-12"f>rt'
-    					 		})
-    					 		$('#ProjectUsersTable tbody tr').on('click', 'input', _.bind(function (e) {
-    					 			if (this.users_and_permissions.indexOf(e.currentTarget.id) != -1) {
-    					 				this.users_and_permissions.splice(this.users_and_permissions.indexOf(e.currentTarget.id), 1)
-    					 				this.selectedUserTableRender(e.currentTarget.id)
-    					 			} else {
-    					 				this.users_and_permissions.push(e.currentTarget.id)
-    					 				// window.tt=e.currentTarget
-    					 				this.selectedUserTableRender(e.currentTarget.id)
-    					 			}
-                  console.log(this.users_and_permissions)
-                }, this))
-    					 		if (!this.selectedUserTable) {
-    					 			this.selectedUserTable = $('#ProjectSelectedUsersTable').DataTable({
-                    dom: 'rt',
-                    // "scrollY": "100%",
-                    scrollY: '15vh',
-                    scrollCollapse: true
-                  })
-    					 		}
-    					 	}, this)
-    					},
-    					{
-    						className: ' btn btn-primary hide',
-    						text: 'Active',
-    						attr: {
-				                id: 'hideInactive'
-				            },
-    					 	action: _.bind(function (e, dt, index) {
-    					 		this.projects_overview_table.rows(function (idx, data, node) {
-							        if (data.projects_status === 'I') { $(node).addClass('hide') }
-							    })
-    					 		// $.fn.dataTable.ext.search.push(
-      							// 	function(settings, data, index) {
-		    					// 		return $(dt.row(index).node()).attr('status') == "A";
-		    					// 		//console.log($(dt.row(1).node()).attr('status'))
-		    					// 	})
-    					 		$('#showInactive').removeClass('hide')
-    					 		$('#hideInactive').addClass('hide')
-    					 	//	dt.draw();
-    					 	}, this)
-    					},
-    					{
-    						className: ' btn btn-primary',
-    						text: 'ALL',
-    						attr: {
-				                id: 'showInactive'
-				            },
-    					 	action: _.bind(function (e, dt, index) {
-    					 		this.projects_overview_table.rows(function (idx, data, node) {
-							        if ($(node).hasClass('hide')) { $(node).removeClass('hide') }
-							    })
-    					 	//	$.fn.dataTable.ext.search.pop();
-    					 		$('#hideInactive').removeClass('hide')
-    					 		$('#showInactive').addClass('hide')
-    							// dt.draw();
-    					 	}, this)
-    					}
-    				],
-			        destroy: true,
+                  columns: [
+                    {
+                          targets: 0,
+                          render: _.bind(function (data, type, full, meta) {
+                            return full.last_name + ',' + full.first_name
+                          })
+                    },
+                    {
+                          targets: 1,
+                          orderable: false,
+                          render: _.bind(function (data, type, full, meta) {
+                            return '<input type=\'checkbox\' id=\'R_' + full.id + '\'><a> </a>'// <input type='checkbox' id='W_"+full.id+"'>"	only give read premission
+                          })
+                    }
+                  ],
+                  columnDefs: [
+                      { targets: [1], searchable: false }
+                  ],
+                  destroy: true,
+                lengthMenu: [[-1], ['ALL']],
+                scrollY: '35vh',
+                scrollCollapse: true,
+                dom: '<"datatable_search_userName col-md-12"f>rt'
+                })
+                $('#ProjectUsersTable tbody tr').on('click', 'input', _.bind(function (e) {
+                  if (this.users_and_permissions.indexOf(e.currentTarget.id) != -1) {
+                    this.users_and_permissions.splice(this.users_and_permissions.indexOf(e.currentTarget.id), 1)
+                    this.selectedUserTableRender(e.currentTarget.id)
+                  } else {
+                    this.users_and_permissions.push(e.currentTarget.id)
+                    // window.tt=e.currentTarget
+                    this.selectedUserTableRender(e.currentTarget.id)
+                  }
+                console.log(this.users_and_permissions)
+              }, this))
+                if (!this.selectedUserTable) {
+                  this.selectedUserTable = $('#ProjectSelectedUsersTable').DataTable({
+                  dom: 'rt',
+                  // "scrollY": "100%",
+                  scrollY: '15vh',
+                  scrollCollapse: true
+                })
+                }
+              }, this)
+            },
+            {
+              className: ' btn btn-primary hide',
+              text: 'Active',
+              attr: {
+                id: 'hideInactive'
+              },
+              action: _.bind(function (e, dt, index) {
+                this.projects_overview_table.rows(function (idx, data, node) {
+                  // if (data.projects_status === 'I') { $(node).addClass('hide') }
+                  if ($(node).attr('status') === 'I') { $(node).css('display', 'none') }
+                })
+                $('#showInactive').removeClass('hide');
+                $('#hideInactive').addClass('hide');
+              }, this)
+            },
+            {
+              className: ' btn btn-primary',
+              text: 'ALL',
+              attr: {
+                id: 'showInactive'
+              },
+              action: _.bind(function (e, dt, index) {
+                this.projects_overview_table.rows(function (idx, data, node) {
+                  // if ($(node).hasClass('hide')) { $(node).removeClass('hide') }
+                  if ($(node).attr('status') === 'I') { $(node).css('display', 'revert') }
+                })
+                $('#hideInactive').removeClass('hide');
+                $('#showInactive').addClass('hide');
+              }, this)
+            }
+          ],
+          destroy: true,
           lengthMenu: [[-1], ['ALL']],
           scrollY: '80vh',
+          scroller: true,
           scrollCollapse: true,
+          // initComplete: _.bind(function () {
+          //   console.log(this)
+          //   this.projects_overview_table.columns.adjust()
+          // }, this),
           dom: ' <"datatable_project_buttons col-md-6"B><"datatable_search_patient col-md-6"f>rt<"datatable_Information col-md-12"i>'// <"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
-
-        })
+        });
+        window.test = this.projects_overview_table;
         $('#projects_overview tbody tr').on('change', 'select', _.bind(function (e) {
           const newProjectStatus = new FormData()
           const status = e.currentTarget[e.currentTarget.selectedIndex].value
@@ -447,14 +448,14 @@ var projects = View.extend({
         }))
 
         this.projects_overview_table = $('#projects_overview').DataTable({
-          language: {
+            language: {
 				        searchPlaceholder: 'Project/PI/Short name'
 				    },
 				    data: res.toJSON(),
 				    rowId: 'nci_projects_id',
 				    createdRow: function (row, data, dataIndex) {
 					      $(row).attr('pid', data.nci_projects_pi_id)
-          },
+            },
 				    columns: [
 				    	// {
 				    	// 	data:"nci_projects_id"	//	nci_projects_id

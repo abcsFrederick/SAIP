@@ -1,6 +1,7 @@
 import Backbone from 'backbone';
 import $ from 'jquery';
-
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 import App from './App.js';
 import Router from './router';
 
