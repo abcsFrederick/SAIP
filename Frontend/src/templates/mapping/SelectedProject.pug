@@ -35,7 +35,7 @@
 							.input-group(style='width:100%')
 								select#probe_id_mapping.form-control
 									option 
-									each probe in Probes
+									each probe in Probes ? Probes : [] 
 										option(value=probe.id) #{probe.name}
 										
 						label.col-md-5.control-label Description:

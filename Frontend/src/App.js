@@ -9,9 +9,8 @@ import ProbeCollection from './collections/probes/probes_overview';
 import ProtocolsCollection from './collections/protocols/protocols_overview';
 
 import HeaderLayout from './templates/headerLayout.pug';
-//import SearchList from './views/searchList';
 import './stylesheets/headerLayout.styl';
-import 'bootstrap';
+
 
 var domain = 'http://localhost:3000/';
 var VMpro = 'https://frsivg-mip02p.ncifcrf.gov/v0.1/';
@@ -24,8 +23,8 @@ var VMdev_ws = 'wss://frsivg-mip02d.ncifcrf.gov/w0.1/';
 var App = View.extend({
 	initialize(){
 		this.render();
-		this.domain = VMdev;
-		this.domain_ws = VMdev_ws;
+		this.domain = domain;
+		this.domain_ws = domain_ws;
 		$.ajax({
 			url: this.domain + '',
 			type: 'GET',
@@ -95,12 +94,6 @@ var App = View.extend({
 					}
 					$('#appVersion').html(' v' + res.appVersion);
 					// var testingRes = [{'nci_projects_name':'ABCC Folder','nci_projects_created_at':'2010-09-15T02:17:10.000Z','nci_projects_updated_at':'2011-02-14T22:37:44.000Z','site_users_id':3,'site_users_last_name':'Miao','site_users_first_name':'Tianyi','nci_project_users_project_id':58},{'nci_projects_name':'ABCC','nci_projects_created_at':'2010-09-15T02:17:09.000Z','nci_projects_updated_at':'2010-09-15T02:17:09.000Z','site_users_id':3,'site_users_last_name':'Miao','site_users_first_name':'Tianyi','nci_project_users_project_id':33}];
-					/* phase 1
-					this.searchList = new SearchList({
-						el:'.searchList',
-						testingRes:testingRes
-					});
-					*/
 				} else {
 					// window.location.replace('https://frsivg-mip01p.ncifcrf.gov/');
 					window.location.replace('C:/Users/miaot2/%7B%7BHome%20Folder%7D%7D/html_learning/SAIP/Frontend/public/loginPageDev.html');

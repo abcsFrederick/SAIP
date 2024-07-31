@@ -11,6 +11,11 @@ var FileStore = require("session-file-store")(session);
 var routes = require('./routes/index');
 var projectsRoutes = require('./routes/projects');
 var experimentsRoutes = require('./routes/experiments');
+var probesRoutes = require('./routes/probes');
+var mappingRoutes = require('./routes/mapping');
+var imagingRoutes = require('./routes/imaging');
+var usersRoutes = require('./routes/users');
+
 var request = require('request');
 
 var compression = require('compression');  
@@ -755,7 +760,7 @@ function request_Access(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBA
     }
   });
 }
-//app.use( cors({credentials:true,origin:['http://fr-s-ivg-ssr-d1:8080','http://ivg-boxx:8082']}));
+app.use( cors({credentials:true,origin:['http://fr-s-ivg-ssr-d1:8080','http://localhost:8888']}));
 app.set('views', path.join(__dirname, './views'));
 app.set('view engine', 'jade');
 
@@ -768,9 +773,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, './public')));
 
 app.use('/', routes);
-app.use('/api/v1/projects', projectsRoutes);
-app.use('/api/v1/experiments', experimentsRoutes);
-
+app.use('/api/v1', projectsRoutes);
+app.use('/api/v1', experimentsRoutes);
+app.use('/api/v1', probesRoutes);
+app.use('/api/v1', mappingRoutes);
+app.use('/api/v1', imagingRoutes);
+app.use('/api/v1', usersRoutes);
 
 app.get('/mysql',function(req,res,next){
   // console.log(req.session)
@@ -802,31 +810,31 @@ app.get('/mysql',function(req,res,next){
 app.get('/accessRequest',request_Access(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
 
 });
-app.get('/',NIH_Authenticate(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
-});
+// app.get('/',NIH_Authenticate(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
+// });
 
 // Fake session
-// app.get('/',function(req,res,next){
-//   req.session.regenerate(function(err){
-//     if(err){
-//       return res_1.json({msg:err})
-//     }
-//     req.session.FirstName = 'Tianyi';
-//     req.session.LastName = 'Miao';
-//     req.session.NedID = 123;
-//     req.session.Telephone = 123;
-//     req.session.Email = 123;
-//     req.session.UserPrincipalName = 123;
-//     req.session.status = 'Authenticated';
-//     req.session.group_id = [7];
-//     req.session.user_id = [5];
+app.get('/',function(req,res,next){
+  req.session.regenerate(function(err){
+    if(err){
+      return res_1.json({msg:err})
+    }
+    req.session.FirstName = 'Tianyi';
+    req.session.LastName = 'Miao';
+    req.session.NedID = 123;
+    req.session.Telephone = 123;
+    req.session.Email = 123;
+    req.session.UserPrincipalName = 123;
+    req.session.status = 'Authenticated';
+    req.session.group_id = [7];
+    req.session.user_id = [5];
 
-//     // console.log(req.session);
-//     return res.json({appVersion:version, code:1,status:req.session.status,FirstName:req.session.FirstName,
-//                       LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
-//                       Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id})
-//   });
-// });
+    // console.log(req.session);
+    return res.json({appVersion:version, code:1,status:req.session.status,FirstName:req.session.FirstName,
+                      LastName:req.session.LastName,NedID:req.session.NedID,Telephone:req.session.Telephone,
+                      Email:req.session.Email,UserPrincipalName:req.session.UserPrincipalName,Group_id:req.session.group_id,User_id:req.session.user_id})
+  });
+});
 
 
 // app.post('/mockLogin',function(req,res,next){

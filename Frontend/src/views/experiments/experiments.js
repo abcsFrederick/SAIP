@@ -15,7 +15,8 @@ import UsersCollection from '../../collections/users/user_under_project'
 import Participants from '../participants/participants'
 import eventsBus from '../../eventsBus'
 import '../../stylesheets/experiments/experiments.styl'
-import 'datatables.net'
+import 'datatables.net';
+import 'datatables.net-buttons';
 
 var experiments = View.extend({
   events: {

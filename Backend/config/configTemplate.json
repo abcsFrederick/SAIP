@@ -1,0 +1,27 @@
+{
+    "version": "1.5.2",
+    "mode": "development",
+    "debugMode": true,
+    "dbConfig":{
+        "postgres": "",
+    "mysql":{
+        "host": "", 
+        "port": 3306,
+        "user": "",
+        "password": "",
+        "database":"",
+        "timezone": "utc"
+    }
+    },
+    "filesystemConfig": {
+        "doc_root": "",
+        "archive_root": "",
+        "intermediate_storage": ""
+    },
+    "ITrust": {
+        "issuer": "https://stsstg.nih.gov",
+        "id": "",
+        "secret": "",
+        "redirect_uri": ".ncifcrf.gov/SAIP/"
+    }
+}
