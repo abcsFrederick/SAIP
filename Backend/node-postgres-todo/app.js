@@ -317,8 +317,9 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
       } else {
         fs.mkdir(workSpace, 0o755);
       }
-      let result_group_id = [];
-      let result_user_id = [];
+      var result_admin_groups = [];
+      var result_user_groups = [];
+      var result_user_id = [];
       let active;
       mysqlcon.getConnection((err, connection) => {
         if(err) throw err;
@@ -383,16 +384,6 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               //       Group_id:req.session.group_id, User_id:req.session.user_id});
               if (req.session.user_id[0]) {
                 eventTracking('Login', req.session.user_id[0]);
-              }
-              // console.log('page refresh!!!!!!!!!');
-              var workSpace = intermediate_storage + req.session.Email;
-              if (fs.existsSync(workSpace)) {
-                rimraf(workSpace, function () { 
-                  // console.log('rm -rf '+workSpace); 
-                  fs.mkdir(workSpace, 0o755);
-                });
-              } else {
-                fs.mkdir(workSpace, 0o755);
               }
               next();
           } else {
