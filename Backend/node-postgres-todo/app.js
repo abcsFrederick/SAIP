@@ -356,13 +356,6 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           connection.release();
           if (result_user_id.length && active) {
             let permission = 0;
-            req.session.FirstName = userFirstName;
-            req.session.LastName = userLastName;
-            // req.session.NedID = NedID;
-            // req.session.Telephone = Telephone;
-            req.session.Email = Email;
-            req.session.UserPrincipalName = UserPrincipalName;
-            req.session.status = authResults.status;
             req.session.user_id = result_user_id;
             req.session.user_groups = result_user_groups;
             req.session.admin_groups = result_admin_groups;
@@ -403,16 +396,8 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
               }
               next();
           } else {
-            logger.error({
-              level: 'error',
-              message: userFirstName + ' ' + userLastName + ' with userID ' 
-              + UserPrincipalName.substr(0,UserPrincipalName.indexOf('@')) 
-              + ' or ' 
-              + Email.substr(0,Email.indexOf('@')) 
-              + ' is not on(or not active) the SAIP whitelist'
-            });
-            authResults.status = "Authentication failed";
-            res_1.json({code:0, status: authResults.status});
+            authResults.status = "User Inactived";
+            res_1.json({code:2, status:authResults.status});
             next();
           }
         });
