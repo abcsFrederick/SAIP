@@ -711,7 +711,6 @@ function request_Access(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALLBA
 app.use(cors({
   credentials: true, 
   origin: [
-    'http://fr-s-ivg-ssr-d1:8080',
     'http://localhost:8888',
     'http://localhost:8884',
     'http://localhost:8881',
