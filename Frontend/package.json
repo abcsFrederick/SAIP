@@ -60,7 +60,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "html-webpack-tags-plugin": "^2.0.17",
-    "jquery-ui": "^1.12.1",
-    "jquery-ui-bundle": "^1.12.1-migrate"
+    "jquery-ui": "1.13.3",
+    "jquery-ui-bundle": "1.13.3"
   }
 }
