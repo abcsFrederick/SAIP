@@ -10,7 +10,7 @@
     "start-groupadmin-1": "PORT=3002 supervisor node-postgres-todo/bin/www",
     "start-groupadmin-2": "PORT=3003 supervisor node-postgres-todo/bin/www",
     "start-user": "PORT=3004 supervisor node-postgres-todo/bin/www",
-    "pm2start": "pm2 restart node-postgres-todo/bin/www"
+    "pm2start": "pm2 restart /var/www/html/APIs/node-postgres-todo/bin/www"
   },
   "author": "",
   "license": "ISC",
