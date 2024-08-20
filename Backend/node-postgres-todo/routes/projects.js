@@ -150,13 +150,7 @@ projectsRouter.delete('/projects/delete/:project_id', isAdmin, (req, res, next) 
     });
 });
 
-projectsRouter.post('/project_add', isAdmin, (req, res, next) => {  //isAdmin
-    /*
-        Testing params
-    */
-    //console.log('hello');
-    //console.log(req.files.SRAC_file)
-    
+projectsRouter.post('/project_add', isAdmin, (req, res, next) => {
     logger.info({
         level: 'info',
         message: req.session.FirstName + ' ' + req.session.LastName
@@ -175,70 +169,66 @@ projectsRouter.post('/project_add', isAdmin, (req, res, next) => {  //isAdmin
 
     // console.log(req.body)
     // console.log(req.files)
-    req.checkBody('name','Project name cannot be empty').notEmpty();
-    req.checkBody('name','Project name should be a string<varchar(127)>').isString();
-    req.checkBody('pi_id','Pi id cannot be empty').notEmpty();
-    req.checkBody('pi_id','Pi id should be an integer<int(11)>').isInt();
-    req.checkBody('status','Status cannot be empty').notEmpty();
-    req.checkBody('status','Status should be a string<varchar(1)>').isLength({ max: 1 });
+    req.checkBody('name', 'Project name cannot be empty').notEmpty();
+    req.checkBody('name', 'Project name should be a string<varchar(127)>').isString();
+    req.checkBody('pi_id', 'Pi id cannot be empty').notEmpty();
+    req.checkBody('pi_id', 'Pi id should be an integer<int(11)>').isInt();
+    req.checkBody('status', 'Status cannot be empty').notEmpty();
+    req.checkBody('status', 'Status should be a string<varchar(1)>').isLength({ max: 1 });
     // req.checkBody('proposal','Proposal cannot be empty').notEmpty();
     // req.checkBody('proposal','Proposal should be a string<text>').isString();
     // req.checkBody('requester','Project name cannot be empty').notEmpty();
     // req.checkBody('requester','Project name should be a string<varchar(255)>').isString();
-    req.checkBody('protocol_category_id','protocol category id cannot be empty').notEmpty();
-    req.checkBody('protocol_category_id','protocol category id should be an array with integer').isArrayOfInt();
+    req.checkBody('protocol_category_id', 'protocol category id cannot be empty').notEmpty();
+    req.checkBody('protocol_category_id', 'protocol category id should be an array with integer').isArrayOfInt();
 
     var errors = req.validationErrors();
 
-    if(errors){
-        return res.json({'err':1,errors});
-    }
-    else{
-        for(let a=0;a<req.body.protocol_category_id.length;a++){
+    if (errors) {
+        return res.json({'err': 1, errors});
+    } else {
+        for(let a = 0; a < req.body.protocol_category_id.length; a++) {
             req.body.protocol_category_id[a] = parseInt(req.body.protocol_category_id[a]);
         }
         req.body.protocol_category_id = req.body.protocol_category_id||[2,1];
 
-
         let name = req.body.name;
         let pi_id = req.body.pi_id;
-        let authors = req.body.authors||'';
-        let collaborator = req.body.collaborator||'';
-        let collab_grant_num = req.body.collab_grant_num||'';
-        let fund_project_id = req.body.fund_project_id||null;
-        let SRAC_number = req.body.SRAC_number||'';
+        let authors = req.body.authors || '';
+        let collaborator = req.body.collaborator || '';
+        let collab_grant_num = req.body.collab_grant_num || '';
+        let fund_project_id = req.body.fund_project_id || null;
+        let SRAC_number = req.body.SRAC_number || '';
         let SRAC_file = '';
-        if(req.files){
+        if (req.files) {
             SRAC_file = req.files.SRAC_file.name;
         }
 
         let status = req.body.status;
-        let proposal = req.body.proposal||'-';
-        let est_costs = req.body.est_costs||0;
-        let disease_id = req.body.disease_id||null;
-        let organ_id = req.body.organ_id||null;
-        let process_id = req.body.process_id||null;
-        let mouse_id = req.body.mouse_id||null;
-        let probe_id = req.body.probe_id||null;
-        let suggested_funding = req.body.suggested_funding||null;
-        let requester = req.body.requester||'-';
-        let miportal_id = req.body.miportal_id||null;
-        let studies_per_object = req.body.studies_per_object||0;
-        let number_of_objects = req.body.number_of_objects||0;
-        let users_and_permissions = req.body.users_and_permissions||null;
+        let proposal = req.body.proposal || '-';
+        let est_costs = req.body.est_costs || 0;
+        let disease_id = req.body.disease_id || null;
+        let organ_id = req.body.organ_id || null;
+        let process_id = req.body.process_id || null;
+        let mouse_id = req.body.mouse_id || null;
+        let probe_id = req.body.probe_id || null;
+        let suggested_funding = req.body.suggested_funding || null;
+        let requester = req.body.requester || '-';
+        let miportal_id = req.body.miportal_id || null;
+        let studies_per_object = req.body.studies_per_object || 0;
+        let number_of_objects = req.body.number_of_objects || 0;
+        let users_and_permissions = req.body.users_and_permissions || null;
         let permissions = [];
         let user_id = [];
         let uniqueUser_id;
-        for(let a=0;a<users_and_permissions.length;a++){
-            if(users_and_permissions[a].match(/\d+/)[0]==uniqueUser_id){
-                 permissions[user_id.indexOf(uniqueUser_id)] = 'RW'
-            }
-            else{
-                uniqueUser_id=users_and_permissions[a].match(/\d+/)[0]
+        for (let a = 0; a < users_and_permissions.length; a++) {
+            if (users_and_permissions[a].match(/\d+/)[0] == uniqueUser_id) {
+                 permissions[user_id.indexOf(uniqueUser_id)] = 'RW';
+            } else{
+                uniqueUser_id=users_and_permissions[a].match(/\d+/)[0];
                 permissions.push(users_and_permissions[a].match(/\w/)[0]);
                 user_id.push(users_and_permissions[a].match(/\d+/)[0]);
             }
-            
         }
         //let permissions = req.query.permissions||'R';   //need to modify
         let project_protocols_names = req.body.project_protocols_names||null;
@@ -249,18 +239,22 @@ projectsRouter.post('/project_add', isAdmin, (req, res, next) => {  //isAdmin
                 //
                 //    Add project for particular users
                 //
-                mysqlcon.getConnection((err,connection)=>{
+                mysqlcon.getConnection((err, connection) => {
                     if(err) throw err;
+                    let group_id = req.session.admin_groups[0].id;
+                    if (req.session.permission > 1) {
+                        group_id = 7;
+                    }
                     var query = connection.query("INSERT INTO nci_projects ( name, pi_id, \
                         authors, collaborator, collab_grant_num, fund_project_id, SRAC_number, \
                         SRAC_file, status, proposal, est_costs, disease_id, organ_id, process_id, \
                         number_of_objects, studies_per_object, mouse_id, probe_id, suggested_funding, \
-                        requester, created_at, updated_at, miportal_id) \
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW(),?)",
-                        [name,pi_id,authors,collaborator,collab_grant_num,fund_project_id,SRAC_number,SRAC_file,
-                        status,proposal,est_costs,disease_id,organ_id,process_id,number_of_objects,studies_per_object,
-                        mouse_id,probe_id,suggested_funding,requester,miportal_id],
-                        function(err,result){
+                        requester, created_at, updated_at, miportal_id, group_id) \
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)",
+                        [name, pi_id, authors, collaborator, collab_grant_num, fund_project_id, SRAC_number, SRAC_file,
+                        status, proposal, est_costs, disease_id, organ_id, process_id, number_of_objects, studies_per_object,
+                        mouse_id, probe_id, suggested_funding, requester, miportal_id, group_id],
+                        function(err, result) {
                             if(err) throw err;
 
                             logger.info({
@@ -408,38 +402,31 @@ projectsRouter.post('/project_add_users', isAdmin, (req, res, next) => {
         message: req.session.FirstName + ' ' + req.session.LastName
         + '(' + req.session.user_id[0] + ') POST `/api/v1/project_add_users`'
     });
-    req.checkBody('project_id','Project id cannot be empty').notEmpty();
-    req.checkBody('project_id','Project id should be an integer').isInt();
+    req.checkBody('project_id', 'Project id cannot be empty').notEmpty();
+    req.checkBody('project_id', 'Project id should be an integer').isInt();
     req.body.users_and_permissions = JSON.parse(req.body.users_and_permissions);
 
-    let project_id = req.body.project_id||null;
-    let users_and_permissions = req.body.users_and_permissions||null;
+    let project_id = req.body.project_id || null;
+    let users_and_permissions = req.body.users_and_permissions || null;
     var errors = req.validationErrors();
 
-    if(errors){
-        return res.json({'err':1,errors});
-    }
-    else{
+    if (errors) {
+        return res.json({'err': 1, errors});
+    } else{
     
         let permissions = [];
         let user_id = [];
         let uniqueUser_id;
-        for(let a=0;a<users_and_permissions.length;a++){
-            if(users_and_permissions[a].match(/\d+/)[0]==uniqueUser_id){
+        for (let a = 0; a < users_and_permissions.length; a++) {
+            if (users_and_permissions[a].match(/\d+/)[0] == uniqueUser_id){
                  permissions[user_id.indexOf(uniqueUser_id)] = 'RW'
-            }
-            else{
+            } else{
                 uniqueUser_id=users_and_permissions[a].match(/\d+/)[0]
                 permissions.push(users_and_permissions[a].match(/\w/)[0]);
                 user_id.push(users_and_permissions[a].match(/\d+/)[0]);
             }
-            
         }
-        // console.log(project_id);
-        // console.log(user_id);
-        // console.log(permissions);
-    
-        if(user_id.length){
+        if (user_id.length) {
             async.waterfall([
                 function(callback){
                     let results=[];
@@ -612,30 +599,30 @@ projectsRouter.get('/projects_overview', isAuth, (req, res, next) => {
     // console.log(req.session);
     var LoginUserId = req.session.user_id[0];
     var results = [];
-    if (req.session.group_id.includes(7)) {
+    if (req.session.permission === 2) {
         mysqlcon.getConnection((err, connection) => {
             if (err) throw err;
             //FOR mariadb 10.2.8
-            var query = connection.query("SELECT nci_projects_created_at, nci_projects_id, \
-                                          nci_projects_name, nci_projects_pi_id, Pi_First_name, \
-                                          Pi_Last_name, number_of_experiments, number_of_studies, \
-                                          projects_status, number_of_images, GROUP_CONCAT(short_name) AS short_name, \
-                                          GROUP_CONCAT(protocol_category_id) AS protocol_category_id \
-                                          FROM (SELECT t5.*, nci_protocol_categories.short_name \
-                                          FROM(SELECT t4.*, nci_protocols.protocol_category_id \
-                                          FROM(SELECT t3.*,COUNT(imaging_experiments.title) AS number_of_experiments, \
-                                          SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, \
-                                          SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images \
-                                          FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, \
-                                          site_users.first_name AS Pi_First_name \
-                                          FROM(SELECT nci_projects.id AS nci_projects_id, \
-                                          nci_projects.name AS nci_projects_name, nci_projects.pi_id AS nci_projects_pi_id, \
-                                          status AS projects_status, created_at AS nci_projects_created_at \
-                                          FROM nci_projects) as t2 \
-                                          LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 \
-                                          LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 \
-                                          LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 \
-                                          LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
+            var query = connection.query(`SELECT nci_projects_created_at, nci_projects_group_id, nci_projects_group_name, 
+                is_admin, projects_status, nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name,
+                number_of_experiments, number_of_studies, number_of_images, GROUP_CONCAT(short_name) AS short_name 
+                FROM (SELECT t5.*, nci_protocol_categories.short_name 
+                FROM (SELECT t4.*, nci_protocols.protocol_category_id 
+                FROM (SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, 
+                (IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, 
+                SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images 
+                FROM (SELECT t2.status AS projects_status, t2.id AS nci_projects_id, t2.name AS nci_projects_name, 
+                t2.pi_id AS nci_projects_pi_id, t2.created_at AS nci_projects_created_at, t2.group_id AS nci_projects_group_id, 
+                t2.group_name AS nci_projects_group_name, t2.is_admin AS is_admin, 
+                site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name 
+                FROM (SELECT t1.*, site_groups.name AS group_name 
+                FROM (SELECT *, @is_admin:=1 AS is_admin FROM nci_projects) 
+                as t1 LEFT JOIN site_groups ON t1.group_id=site_groups.id) 
+                as t2 LEFT JOIN site_users ON t2.pi_id=site_users.id) 
+                as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) 
+                as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) 
+                as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) 
+                as t6 GROUP BY nci_projects_id;`);
             //FOR MySQL
             //var query = connection.query("SELECT nci_projects_created_at,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_experiments, number_of_studies, projects_status, number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*,COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id,status AS projects_status, created_at AS nci_projects_created_at  FROM nci_projects) as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");//SELECT nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_studies, number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id FROM nci_projects) as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");            
             query.on('result', (row) => {
@@ -646,11 +633,112 @@ projectsRouter.get('/projects_overview', isAuth, (req, res, next) => {
                 return res.json(results);
             });
         });
+    } else if (req.session.permission === 1) {
+        let admin_group = req.session.admin_groups[0].id;
+        async.parallel({
+            admin: function(callback) {
+                let results_admin = [];
+                mysqlcon.getConnection((err, connection) => {
+                    // for admin owned projects
+                    var query = connection.query(`SELECT nci_projects_created_at, nci_projects_group_id, nci_projects_group_name, 
+                        is_admin, projects_status ,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, 
+                        Pi_Last_name,number_of_experiments, number_of_studies, number_of_images, GROUP_CONCAT(short_name) AS short_name 
+                        FROM (SELECT t5.*, nci_protocol_categories.short_name 
+                        FROM(SELECT t4.*, nci_protocols.protocol_category_id 
+                        FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, 
+                        (IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, 
+                        SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images 
+                        FROM(SELECT t2.status AS projects_status, t2.id AS nci_projects_id, t2.name AS nci_projects_name, 
+                        t2.pi_id AS nci_projects_pi_id, t2.created_at AS nci_projects_created_at, t2.group_id AS nci_projects_group_id, 
+                        t2.group_name AS nci_projects_group_name, t2.is_admin AS is_admin, site_users.last_name AS Pi_Last_name, 
+                        site_users.first_name AS Pi_First_name 
+                        FROM (SELECT t1.*, site_groups.name AS group_name 
+                        FROM (SELECT *, @is_admin:=1 AS is_admin FROM nci_projects WHERE group_id = ${admin_group}) 
+                        as t1 LEFT JOIN site_groups ON t1.group_id=site_groups.id) 
+                        as t2 LEFT JOIN site_users ON t2.pi_id=site_users.id) 
+                        as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) 
+                        as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) 
+                        as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) 
+                        as t6 GROUP BY nci_projects_id;`);
+                    query.on('result', (row) => {
+                        results_admin.push(row);
+                    });
+                    query.on('end', () => {
+                        connection.release();
+                        callback(null, results_admin);
+                    });
+                });
+            },
+            users: function(callback) {
+                // for projects of the admin user have access to
+                let results_users = [];
+                mysqlcon.getConnection((err, connection) => {
+                    var query = connection.query(`SELECT t7.*, site_groups.name as nci_projects_group_name 
+                        FROM(SELECT nci_projects_created_at, Login_user, nci_projects_group_id, is_admin, projects_status ,
+                        nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name,number_of_experiments, 
+                        number_of_studies, number_of_images, GROUP_CONCAT(short_name) AS short_name 
+                        FROM (SELECT t5.*, nci_protocol_categories.short_name 
+                        FROM(SELECT t4.*, nci_protocols.protocol_category_id 
+                        FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, 
+                        (IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, 
+                        (IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images 
+                        FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name 
+                        FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, 
+                        nci_projects.id AS nci_projects_id, nci_projects.name AS nci_projects_name,
+                        nci_projects.pi_id AS nci_projects_pi_id, nci_projects.created_at AS nci_projects_created_at, 
+                        nci_projects.group_id AS nci_projects_group_id, @is_admin:=0 AS is_admin 
+                        FROM (SELECT id AS project_users_id, project_id AS project_users_project_id, user_id AS project_users_user_id,
+                        permissions AS project_users_permissions FROM nci_project_users WHERE user_id = ${LoginUserId}) 
+                        as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') 
+                        as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) 
+                        as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) 
+                        as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) 
+                        as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) 
+                        as t6 GROUP BY nci_projects_id) 
+                        as t7 LEFT JOIN site_groups ON t7.nci_projects_group_id=site_groups.id WHERE nci_projects_group_id!=${admin_group};`);
+                    //FOR MySQL
+                    //var query = connection.query("SELECT nci_projects_created_at,Login_user, projects_status ,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_studies, number_of_experiments,number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id, nci_projects.created_at AS nci_projects_created_at FROM (SELECT id AS project_users_id,project_id AS project_users_project_id,user_id AS project_users_user_id,permissions AS project_users_permissions FROM nci_project_users WHERE user_id = "+LoginUserId+") as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
+                    query.on('result', (row) => {
+                        results_users.push(row);
+                    });
+                    query.on('end', () => {
+                        connection.release();
+                        callback(null, results_users);
+                    });
+                });
+            }
+        }, function(err, admin_user_results) {
+            console.log(admin_user_results)
+            results = admin_user_results.users.concat(admin_user_results.admin);
+            return res.json(results);
+        });
     } else {
         mysqlcon.getConnection((err, connection) => {
             if (err) throw err;
             //FOR mariadb 10.2.8
-            var query = connection.query("SELECT nci_projects_created_at,Login_user, projects_status ,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name,number_of_experiments, number_of_studies, number_of_images, GROUP_CONCAT(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id,nci_projects.created_at AS nci_projects_created_at FROM (SELECT id AS project_users_id,project_id AS project_users_project_id,user_id AS project_users_user_id,permissions AS project_users_permissions FROM nci_project_users WHERE user_id = "+LoginUserId+") as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
+            var query = connection.query(`SELECT t7.*, site_groups.name as nci_projects_group_name 
+                FROM(SELECT nci_projects_created_at, Login_user, nci_projects_group_id, is_admin, projects_status ,
+                nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name,number_of_experiments, 
+                number_of_studies, number_of_images, GROUP_CONCAT(short_name) AS short_name 
+                FROM (SELECT t5.*, nci_protocol_categories.short_name 
+                FROM(SELECT t4.*, nci_protocols.protocol_category_id 
+                FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, 
+                (IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, 
+                (IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images 
+                FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name 
+                FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, 
+                nci_projects.id AS nci_projects_id, nci_projects.name AS nci_projects_name,
+                nci_projects.pi_id AS nci_projects_pi_id, nci_projects.created_at AS nci_projects_created_at, 
+                nci_projects.group_id AS nci_projects_group_id, @is_admin:=0 AS is_admin 
+                FROM (SELECT id AS project_users_id, project_id AS project_users_project_id, user_id AS project_users_user_id,
+                permissions AS project_users_permissions FROM nci_project_users WHERE user_id = ${LoginUserId}) 
+                as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') 
+                as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) 
+                as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) 
+                as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) 
+                as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) 
+                as t6 GROUP BY nci_projects_id) 
+                as t7 LEFT JOIN site_groups ON t7.nci_projects_group_id=site_groups.id;`);
             //FOR MySQL
             //var query = connection.query("SELECT nci_projects_created_at,Login_user, projects_status ,nci_projects_id, nci_projects_name, nci_projects_pi_id, Pi_First_name, Pi_Last_name, number_of_studies, number_of_experiments,number_of_images, JSON_ARRAYAGG(short_name) AS short_name FROM (SELECT t5.*, nci_protocol_categories.short_name FROM(SELECT t4.*, nci_protocols.protocol_category_id FROM(SELECT t3.*, COUNT(imaging_experiments.title) AS number_of_experiments, SUM(IFNULL(imaging_experiments.number_of_studies,0)) AS number_of_studies, SUM(IFNULL(imaging_experiments.number_of_images,0)) AS number_of_images FROM(SELECT t2.*, site_users.last_name AS Pi_Last_name, site_users.first_name AS Pi_First_name FROM(SELECT status AS projects_status, t1.project_users_user_id AS Login_user, nci_projects.id AS nci_projects_id,nci_projects.name AS nci_projects_name,nci_projects.pi_id AS nci_projects_pi_id, nci_projects.created_at AS nci_projects_created_at FROM (SELECT id AS project_users_id,project_id AS project_users_project_id,user_id AS project_users_user_id,permissions AS project_users_permissions FROM nci_project_users WHERE user_id = "+LoginUserId+") as t1 LEFT JOIN nci_projects ON t1.project_users_project_id=nci_projects.id WHERE status= 'A') as t2 LEFT JOIN site_users ON t2.nci_projects_pi_id=site_users.id) as t3 LEFT JOIN imaging_experiments ON t3.nci_projects_id =imaging_experiments.project_id GROUP BY t3.nci_projects_id) as t4 LEFT JOIN nci_protocols ON t4.nci_projects_id=nci_protocols.project_id) as t5 LEFT JOIN nci_protocol_categories ON t5.protocol_category_id=nci_protocol_categories.id) AS t6 GROUP BY nci_projects_id;");
             query.on('result', (row) => {
@@ -684,7 +772,27 @@ projectsRouter.get('/project/:project_id', isAuth, (req, res, next) => {   //isA
     mysqlcon.getConnection((err, connection) => {
         if (err) throw err;
         //FOR mariadb10.2.8
-        var query = connection.query("SELECT last_name,first_name, nci_project_pi_id,nci_project_id, nci_project_name, authors, requester, collaborator, collab_grant_num, SRAC_number, SRAC_file, status, proposal, est_costs, fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id, GROUP_CONCAT(nci_protocols_number_of_objects) AS number_of_objects, GROUP_CONCAT(nci_protocols_studies_per_object) AS studies_per_object, GROUP_CONCAT(nci_protocols_hours_per_study) AS hours_per_study, GROUP_CONCAT(name) AS name, GROUP_CONCAT(short_name) AS short_name, GROUP_CONCAT(nci_protocols_id) AS protocols_id, GROUP_CONCAT(protocol_category_id) AS protocol_category_id FROM(SELECT t3.*, nci_protocol_categories.name, nci_protocol_categories.short_name FROM(SELECT site_users.last_name, site_users.first_name, t2.* FROM(SELECT t1.*, nci_protocols.id AS nci_protocols_id, nci_protocols.protocol_category_id AS protocol_category_id, nci_protocols.project_id AS nci_protocols_project_id, nci_protocols.number_of_objects AS nci_protocols_number_of_objects, nci_protocols.studies_per_object AS nci_protocols_studies_per_object, nci_protocols.hours_per_study AS nci_protocols_hours_per_study From (SELECT id AS nci_project_id,name AS nci_project_name,pi_id AS nci_project_pi_id,authors,requester,collaborator,collab_grant_num,SRAC_number,SRAC_file,status,proposal,est_costs,fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id FROM nci_projects WHERE id = "+selected_project+") as t1 LEFT JOIN nci_protocols ON t1.nci_project_id=nci_protocols.project_id) as t2 LEFT JOIN site_users ON t2.nci_project_pi_id = site_users.id) AS t3 LEFT JOIN nci_protocol_categories ON t3.protocol_category_id=nci_protocol_categories.id) AS t4 GROUP BY nci_project_id;");
+        var query = connection.query(`SELECT last_name, first_name, nci_project_pi_id,nci_project_id, 
+            nci_project_name, authors, requester, collaborator, collab_grant_num, SRAC_number, 
+            SRAC_file, status, proposal, est_costs, fund_project_id, disease_id, organ_id, 
+            process_id, mouse_id, probe_id, GROUP_CONCAT(nci_protocols_number_of_objects) AS number_of_objects, 
+            GROUP_CONCAT(nci_protocols_studies_per_object) AS studies_per_object, 
+            GROUP_CONCAT(nci_protocols_hours_per_study) AS hours_per_study, 
+            GROUP_CONCAT(name) AS name, GROUP_CONCAT(short_name) AS short_name, 
+            GROUP_CONCAT(nci_protocols_id) AS protocols_id, 
+            GROUP_CONCAT(protocol_category_id) AS protocol_category_id 
+            FROM(SELECT t3.*, nci_protocol_categories.name, nci_protocol_categories.short_name 
+                FROM(SELECT site_users.last_name, site_users.first_name, t2.* 
+                    FROM(SELECT t1.*, nci_protocols.id AS nci_protocols_id, nci_protocols.protocol_category_id AS protocol_category_id, 
+                        nci_protocols.project_id AS nci_protocols_project_id, nci_protocols.number_of_objects AS nci_protocols_number_of_objects, 
+                        nci_protocols.studies_per_object AS nci_protocols_studies_per_object, nci_protocols.hours_per_study AS nci_protocols_hours_per_study 
+                        From (SELECT id AS nci_project_id,name AS nci_project_name,pi_id AS nci_project_pi_id,
+                            authors, requester, collaborator, collab_grant_num, SRAC_number, SRAC_file, status, proposal, est_costs, fund_project_id, disease_id, organ_id, 
+                            process_id, mouse_id, probe_id 
+                            FROM nci_projects WHERE id = ${selected_project}) as t1 LEFT JOIN nci_protocols ON t1.nci_project_id=nci_protocols.project_id) 
+                            AS t2 LEFT JOIN site_users ON t2.nci_project_pi_id = site_users.id) 
+                            AS t3 LEFT JOIN nci_protocol_categories ON t3.protocol_category_id=nci_protocol_categories.id) 
+                            AS t4 GROUP BY nci_project_id;`);
         //FOR MySQL
         //var query = connection.query("SELECT last_name,first_name, nci_project_pi_id,nci_project_id, nci_project_name, authors, requester, collaborator, collab_grant_num, SRAC_number, SRAC_file, status, proposal, est_costs, fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id, JSON_ARRAYAGG(nci_protocols_number_of_objects) AS number_of_objects, JSON_ARRAYAGG(nci_protocols_studies_per_object) AS studies_per_object, JSON_ARRAYAGG(nci_protocols_hours_per_study) AS hours_per_study, JSON_ARRAYAGG(name) AS name, JSON_ARRAYAGG(short_name) AS short_name, JSON_ARRAYAGG(nci_protocols_id) AS protocols_id, JSON_ARRAYAGG(protocol_category_id) AS protocol_category_id FROM(SELECT t3.*, nci_protocol_categories.name, nci_protocol_categories.short_name FROM(SELECT site_users.last_name, site_users.first_name, t2.* FROM(SELECT t1.*, nci_protocols.id AS nci_protocols_id, nci_protocols.protocol_category_id AS protocol_category_id, nci_protocols.project_id AS nci_protocols_project_id, nci_protocols.number_of_objects AS nci_protocols_number_of_objects, nci_protocols.studies_per_object AS nci_protocols_studies_per_object, nci_protocols.hours_per_study AS nci_protocols_hours_per_study From (SELECT id AS nci_project_id,name AS nci_project_name,pi_id AS nci_project_pi_id,authors,requester,collaborator,collab_grant_num,SRAC_number,SRAC_file,status,proposal,est_costs,fund_project_id, disease_id, organ_id, process_id, mouse_id, probe_id FROM nci_projects WHERE id = "+selected_project+") as t1 LEFT JOIN nci_protocols ON t1.nci_project_id=nci_protocols.project_id) as t2 LEFT JOIN site_users ON t2.nci_project_pi_id = site_users.id) AS t3 LEFT JOIN nci_protocol_categories ON t3.protocol_category_id=nci_protocol_categories.id) AS t4 GROUP BY nci_project_id;");
         query.on('result', (row) => {
@@ -692,6 +800,7 @@ projectsRouter.get('/project/:project_id', isAuth, (req, res, next) => {   //isA
         });
         query.on('end', () => {
             connection.release();
+            console.log(results);
             return res.json(results);
         });
     });

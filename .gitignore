@@ -3,11 +3,14 @@ npm-debug.log
 Frontend/node_modules
 Frontend/package-lock.json
 Frontend/public/test
+Frontend/start.sh
 Backend/node_modules
 Backend/package-lock.json
 Backend/node-postgres-todo/package-lock.json
 Backend/node-postgres-todo/node_modules
 Backend/node-postgres-todo/logs/*
+Backend/start.sh
+*.sh
 AuthFrontend/node_modules
 AuthFrontend/package-lock.json
 .DS_Store

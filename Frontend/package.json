@@ -5,8 +5,12 @@
   "main": "webpack.config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "server": "webpack-dev-server"
+    "build": "webpack --env.port=8888",
+    "server-sysadmin": "webpack-dev-server --env.port=8881 --env.api=3001",
+    "server-groupadmin-1": "webpack-dev-server --env.port=8882 --env.api=3002",
+    "server-groupadmin-2": "webpack-dev-server --env.port=8883 --env.api=3003",
+    "server-user": "webpack-dev-server --env.port=8884 --env.api=3004",
+    "server": "webpack-dev-server --env.port=8888"
   },
   "author": "",
   "license": "ISC",
@@ -54,6 +58,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "html-webpack-tags-plugin": "^2.0.17",
     "jquery-ui": "^1.12.1",
     "jquery-ui-bundle": "^1.12.1-migrate"

@@ -5,6 +5,8 @@ import eventsBus from '../../eventsBus'
 import UsersTemplate from '../../templates/users/UsersTemplate.pug'
 import AlertTemplate from '../../templates/users/AlertTemplate.pug'
 import UsersCollection from '../../collections/users/users_overview'
+import GroupsCollection from '../../collections/groups/groups_overview';
+
 
 var users = Backbone.View.extend({
   events: {
@@ -17,17 +19,122 @@ var users = Backbone.View.extend({
     'click #edit_User': 'edit_User'
   },
   initialize (setting) {
-    this.domain = setting.domain
-    this.user_id = setting.user_id
-    this.users = setting.users
-    this.admin = setting.admin
+    this.domain = setting.domain;
+    this.user_id = setting.user_id;
+    this.users = setting.users;
+    this.permission = setting.permission;
+    this.admin_groups = setting.admin_groups;
+    
+    this.newUserList = [];
+    this.newAdminList = [];
+
 
     this.$el.html(UsersTemplate({
-      admin: this.admin
-    }))
+      permission: this.permission,
+      admin_groups: this.admin_groups
+    }));
+
     this.usersCollection = new UsersCollection({
       domain: this.domain
-    })
+    });
+    this.groupsCollection = new GroupsCollection({
+      domain: this.domain
+    });
+    if (this.permission > 1) {
+      this.groupsCollection.fetch({
+        xhrFields: {
+          withCredentials: true // override ajax to send with credential
+        },
+        success: (_.bind(function (res) {
+          this.userAdminTable = this.$('#UserAdminTable').DataTable({
+            data: res.toJSON(),
+            rowId: 'id',
+            columns: [{
+              targets: 0,
+              render: _.bind(function (data, type, full, meta) {
+                return full.name
+              }, this)
+            },
+            {
+              targets: 1,
+              render: _.bind(function (data, type, full, meta) {
+                  return '<input class="check_admin" type=checkbox group_id=' + full.id + ' group_name=' + full.name +'></input>'
+                  
+              }, this),
+              orderDataType: 'dom-select'
+            }],
+            destroy: true,
+            lengthMenu: [[-1], ['ALL']],
+            scrollY: '50vh',
+            scrollCollapse: true,
+            dom: 'rt'
+          });
+          this.$('#UserAdminTable tbody').on('click', 'tr', _.bind(function (e) {
+            if(!$(e.target).hasClass('check_admin')) {
+              if ($(e.currentTarget).hasClass('selected')) {
+                $(e.currentTarget).removeClass('selected');
+                this.newUserList.splice(this.newUserList.indexOf(e.currentTarget.id), 1);
+              } else {
+                this.newUserList.push(e.currentTarget.id);
+                $(e.currentTarget).addClass('selected')
+              }
+            }
+            
+          }, this));
+          this.$('#UserAdminTable tbody tr').on('click', 'input', _.bind(function (e) {
+            if (this.newAdminList.indexOf($(e.currentTarget).attr('group_id')) < 0) {
+              this.newAdminList.push($(e.currentTarget).attr('group_id'));
+            } else {
+              this.newAdminList.splice(this.newAdminList.indexOf($(e.currentTarget).attr('group_id')), 1);
+            }
+          }, this));
+        }, this))
+      });
+    } else {
+      this.userAdminTable = this.$('#UserAdminTable').DataTable({
+        data: this.admin_groups,
+        rowId: 'id',
+        columns: [{
+          targets: 0,
+          render: _.bind(function (data, type, full, meta) {
+            return full.name
+          }, this)
+        },
+        {
+          targets: 1,
+          render: _.bind(function (data, type, full, meta) {
+              return '<input class="check_admin" type=checkbox group_id=' + full.id + ' group_name=' + full.name +'></input>'
+              
+          }, this),
+          orderDataType: 'dom-select'
+        }],
+        destroy: true,
+        lengthMenu: [[-1], ['ALL']],
+        scrollY: '50vh',
+        scrollCollapse: true,
+        dom: 'rt'
+      });
+      this.$('#UserAdminTable tbody').on('click', 'tr', _.bind(function (e) {
+        if(!$(e.target).hasClass('check_admin')) {
+          if ($(e.currentTarget).hasClass('selected')) {
+            $(e.currentTarget).removeClass('selected');
+            this.newUserList.splice(this.newUserList.indexOf(e.currentTarget.id), 1);
+          } else {
+            this.newUserList.push(e.currentTarget.id);
+            $(e.currentTarget).addClass('selected')
+          }
+        }
+        
+      }, this));
+      this.$('#UserAdminTable tbody tr').on('click', 'input', _.bind(function (e) {
+        if (this.newAdminList.indexOf($(e.currentTarget).attr('group_id')) < 0) {
+          this.newAdminList.push($(e.currentTarget).attr('group_id'));
+        } else {
+          this.newAdminList.splice(this.newAdminList.indexOf($(e.currentTarget).attr('group_id')), 1);
+        }
+      }, this));
+    }
+    
   },
   render () {
     $.fn.dataTable.ext.order['dom-select'] = function (settings, col) {
@@ -35,13 +142,18 @@ var users = Backbone.View.extend({
         return $('select', td).val()
       })
     }
-
     this.usersCollection.fetch({
+      data: $.param({ 
+        permission: this.permission,
+        groups: this.admin_groups
+      }),
+      processData: false,
+      contentType: false, 
+      dataType: 'json',
       xhrFields: {
         withCredentials: true // override ajax to send with credential
       },
       success: (_.bind(function (res) {
-        console.log($('#usersTable'))
         this.usersTable = $('#usersTable').DataTable({
           language: {
             searchPlaceholder: 'Search User'
@@ -57,16 +169,18 @@ var users = Backbone.View.extend({
             {
               targets: 1,
               render: _.bind(function (data, type, full, meta) {
-                if (typeof (full.Groups) === 'string') {
-                  const Group = full.Groups.replace(/null|[\[\]"]+/g, '')
-                  if (Group === 'SAIP_Admin') {
-                    return '<select id = \'selector_' + full.id + '\' class=\'changeUserPermission\' user_id=' + full.id + ' ><option value=\'7\' selected>SAIP_Admin</option><option value=\'8\'>User</option></select>'
-                  } else if (Group === 'User') {
-                    return '<select id = \'selector_' + full.id + '\' class=\'changeUserPermission\' user_id=' + full.id + ' ><option value=\'7\'>SAIP_Admin</option><option value=\'8\' selected>User</option></select>'
+                  return full.user_groups
+              }, this),
+              orderDataType: 'dom-select'
+            },
+            {
+              targets: 2,
+              render: _.bind(function (data, type, full, meta) {
+                  if (full.admin_groups) {
+                    return `<select id = 'selector_${full.id}' class='changeUserPermission' user_id=${full.id} group_id=${this.admin_groups[0].id}><option value=1 selected>${this.admin_groups[0].name}</option><option value=0>User</option></select>`
+                  } else {
+                    return `<select id = 'selector_${full.id}' class='changeUserPermission' user_id=${full.id} group_id=${this.admin_groups[0].id}><option value=1>${this.admin_groups[0].name}</option><option value=0 selected>User</option></select>`
                   }
-                } else {
-                  return full.Groups
-                }
               }, this),
               orderDataType: 'dom-select'
             },
@@ -80,7 +194,6 @@ var users = Backbone.View.extend({
               orderable: false,
               targets: -1,
               render: _.bind(function (data, type, full, meta) {
-                // console.log(full)
                 const phoneOffice = full.phone_office || null
                 const position = full.position || null
                 const email = full.email || null
@@ -89,7 +202,6 @@ var users = Backbone.View.extend({
                 const status = full.status || null
 
                 if (full.id !== this.user_id) {
-                  // console.log(phone_office)
                   return '<a last_name=' + lastName + ' first_name=' + firstName + ' email=' + email + ' phone_office=' + phoneOffice + ' position=' + position + ' status=' + status + ' userID=' + full.userID + ' is_pi=' + full.is_pi + ' user_id=' + full.id + ' class=\'fa fa-edit user_edit\' style=\'cursor:pointer\'></a>'
                 } else {
                   return ''
@@ -102,12 +214,13 @@ var users = Backbone.View.extend({
               className: ' btn btn-primary',
               text: 'Add New User',
               action: _.bind(function () {
-                $('#addNewUser').show()
+                $('#addNewUser').show();
+                this.userAdminTable.columns.adjust().draw();
                 $('.close').on('click', function () {
-                  $('#addNewUser').hide()
+                  $('#addNewUser').hide();
                 })
                 $('.cancel').on('click', function () {
-                  $('#addNewUser').hide()
+                  $('#addNewUser').hide();
                 })
               }, this)
             }
@@ -120,11 +233,11 @@ var users = Backbone.View.extend({
           scrollY: '80vh',
           scrollCollapse: true,
           dom: '<"datatable_addUser_buttons col-md-6"B><"datatable_search_users col-md-6"f>rt'
-        })
+        });
       }, this))
-    })
+    });
 
-    return this
+    return this;
   },
   changeUserStatus (e) {
     const newUserStatus = new FormData()
@@ -154,18 +267,16 @@ var users = Backbone.View.extend({
   },
   changeUserPermission (e) {
     this.newUserPermission = new FormData()
-    const groupId = e.currentTarget[e.currentTarget.selectedIndex].value
-
+    const is_admin = e.currentTarget[e.currentTarget.selectedIndex].value
+    const group_id = $(e.currentTarget).attr('group_id')
     this.selectedUser_id = $(e.currentTarget).attr('user_id')
     const selectUser = this.users.models.filter(x => x.id == this.selectedUser_id)
-    window.models = this.users.models
-    window.selectedUser_id = this.selectedUser_id
-
 
     const selectUserName = selectUser[0].get('last_name') + ',' + selectUser[0].get('first_name')
 
     this.newUserPermission.append('user_id', this.selectedUser_id)
-    this.newUserPermission.append('group_id', groupId)
+    this.newUserPermission.append('group_id', group_id)
+    this.newUserPermission.append('is_admin', is_admin)
     //  console.log("#"+e.currentTarget.id+" option:selected")
     $('#changeUserPermissionAlert').html(AlertTemplate({
       selectUserName: selectUserName,
@@ -219,16 +330,6 @@ var users = Backbone.View.extend({
     })
   },
   add_New_User () {
-    console.log($('#newUser_firstName').val())
-    console.log($('#newUser_lastName').val())
-    console.log($('#newUser_userID').val())
-    console.log($('#newUser_status').val())
-    console.log($('#newUser_pi').val())
-    console.log($('#newUser_group').val())
-    console.log($('#newUser_position').val())
-    console.log($('#newUser_phone_office').val())
-    console.log($('#newUser_email').val())
-
     var newUserData = new FormData()
 
     newUserData.append('first_name', $('#newUser_firstName').val())
@@ -237,10 +338,12 @@ var users = Backbone.View.extend({
     newUserData.append('status', $('#newUser_status').val())
 
     newUserData.append('is_pi', $('#newUser_pi').val())
-    newUserData.append('group', $('#newUser_group').val())
     newUserData.append('position', $('#newUser_position').val())
     newUserData.append('phone_office', $('#newUser_phone_office').val())
     newUserData.append('email', $('#newUser_email').val())
+
+    newUserData.append('userlist', this.newUserList);
+    newUserData.append('adminlist', this.newAdminList);
 
     $.ajax({
       url: this.domain + 'api/v1/whitelist',
@@ -256,7 +359,7 @@ var users = Backbone.View.extend({
         console.log(res)
         if (!res.err) {
           $('#addNewUser').hide()
-          eventsBus.trigger('addNewUserEvent')
+          eventsBus.trigger('addNewUserEvent');
           $('.alert-success').empty()
           $('.alert-success').html(res.msg)
           $('.alert-success').fadeTo('slow', 0.8).delay(3000).slideUp(500)

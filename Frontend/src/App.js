@@ -4,19 +4,16 @@ import Backbone from 'backbone';
 
 import View from './views/View';
 import ControlPanel from './views/panels/controlPanel';
-import UsersCollection from './collections/users/users_overview';
-import ProbeCollection from './collections/probes/probes_overview';
-import ProtocolsCollection from './collections/protocols/protocols_overview';
 
 import HeaderLayout from './templates/headerLayout.pug';
 import './stylesheets/headerLayout.styl';
+import {SYSTEM_ADMIN} from './constants.js';
 
-
-var domain = 'http://localhost:3000/';
-var VMpro = 'https://frsivg-mip02p.ncifcrf.gov/v0.1/';
+var domain = api;
+var VMpro = 'https://fsivgl-mip02p.ncifcrf.gov/v0.1/';
 var VMdev = 'https://frsivg-mip02d.ncifcrf.gov/v0.1/';
-var domain_ws = 'ws://localhost:3000/';
-var VMpro_ws = 'wss://frsivg-mip02p.ncifcrf.gov/w0.1/';
+var domain_ws = ws;
+var VMpro_ws = 'wss://fsivgl-mip02p.ncifcrf.gov/w0.1/';
 var VMdev_ws = 'wss://frsivg-mip02d.ncifcrf.gov/w0.1/';
 
 
@@ -34,61 +31,26 @@ var App = View.extend({
 			},
 			success: _.bind(function (res) {
 				if (res.status === 'Authenticated') {
-					this.is_admin = res.Group_id.includes(7);
+					this.permission = res.Permission;
+					this.admin_groups = res.Admin_groups;
+					this.user_groups = res.User_groups;
 					/* phase2 */
-					this.probeCollection = new ProbeCollection({
-						domain: this.domain
-					});
-					this.probeCollection.fetch({
-						xhrFields: {
-							withCredentials: true							// override ajax to send with credential
-						},
-						success: (_.bind(function (res) {
-							console.log('probes collection');
-							console.log(res.toJSON());
-						}, this))
-					});
-					if (this.is_admin) {
-						this.usersCollection = new UsersCollection({
-							domain: this.domain
-						});
-						this.usersCollection.fetch({
-							xhrFields: {
-								withCredentials: true							// override ajax to send with credential
-							},
-							success: (_.bind(function (res) {
-								console.log('users collection');
-								console.log(res);
-							}, this))
-						});
-						this.protocolsCollection = new ProtocolsCollection({
-							domain: this.domain
-						});
-						this.protocolsCollection.fetch({
-							xhrFields: {
-								withCredentials: true							// override ajax to send with credential
-							},
-							success: (_.bind(function (res) {
-								console.log('protocols collection');
-								console.log(res.toJSON());
-							}, this))
-						});
-					}
 					this.controlPanel = new ControlPanel({
-						admin: this.is_admin,	// res.Group_id.includes(10) no admin
+						permission: this.permission,
+						admin_groups: this.admin_groups,
+						is_sys_admin: this.permission === 2,
 						el: this.$('.playground'),
 						domain_ws: this.domain_ws,
 						domain: this.domain,
 						user_id: res.User_id[0],
-						LoginAdminUser: res,
-						users: this.usersCollection || '',
-						probes: this.probeCollection || '',
-						protocols: this.protocolsCollection || ''
+						LoginAdminUser: res
 					});
 
 					this.user = res.msg;
-					if (this.is_admin) {
-						$('#NCIAdminUser').html('&nbsp;&nbsp;&nbsp;(' + res.FirstName + ' ' + res.LastName + ')');
+					if (this.permission === 2) {
+						$('#NCIAdminUser').html('&nbsp;&nbsp;&nbsp;(' + res.FirstName + ' ' + res.LastName + ' Admin of System)');
+					} else if (this.permission === 1) {
+						$('#NCIAdminUser').html(`&nbsp;&nbsp;&nbsp;(${res.FirstName} ${res.LastName} Admin of ${res.Admin_groups[0].name})`);
 					} else {
 						$('#NCIEndUser').html('&nbsp;&nbsp;&nbsp;(' + res.FirstName + ' ' + res.LastName + ')');
 					}

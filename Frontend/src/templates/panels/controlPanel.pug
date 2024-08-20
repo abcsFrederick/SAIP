@@ -7,8 +7,9 @@
 				a.mapping(href="#mapping") Mapping
 			li
 				a.users(href="#users") Users
-			//li
-			//	a.group(href="#Group") Group
+			if system_admin
+				li
+					a.group(href="#Group") Group
 			li
 				a.protocol(href="#Protocol") Protocols
 			li

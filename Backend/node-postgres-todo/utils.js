@@ -12,8 +12,18 @@ var parse = require('pg-connection-string').parse;
 var pgConfig = parse(postgresConfig);
 const pgconpool = new Pool(pgConfig);
 
+var isSysAdmin = function (req, res, next) {
+    if (req.session.admin_groups.filter(a => a.id === 7).length) {
+        return next();
+    } else {
+        return res.json({'err': '1', 'msg': 'Contact System Admin user to gain permission'});
+    }
+}
 var isAdmin = function (req, res, next) {
-    if (req.session.group_id.includes(7)) {
+    console.log('===============')
+    console.log(req.session)
+    console.log(req.session.admin_groups)
+    if (req.session.admin_groups.length) {
         return next();
     } else {
         return res.json({'err': '1', 'msg': 'Contact Admin user to gain permission'});
@@ -28,4 +38,4 @@ var isAuth = function (req, res, next) {
     }
 }
 
-module.exports = { isAdmin, isAuth, mysqlcon, pgconpool }
+module.exports = { isSysAdmin, isAdmin, isAuth, mysqlcon, pgconpool }
