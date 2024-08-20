@@ -258,8 +258,13 @@ usersRouter.post('/whitelist', isAdmin, (req, res, next) => {
         let adminlist = [];
         let userlist = [];
         let validate_errors = `Invalid action, user ${req.session.FirstName} ${req.session.LastName} is trying to add new user to the group that he does not have permission. Action is reported to the system admin.`;
-        adminlist = req.body.adminlist.split(',');
-        userlist = req.body.userlist.split(',');
+
+        if (req.body.adminlist !== '') {
+            adminlist = req.body.adminlist.split(',');
+        }
+        if (req.body.userlist !== '') {
+            userlist = req.body.userlist.split(',');
+        }
         if (req.session.permission < 2) {
             if (req.body.adminlist !== '') {
                 if (!validationPermission(req.session.admin_groups, adminlist)) {
@@ -317,6 +322,7 @@ usersRouter.post('/whitelist', isAdmin, (req, res, next) => {
                             // In case the group admin did not select the groups
                             if (!userlist.length && !adminlist.length) {
                                 if (req.session.permission !== 2) {
+
                                     var sql = `INSERT INTO site_group_memberships (person_id, group_id, is_admin, created_at, updated_at) VALUES ?`;
                                     var values = [[result.insertId, parseInt(req.session.admin_groups[0].id), 0, new Date(), new Date()]];
                                     var query = connection.query(sql, [values], function(err) {
@@ -345,7 +351,6 @@ usersRouter.post('/whitelist', isAdmin, (req, res, next) => {
                         if (userlist.length) {
                             var sql = `INSERT INTO site_group_memberships (person_id, group_id, is_admin, created_at, updated_at) VALUES ?`;
                             var values =  userlist.map(x => [exist_user_id, parseInt(x), 0, new Date(), new Date()]);
-                            console.log(values)
                             var query = connection.query(sql, [values], function(err) {
                                 if (err) throw err;
                             });
