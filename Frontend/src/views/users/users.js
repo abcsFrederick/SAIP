@@ -176,11 +176,16 @@ var users = Backbone.View.extend({
             {
               targets: 2,
               render: _.bind(function (data, type, full, meta) {
+                if (this.permission > 1) {
+                  return full.admin_groups
+                } else {
                   if (full.admin_groups) {
-                    return `<select id = 'selector_${full.id}' class='changeUserPermission' user_id=${full.id} group_id=${this.admin_groups[0].id}><option value=1 selected>${this.admin_groups[0].name}</option><option value=0>User</option></select>`
+                    return `<select id = 'selector_${full.id}' class='changeUserPermission' user_id=${full.id} group_id=${this.admin_groups[0].id}><option value=1 selected>True</option><option value=0>False</option></select>`
                   } else {
-                    return `<select id = 'selector_${full.id}' class='changeUserPermission' user_id=${full.id} group_id=${this.admin_groups[0].id}><option value=1>${this.admin_groups[0].name}</option><option value=0 selected>User</option></select>`
+                    return `<select id = 'selector_${full.id}' class='changeUserPermission' user_id=${full.id} group_id=${this.admin_groups[0].id}><option value=1>True</option><option value=0 selected>False</option></select>`
                   }
+                }
+                  
               }, this),
               orderDataType: 'dom-select'
             },

@@ -20,9 +20,6 @@ var isSysAdmin = function (req, res, next) {
     }
 }
 var isAdmin = function (req, res, next) {
-    console.log('===============')
-    console.log(req.session)
-    console.log(req.session.admin_groups)
     if (req.session.admin_groups.length) {
         return next();
     } else {
