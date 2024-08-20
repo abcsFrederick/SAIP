@@ -20,3 +20,4 @@ Backend/config/production.json
 SAIP_2021_04_12.sql.gz
 sftp-config.json
 temp/
+.vscode
