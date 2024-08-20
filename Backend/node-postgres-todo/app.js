@@ -327,7 +327,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
           t3.admin_of_groups) AS admin_group_id, GROUP_CONCAT(t3.admin_groups) AS admin_groups, t3.name AS user_groups, t3.group_id FROM
           (SELECT t2.*, site_groups.name, IF(t2.admin_of_groups IS NULL, NULL, site_groups.name) AS admin_groups FROM 
           (SELECT t1.*, site_group_memberships.group_id, IF(site_group_memberships.is_admin=1, site_group_memberships.group_id, NULL) AS admin_of_groups 
-          FROM (SELECT * FROM site_users WHERE userID IN ("${UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))}", "${Email.substr(0,Email.indexOf('@'))}")) as t1 
+          FROM (SELECT * FROM site_users WHERE userID IN ("${req.session.UserPrincipalName.substr(0, req.session.UserPrincipalName.indexOf('@'))}", "${req.session.Email.substr(0, req.session.Email.indexOf('@'))}")) as t1 
           LEFT JOIN site_group_memberships ON t1.id=site_group_memberships.person_id) AS t2 
           LEFT JOIN site_groups ON t2.group_id=site_groups.id ) AS t3 Group by t3.name;
           `
