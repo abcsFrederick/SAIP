@@ -5,7 +5,7 @@
   "main": "webpack.config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --env.port=8888 --env.mode=development",
+    "build": "webpack --env.port=8888",
     "server-sysadmin": "webpack-dev-server --env.port=8881 --env.api=3001",
     "server-groupadmin-1": "webpack-dev-server --env.port=8882 --env.api=3002",
     "server-groupadmin-2": "webpack-dev-server --env.port=8883 --env.api=3003",
