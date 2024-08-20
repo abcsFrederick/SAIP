@@ -2,21 +2,26 @@
     "version": "1.5.2",
     "mode": "development",
     "debugMode": true,
-    "dbConfig":{
+    "dbConfig": {
         "postgres": "",
-    "mysql":{
-        "host": "", 
-        "port": 3306,
-        "user": "",
-        "password": "",
-        "database":"",
-        "timezone": "utc"
-    }
+        "mysql": {
+            "host": "", 
+            "port": 3306,
+            "user": "",
+            "password": "",
+            "database": "",
+            "timezone": "utc"
+        }
     },
     "filesystemConfig": {
         "doc_root": "",
         "archive_root": "",
         "intermediate_storage": ""
+    },
+    "adConfig": {
+        "url": "",
+        "account": "",
+        "password": ""
     },
     "ITrust": {
         "issuer": "https://stsstg.nih.gov",

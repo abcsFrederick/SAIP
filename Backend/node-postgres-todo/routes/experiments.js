@@ -354,7 +354,12 @@ experimentsRouter.get('/experiments/:project_id', isAuth, (req, res, next) => { 
     var results=[];
     mysqlcon.getConnection((err,connection)=>{
         if(err) throw err;
-        var query = connection.query("SELECT id, title, description,number_of_studies, number_of_series,number_of_images, mouse_id, probe_id, updated_at, last_name,first_name FROM(SELECT t1.*, site_users.last_name,site_users.first_name FROM (SELECT * FROM imaging_experiments WHERE project_id = "+selected_project+") as t1 LEFT JOIN site_users ON t1.pi_id=site_users.id) AS t2;");
+        var query = connection.query(`SELECT id, title, description,number_of_studies, number_of_series,
+            number_of_images, mouse_id, probe_id, updated_at, last_name,first_name 
+            FROM(SELECT t1.*, site_users.last_name,site_users.first_name 
+            FROM (SELECT * FROM imaging_experiments WHERE project_id = ${selected_project}) 
+            as t1 LEFT JOIN site_users ON t1.pi_id=site_users.id) 
+            as t2;`);
         query.on('result',(row)=>{
                 results.push(row);
         });

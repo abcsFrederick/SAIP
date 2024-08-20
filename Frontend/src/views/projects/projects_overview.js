@@ -26,13 +26,15 @@ var projects = View.extend({
     'click #deleteProjectSubmit': 'removeProject'
   },
   initialize (setting) {
-    this.is_admin = setting.admin
+    this.permission = setting.permission
     this.LoginAdminUser = setting.LoginAdminUser
     this.domain = setting.domain
     this.domain_ws = setting.domain_ws
     this.user_id = setting.user_id
     this.users = setting.users
     this.probes = setting.probes
+    console.log('this probe')
+    console.log(this.probes)
     this.mappingAttrReserve = setting.mappingAttrReserve
     this.protocols = setting.protocols
     this.projects_overview_collection = new Projects_overview_collection({
@@ -42,10 +44,11 @@ var projects = View.extend({
 
     this.users_and_permissions = []
     this.selectedUserIdAll = []
-    if (this.is_admin) {
+
+    if (this.permission > 0) {
       _.each(this.users.toJSON(), _.bind(function (row) {
         if (row.is_pi) {
-          this.PI.push(row)
+          this.PI.push(row);
         }
       }, this))
       this.render()
@@ -65,18 +68,13 @@ var projects = View.extend({
         withCredentials: true							// override ajax to send with credential
       },
       success: (_.bind(function (res) {
-        if (this.is_admin) {
-          this.$el.html(Projects_overview_templates({
-            admin: this.is_admin,
-            PI: this.users.toJSON().sort(this.dynamicSort('first_name')),
-            LoginAdminUser: this.LoginAdminUser,
-            Probes: this.probes.toJSON()
-          }))
-        } else {
-          this.$el.html(Projects_overview_templates({
-            admin: this.is_admin
-          }))
-        }
+        console.log(this.users.toJSON().sort(this.dynamicSort('first_name')))
+        this.$el.html(Projects_overview_templates({
+          permission: this.permission,
+          PI: this.users.toJSON().sort(this.dynamicSort('first_name')),
+          LoginAdminUser: this.LoginAdminUser,
+          Probes: this.probes.toJSON()
+        }))
         
         this.projects_overview_table = 
         // new DataTable('#projects_overview', {
@@ -94,9 +92,11 @@ var projects = View.extend({
             }
           },
           columns: [{
-            data: 'nci_projects_id'	//	nci_projects_id
+            data: 'nci_projects_id'
           }, {
-            data: 'nci_projects_name'	//	nci_projects_name
+            data: 'nci_projects_name'
+          }, {
+            data: 'nci_projects_group_name'
           }, {
             targets: 2,
             render: function (data, type, full, meta) {
@@ -128,20 +128,28 @@ var projects = View.extend({
             orderable: false,
             targets: -2,
             render: _.bind(function (data, type, full, meta) {
-              if (full.projects_status == 'I') {
-                return '<select id=' + full.nci_projects_id + '><option value=\'I\' selected>Inactive</option><option value=\'A\'>Active</option></select>'
-              } else {
-                return '<select id=' + full.nci_projects_id + '><option value=\'A\' selected>Active</option><option value=\'I\'>Inactive</option></select>'
+              if (full.is_admin) {
+                if (full.projects_status == 'I') {
+                  return '<select id=' + full.nci_projects_id + '><option value=\'I\' selected>Inactive</option><option value=\'A\'>Active</option></select>'
+                } else {
+                  return '<select id=' + full.nci_projects_id + '><option value=\'A\' selected>Active</option><option value=\'I\'>Inactive</option></select>'
                 }
+              } else {
+                return 'Active';
+              }
             }, this)
           }, {
             orderable: false,
             targets: -1,
             render: _.bind(function (data, type, full, meta) {
-              return '<a project_id=' + full.nci_projects_id + ' project_name="' + full.nci_projects_name +
-                    '" pi_id=' + full.nci_projects_pi_id + ' protocol_category_id=' + full.protocol_category_id +
-                    ' protocol_category_name=' + full.short_name + ' class=\'fa fa-edit project_edit\' style=\'cursor:pointer\'></a>' +
-                    '<a class=\'fa icon-trash\' style=\'cursor: pointer;color:red;font-size:18px\'></a>'
+              if (full.is_admin) {
+                return '<a project_id=' + full.nci_projects_id + ' project_name="' + full.nci_projects_name +
+                      '" pi_id=' + full.nci_projects_pi_id + ' protocol_category_id=' + full.protocol_category_id +
+                      ' protocol_category_name=' + full.short_name + ' class=\'fa fa-edit project_edit\' style=\'cursor:pointer\'></a>' +
+                      '<a class=\'fa icon-trash\' style=\'cursor: pointer;color:red;font-size:18px\'></a>'
+              } else {
+                return '';
+              }
             }, this)
           }],
           columnDefs: [
@@ -297,7 +305,7 @@ var projects = View.extend({
           // }, this),
           dom: ' <"datatable_project_buttons col-md-6"B><"datatable_search_patient col-md-6"f>rt<"datatable_Information col-md-12"i>'// <"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
         });
-        window.test = this.projects_overview_table;
+
         $('#projects_overview tbody tr').on('change', 'select', _.bind(function (e) {
           const newProjectStatus = new FormData()
           const status = e.currentTarget[e.currentTarget.selectedIndex].value
@@ -328,7 +336,7 @@ var projects = View.extend({
             }
             this.experiments = new Experiments({
               users: this.users,
-              admin: this.is_admin,
+              admin: this.permission,
               domain: this.domain,
               domain_ws: this.domain_ws,
               project_id: e.currentTarget.id,
@@ -444,7 +452,7 @@ var projects = View.extend({
         console.log(res)
 
         this.$el.html(Projects_overview_templates({
-          admin: this.is_admin
+          permission: this.permission
         }))
 
         this.projects_overview_table = $('#projects_overview').DataTable({
@@ -462,7 +470,14 @@ var projects = View.extend({
 				    	// },
 				    	{
 				    		data: 'nci_projects_name'	//	nci_projects_name
-				    	},
+				    	},{
+                data: 'nci_projects_group_name'
+              },{
+                targets: 2,
+                render: function (data, type, full, meta) {
+                  return full.Pi_Last_name + ',' + full.Pi_First_name
+                }
+              },
 				    	// {
 				    	// 	"targets": 2,
 				    	// 	"render": function ( data, type, full, meta ) {
@@ -525,7 +540,7 @@ var projects = View.extend({
               this.experiments.close()
             }
             this.experiments = new Experiments({
-              admin: this.is_admin,
+              admin: this.permission,
               domain: this.domain,
               domain_ws: this.domain_ws,
               project_id: e.currentTarget.id,
@@ -584,6 +599,7 @@ var projects = View.extend({
     this.editProject_protocols_names = [];
     $('#editProject_name').val($(e.currentTarget).attr('project_name'));
     $('#editStatus').val($(e.currentTarget).parent().parent().attr('status'));
+    console.log($(e.currentTarget).attr('pi_id'))
     $('#editPi_id').val($(e.currentTarget).attr('pi_id'));
     this.editProjectProtocolsTable = $('#editProjectProtocolsTable').DataTable({
  			drawCallback: function (settings) {

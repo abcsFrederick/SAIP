@@ -6,13 +6,18 @@ import Projects_overview from '../projects/projects_overview'
 import users from '../users/users'
 import mapping from '../mapping/mapping'
 import protocol from '../protocols/protocol'
+import groups from '../groups/groups';
+
 import probe from '../probes/probe'
 import access from '../access/access'
 import about from '../about/about'
 import statistics from '../statistics/statistics'
 import View from '../View'
 import eventsBus from '../../eventsBus'
-import ProbeCollection from '../../collections/probes/probes_overview'
+import UsersCollection from '../../collections/users/users_overview';
+import ProbeCollection from '../../collections/probes/probes_overview';
+import ProtocolsCollection from '../../collections/protocols/protocols_overview';
+
 import AccessRequestsCollection from '../../collections/users/accessRequests_overview'
 
 import ControlPanelTemplate from '../../templates/panels/controlPanel.pug'
@@ -23,7 +28,7 @@ var controlPanel = View.extend({
     'click .projects': 'projects',
     'click .mapping': 'mapping',
     'click .users': 'usersRender',
-    'click .group': 'group',
+    'click .group': 'groupsRender',
     'click .protocol': 'protocol',
     'click .probe': 'probesRender',
     'click .statistics': 'statistics',
@@ -32,38 +37,83 @@ var controlPanel = View.extend({
     'click .TESTWS': 'TESTWS'
   },
   initialize (setting) {
-    this.is_admin = setting.admin
-    this.domain_ws = setting.domain_ws
-    this.domain = setting.domain
-    this.user_id = setting.user_id
-    this.LoginAdminUser = setting.LoginAdminUser
-    this.probes = setting.probes
-    this.protocols = setting.protocols
-    this.users = setting.users
+    this.is_admin = this.permission = setting.permission;
+    this.admin_groups = setting.admin_groups || "";
+    this.is_sys_admin = setting.is_sys_admin;
+    this.domain_ws = setting.domain_ws;
+    this.domain = setting.domain;
+    this.user_id = setting.user_id;
+    this.LoginAdminUser = setting.LoginAdminUser;
+    this.probes = setting.probes;
+    this.protocols = setting.protocols;
+    this.users = setting.users;
+
     this.accessRequestsCollection = new AccessRequestsCollection({
       domain: this.domain
-    })
+    });
     this.accessRequestsCollection.fetch({
       xhrFields: {
         withCredentials: true							// override ajax to send with credential
       },
       success: (_.bind(function (res) {
         this.$el.html(ControlPanelTemplate({
-          admin: setting.admin,
+          admin: this.permission,
+          system_admin: this.is_sys_admin,
           numberOfRequest: res.filter((x) => x.get('status') === 'pending').length || ''
         }));
-
-
-
-        
-      this.projects();
-
-
-
       }, this))
     })
+    this.probes = new ProbeCollection({
+      domain: this.domain
+    });
+    this.probes.fetch({
+      xhrFields: {
+        withCredentials: true							// override ajax to send with credential
+      },
+      success: (_.bind(function (res) {
+        console.log('probes collection');
+        console.log(res.toJSON());
+      }, this))
+    });
+    if (this.permission > 0) {
+      this.users = new UsersCollection({
+        domain: this.domain
+      });
+      
+      this.users.fetch({
+        data: $.param({ 
+          permission: this.permission,
+          groups: this.admin_groups
+        }),
+        processData: false,
+        contentType: false, 
+        dataType: 'json',
+        xhrFields: {
+          withCredentials: true							// override ajax to send with credential
+        },
+        success: (_.bind(function (res) {
+          console.log('users collection');
+          console.log(res);
+
+          // this.usersRender();
+        }, this))
+      });
+      this.protocols = new ProtocolsCollection({
+        domain: this.domain
+      });
+      this.protocols.fetch({
+        xhrFields: {
+          withCredentials: true							// override ajax to send with credential
+        },
+        success: (_.bind(function (res) {
+          console.log('protocols collection');
+          console.log(res.toJSON());
+        }, this))
+      });
+    }
     eventsBus.on('addNewProject', this.projects, this)
     eventsBus.on('addNewUserEvent', this.usersRender, this)
+    eventsBus.on('addNewGroupEvent', this.groupsRender, this)
     eventsBus.on('addNewUserEvent_access', this.accessRequest, this)
     eventsBus.on('addNewProbeEvent', this.probesRender, this)
     // eventsBus.on('goAbout',this.about,this);
@@ -77,8 +127,9 @@ var controlPanel = View.extend({
     if (this.projectsView) {
       this.projectsView.close()	// prevent from zombie view
     }
+
     this.projectsView = new Projects_overview({
-      admin: this.is_admin,
+      permission: this.permission,
       domain: this.domain,
       domain_ws: this.domain_ws,
       user_id: this.user_id,
@@ -115,18 +166,46 @@ var controlPanel = View.extend({
     }
     this.usersView = new users({
       user_id: this.user_id,
-      admin: this.is_admin,
+      permission: this.permission,
+      admin_groups: this.admin_groups,
       users: this.users,
       accessRequest: this.accessRequest,
       domain: this.domain
     })									// if this.render() call el is not been set up yet
     $('#PUMA').html(this.usersView.el)	// render order matter
     this.usersView.render()
-    //	console.log('zoombie');
+    
+    this.users.fetch({
+      data: $.param({ 
+        permission: this.permission,
+        groups: this.admin_groups
+      }),
+      processData: false,
+      contentType: false, 
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true							// override ajax to send with credential
+      },
+      success: (_.bind(function (res) {
+        console.log('users collection');
+        console.log(res);
+      }, this))
+    });
   },
-  group (e) {
-    $(e.currentTarget).parent().parent().children().children().removeClass('active')
-    $(e.currentTarget).addClass('active')
+  groupsRender (e) {
+    if (e !== undefined) {
+      this.$('.active').removeClass('active')
+      $(e.currentTarget).addClass('active');
+    }
+    if (this.groupsView) {
+      this.groupsView.close();	// prevent from zombie view
+    }
+    this.groupsView = new groups({
+      admin: this.is_sys_admin,
+      domain: this.domain,
+      users: this.users
+    })
+    $('#PUMA').html(this.groupsView.el)
   },
   protocol (e) {
     $(e.currentTarget).parent().parent().children().children().removeClass('active')

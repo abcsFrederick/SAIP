@@ -4,9 +4,10 @@
 			tr
 				th User Name
 				th Group(s)
+				th Admin
 				th Status
 				th
-if admin
+if permission > 0
 	#addNewUser.modal
 		.modal-content
 			.modal-header
@@ -66,22 +67,6 @@ if admin
 									option(value='1') True
 									option(value='0') False
 
-						label.col-md-3.control-label Group:
-						.col-md-3.inputGroupContainer
-							.input-group(style='width:100%')
-								span.input-group-addon(style='font-size:15px')
-									i.fas.fa-user-tag
-								select#newUser_group.form-control(required)
-									//option(value='0') 
-									//- option(value='3') NCI_PI
-									//- option(value='1') SYSTEM Admin
-									//- option(value='2') NCI
-									//- //option(value='3') NCI_PI
-									//- option(value='4') SAIP
-									//- option(value='5') MIP
-									//- option(value='6') Commitee
-									option(value='8') User
-									option(value='7') SAIP_Admin
 						label.col-md-3.control-label Position:
 						.col-md-3.inputGroupContainer
 							.input-group
@@ -103,7 +88,13 @@ if admin
 									i.fas.fa-envelope
 								input#newUser_email.form-control(type="text")
 
-
+						label.col-md-1.control-label Groups:
+						.col-md-4.inputGroupContainer
+							table#UserAdminTable.table.table-hover
+								thead
+									tr
+										th Name
+										th Admin
 			.modal-footer
 				button.cancel.btn.btn-default Cancel
 				button#add_New_User.btn.btn-success Submit
@@ -207,6 +198,6 @@ if admin
 			.modal-footer
 				button.cancel.btn.btn-default Cancel
 				button#edit_User.btn.btn-success Save
-if admin
+if permission > 0
 	#changeUserPermissionAlert.modal
 					

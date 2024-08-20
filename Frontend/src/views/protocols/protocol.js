@@ -20,7 +20,7 @@ var protocol = View.extend({
     this.protocol_groups_collection = new Protocol_groups_collection({
       domain: this.domain
     })
-    this.render()
+    this.render();
   },
   render () {
     this.protocol_groups_collection.fetch({

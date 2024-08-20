@@ -30,6 +30,8 @@ const intermediate_storage = config.get('filesystemConfig.intermediate_storage')
 
 const mysqlConfig = config.get('dbConfig.mysql');
 const postgresConfig = config.get('dbConfig.postgres');
+const { isSysAdmin, isAdmin, isAuth } = require('../utils.js');
+
 
 router.use(fileUpload());
 router.use(validator({
@@ -74,23 +76,6 @@ router.use(session({
         secure: true
     }
 }));
-
-var isAdmin = function(req, res, next) {
-    if(req.session.group_id.includes(7)) {
-        return next();
-    } else {
-        return res.json({'err': '1', 'msg': 'Contact Admin user to gain permission.'});
-    }
-}
-
-
-var isAuth = function (req, res, next) {
-    if (req.session.status === 'Authenticated') {
-        return next();
-    } else {
-        return res.json({'err': '1', 'msg': 'Please login first or contact admin user to whitelist you.'});
-    }
-}
 
 function stringFilter(str){
     return str.replace(/[^A-Za-z0-9]/g, '');
@@ -1099,93 +1084,6 @@ router.post('/api/v1/upload',isAdmin,(req,res,next)=>{  //isAdmin
                     });
             }
         }
-    }
-});
-router.post('/api/v1/whitelist',isAdmin,(req,res,next)=>{  //isAdmin
-    
-
-    req.checkBody('userID','User id cannot be empty').notEmpty();
-    req.checkBody('userID','User id should be a string<varchar(127)>').isString();
-    req.checkBody('first_name','First name cannot be empty').notEmpty();
-    req.checkBody('first_name','First name should be a string<varchar(127)>').isString();
-    req.checkBody('last_name','Last name cannot be empty').notEmpty();
-    req.checkBody('last_name','Last name should be a string<varchar(127)>').isString();
-    req.checkBody('status','Status cannot be empty').notEmpty();
-    req.checkBody('status','Status should be a string<varchar(127)>').isString();
-    req.checkBody('group','Group cannot be empty').notEmpty();
-    req.checkBody('group','Group should be an integer larger than 6 and less than 9').isInt({ min: 7, max: 8 });
-
-    var errors = req.validationErrors();
-
-    if(errors){
-        return res.json({'err':1,errors});
-    }
-    else{
-        let userID = req.body.userID;
-        let first_name = req.body.first_name;
-        let last_name = req.body.last_name;
-        let is_pi = req.body.is_pi||null;
-        let position = req.body.position||null;
-        let status = req.body.status;
-        let phone_office = req.body.phone_office||null;
-        let email = req.body.email||null;
-        let user_results=[];
-        let group=parseInt(req.body.group);
-        async.waterfall([
-            function(callback){
-                 mysqlcon.getConnection((err,connection)=>{
-                    var query = connection.query("SELECT last_name,first_name,position,is_pi,status,email,phone_office,userID,created_at,updated_at FROM site_users WHERE userID = '"+userID+"';");
-                    query.on('result',(row)=>{
-                        user_results.push(row);
-                    });
-                    query.on('end',()=>{
-                        connection.release();
-                        callback(null,user_results)
-                    });
-                 });
-            },function(arg,callback){
-                if(!arg.length){
-                    mysqlcon.getConnection((err,connection)=>{
-                        if(err) throw err;
-                        var query = connection.query("INSERT INTO site_users (last_name,first_name,position,is_pi,status,email,phone_office,userID,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,NOW(), NOW())",
-                            [last_name,first_name,position,is_pi,status,email,phone_office,userID],function(err,result){
-                            if(err) {
-                               throw err; 
-                            }
-
-                            console.log('successfully insert '+result.insertId+' row in `site_users` table');
-                            console.log('INSERT INTO site_users (last_name,first_name,position,is_pi,status,email,phone_office,userID,created_at,updated_at)');
-                            console.log('VALUES ('+last_name+', '+first_name+', '+position+', '+is_pi+', '+status+', '+email+', '+phone_office+', '+userID+', NOW(), NOW());');
-                            if(group){
-                                var query = connection.query('INSERT INTO site_group_memberships (person_id,group_id,created_at,updated_at) VALUES(?,?,NOW(), NOW())',[result.insertId,group]);
-                                query.on('result',(row)=>{
-                                    user_results.push(row);
-                                });
-                                query.on('end',()=>{
-                                    connection.release();
-                                    console.log('successfully insert '+result.insertId+' row in `site_group_memberships` table');
-                                    console.log('INSERT INTO site_group_memberships (person_id,group_id,created_at,updated_at) VALUES(?,?,NOW(), NOW())');
-                                    console.log('VALUES ('+result.insertId+', '+group+', NOW(), NOW());');
-                                });
-                            }else{
-                                console.log('No group for this new user');
-                                connection.release();
-                            }
-                            
-                            let msg = last_name+' '+first_name+' is added in the whitelist';
-                            callback(null,{'err':0,'msg':msg})
-                        });
-                    });
-                }else{
-                    let msg = 'Same user id ' +userID+ ' is already in the whitelist for user '+first_name+' '+last_name;
-                    callback(null,{'err':1,'errors':msg,'result':user_results})
-                }
-                
-            }
-            ],function(err,result){
-                return res.json(result)
-            })
-        
     }
 });
 

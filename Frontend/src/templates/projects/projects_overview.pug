@@ -1,10 +1,11 @@
-if admin
+if permission > 0
 	#table-wrapper(style="width:100hv;border: solid 2px;padding: 20px;border-color:lightgray;border-radius:5px").col-md-12
 		table#projects_overview.table.table-hover
 			thead
 				tr
 					th Id
 					th Project Name
+					th Group
 					th PI
 					th # of Experiments
 					th # of Sudies
@@ -20,13 +21,15 @@ else
 				tr
 					//- th Id
 					th Project Name
-					//- th PI
+					th Group
+					th PI
 					th # of Experiments
 					th # of Sudies
 					th Protocal(s)
 					th Created
 					//- th Project Status
-if admin
+					//- th Options
+if permission > 0
 	#createProject.modal
 		.modal-content
 			.modal-header

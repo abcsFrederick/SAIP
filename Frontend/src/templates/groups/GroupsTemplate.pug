@@ -1,0 +1,64 @@
+.col-md-12.groupstemp(style="width: 100hv; border: solid 2px; padding: 20px; border-color: lightgray; border-radius: 5px")
+	table#groupsTable.table.table-hover
+		thead
+			tr
+				th Group Name
+				th # of Admin
+				th # of Users
+				th
+if admin
+	#addNewGroup.modal
+		.modal-content
+			.modal-header
+				span.close &times;
+				h2 Add a new group
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-3.control-label Group Name:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-users
+								input#newGroup_Name.form-control(type="text" required)
+
+						label.col-md-3.control-label Admin User:
+						.col-md-3.inputGroupContainer
+							.input-group(style='width:100%')
+								span.input-group-addon(style='font-size:15px')
+									i.fas.fa-user-tie
+								select#admin_id.form-control(style='width: 60%;')
+									option 
+									each user in users
+										option(value=user.id) #{user.first_name},#{user.last_name}
+								
+
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#add_New_Group.btn.btn-success Submit
+	#EditGroup.modal
+		.modal-content
+			.modal-header
+				span.close &times;
+				h2 Edit current group
+			.modal-body
+				.container(style='width:100%;margin-bottom: 15px;')
+					.form-group
+						.col-md-12
+							label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Require fields*
+						label.col-md-3.control-label Group Name:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-users
+								input#editGroup_Name.form-control(type="text" required)
+
+
+			.modal-footer
+				button.cancel.btn.btn-default Cancel
+				button#edit_Group.btn.btn-success Save
+if admin
+	#changeUserPermissionAlert.modal
+					
