@@ -16,7 +16,7 @@ var mappingRoutes = require('./routes/mapping');
 var imagingRoutes = require('./routes/imaging');
 var usersRoutes = require('./routes/users');
 var groupsRoutes = require('./routes/groups');
-
+var datasourceRouter= require('./routes/datasource');
 var request = require('request');
 
 var compression = require('compression');  
@@ -738,6 +738,7 @@ app.use('/api/v1', mappingRoutes);
 app.use('/api/v1', imagingRoutes);
 app.use('/api/v1', usersRoutes);
 app.use('/api/v1', groupsRoutes);
+app.use('/api/v1', datasourceRouter);
 
 app.get('/mysql',function(req,res,next){
   // console.log(req.session)
@@ -769,129 +770,129 @@ app.get('/mysql',function(req,res,next){
 app.get('/accessRequest',request_Access(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
 
 });
-app.get('/', NIH_Authenticate(ADServiceAccount, ADServicePassword, isAuth), function(req, res, next) {
-});
-
-// Fake session
-// app.get('/',function(req,res,next){
-//   req.session.regenerate(function(err){
-//     if (err) {
-//       return res.json({msg: err})
-//     }
-//     // Admin_groups and user_groups should NOT have overlaying
-//     // for system admin
-//     // If is system admin, it has all admin groups/ user groups
-//     console.log(process.env.PORT)
-//     if (process.env.PORT === '3001') {
-//       UserPrincipalName = 'tianyi.miao@nih.gov';
-//       Email = 'tianyi.miao@nih.gov';
-//       userFirstName = 'Tianyi';
-//       userLastName = 'Miao';
-//       authResults= {"status": "Authenticated"};
-//     }
-//     // If is group admin, it has its user groups and other user group
-//     else if (process.env.PORT === '3002') {
-//       // SAIP group admin
-//       UserPrincipalName = 'Joe@nih.gov';
-//       Email = 'Joe@nih.gov';
-//       userFirstName = 'Joe';
-//       userLastName = 'Joe';
-//       authResults= {"status": "Authenticated"};
-
-//     }
-
-//     else if (process.env.PORT === '3003') {
-//       // TACL group admin
-
-//       UserPrincipalName = 'David@nih.gov';
-//       Email = 'David@nih.gov';
-//       userFirstName = 'David';
-//       userLastName = 'David';
-//       authResults= {"status": "Authenticated"};
-
-//     }
-
-//     // for normal user
-//     else if (process.env.PORT === '3004') {
-//       UserPrincipalName = 'SAIP_TACL_user_both@nih.gov';
-//       Email = 'SAIP_TACL_user_both@nih.gov';
-//       userFirstName = 'SAIP_TACL_user_both';
-//       userLastName = 'SAIP_TACL_user_both';
-//       authResults= {"status": "Authenticated"};
-//     }
-    
-    
-//     var result_admin_groups = [];
-//     var result_user_groups = [];
-//     var result_user_id = [];
-//     var active;
-//     mysqlcon.getConnection((err, connection) => {
-//       if(err) throw err;
-//       // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
-//       let sql =`SELECT t3.id,t3.last_name,t3.first_name, t3.position, t3.email, t3.phone_office, t3.status, t3.active, t3.is_pi, t3.userID, GROUP_CONCAT(
-// t3.admin_of_groups) AS admin_group_id, GROUP_CONCAT(t3.admin_groups) AS admin_groups, t3.name AS user_groups, t3.group_id FROM
-// (SELECT t2.*, site_groups.name, IF(t2.admin_of_groups IS NULL, NULL, site_groups.name) AS admin_groups FROM 
-// (SELECT t1.*, site_group_memberships.group_id, IF(site_group_memberships.is_admin=1, site_group_memberships.group_id, NULL) AS admin_of_groups 
-// FROM (SELECT * FROM site_users WHERE userID IN ("${UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))}", "${Email.substr(0,Email.indexOf('@'))}")) as t1 
-// LEFT JOIN site_group_memberships ON t1.id=site_group_memberships.person_id) AS t2 
-// LEFT JOIN site_groups ON t2.group_id=site_groups.id ) AS t3 Group by t3.name;
-// `
-//       // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
-      
-//       var query = connection.query(sql)
-
-//       query.on('result',(row) => {
-//         result_user_id = [row['id']]
-//         if (row['admin_group_id']) {
-//           let admin_group = {
-//             'id': parseInt(row['admin_group_id']),
-//             'name': row['admin_groups']
-//           }
-//           result_admin_groups.push(admin_group);
-//         } else {
-//           let user_group = {
-//             'id': row['group_id'],
-//             'name': row['user_groups']
-//           }
-//           result_user_groups.push(user_group);
-//         }
-//         active = row['active'];
-//       });
-//       query.on('end',() => {
-//         connection.release();
-//         let permission = 0;
-//         req.session.FirstName = userFirstName;
-//         req.session.LastName = userLastName;
-//         // req.session.NedID = NedID;
-//         // req.session.Telephone = Telephone;
-//         req.session.Email = Email;
-//         req.session.UserPrincipalName = UserPrincipalName;
-//         req.session.status = authResults.status;
-//         req.session.user_id = result_user_id;
-//         req.session.user_groups = result_user_groups;
-//         req.session.admin_groups = result_admin_groups;
-//         if (result_admin_groups.length > 0) {
-//           permission = 1;
-//         }
-//         if (result_admin_groups.filter(a => a.id === 7).length > 0) {
-//           permission = 2;
-//         }
-//         req.session.permission = permission;
-//         return res.json({ appVersion: version, code: 1, status: req.session.status,
-//           FirstName: req.session.FirstName,
-//           LastName: req.session.LastName,
-//           NedID: req.session.NedID,
-//           Telephone: req.session.Telephone,
-//           Email: req.session.Email,
-//           UserPrincipalName: req.session.UserPrincipalName,
-//           User_groups: req.session.user_groups,
-//           Admin_groups: req.session.admin_groups,
-//           Permission: req.session.permission,
-//           User_id: req.session.user_id})
-//       });
-//     });
-//   });
+// app.get('/', NIH_Authenticate(ADServiceAccount, ADServicePassword, isAuth), function(req, res, next) {
 // });
+
+//Fake session
+app.get('/',function(req,res,next){
+  req.session.regenerate(function(err){
+    if (err) {
+      return res.json({msg: err})
+    }
+    // Admin_groups and user_groups should NOT have overlaying
+    // for system admin
+    // If is system admin, it has all admin groups/ user groups
+    console.log(process.env.PORT)
+    if (process.env.PORT === '3001') {
+      UserPrincipalName = 'tianyi.miao@nih.gov';
+      Email = 'tianyi.miao@nih.gov';
+      userFirstName = 'Tianyi';
+      userLastName = 'Miao';
+      authResults= {"status": "Authenticated"};
+    }
+    // If is group admin, it has its user groups and other user group
+    else if (process.env.PORT === '3002') {
+      // SAIP group admin
+      UserPrincipalName = 'Joe@nih.gov';
+      Email = 'Joe@nih.gov';
+      userFirstName = 'Joe';
+      userLastName = 'Joe';
+      authResults= {"status": "Authenticated"};
+
+    }
+
+    else if (process.env.PORT === '3003') {
+      // TACL group admin
+
+      UserPrincipalName = 'David@nih.gov';
+      Email = 'David@nih.gov';
+      userFirstName = 'David';
+      userLastName = 'David';
+      authResults= {"status": "Authenticated"};
+
+    }
+
+    // for normal user
+    else if (process.env.PORT === '3004') {
+      UserPrincipalName = 'SAIP_TACL_user_both@nih.gov';
+      Email = 'SAIP_TACL_user_both@nih.gov';
+      userFirstName = 'SAIP_TACL_user_both';
+      userLastName = 'SAIP_TACL_user_both';
+      authResults= {"status": "Authenticated"};
+    }
+    
+    
+    var result_admin_groups = [];
+    var result_user_groups = [];
+    var result_user_id = [];
+    var active;
+    mysqlcon.getConnection((err, connection) => {
+      if(err) throw err;
+      // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE last_name="' + userLastName + '" AND first_name="' + userFirstName + '") as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+      let sql =`SELECT t3.id,t3.last_name,t3.first_name, t3.position, t3.email, t3.phone_office, t3.status, t3.active, t3.is_pi, t3.userID, GROUP_CONCAT(
+t3.admin_of_groups) AS admin_group_id, GROUP_CONCAT(t3.admin_groups) AS admin_groups, t3.name AS user_groups, t3.group_id FROM
+(SELECT t2.*, site_groups.name, IF(t2.admin_of_groups IS NULL, NULL, site_groups.name) AS admin_groups FROM 
+(SELECT t1.*, site_group_memberships.group_id, IF(site_group_memberships.is_admin=1, site_group_memberships.group_id, NULL) AS admin_of_groups 
+FROM (SELECT * FROM site_users WHERE userID IN ("${UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))}", "${Email.substr(0,Email.indexOf('@'))}")) as t1 
+LEFT JOIN site_group_memberships ON t1.id=site_group_memberships.person_id) AS t2 
+LEFT JOIN site_groups ON t2.group_id=site_groups.id ) AS t3 Group by t3.name;
+`
+      // var query = connection.query('SELECT t1.*,site_group_memberships.group_id AS group_id FROM (SELECT id,last_name,first_name,active FROM site_users WHERE userID IN ("'+UserPrincipalName.substr(0,UserPrincipalName.indexOf('@'))+'", "'+Email.substr(0,Email.indexOf('@'))+'")) as t1 LEFT JOIN site_group_memberships ON site_group_memberships.person_id=t1.id;');
+      
+      var query = connection.query(sql)
+
+      query.on('result',(row) => {
+        result_user_id = [row['id']]
+        if (row['admin_group_id']) {
+          let admin_group = {
+            'id': parseInt(row['admin_group_id']),
+            'name': row['admin_groups']
+          }
+          result_admin_groups.push(admin_group);
+        } else {
+          let user_group = {
+            'id': row['group_id'],
+            'name': row['user_groups']
+          }
+          result_user_groups.push(user_group);
+        }
+        active = row['active'];
+      });
+      query.on('end',() => {
+        connection.release();
+        let permission = 0;
+        req.session.FirstName = userFirstName;
+        req.session.LastName = userLastName;
+        // req.session.NedID = NedID;
+        // req.session.Telephone = Telephone;
+        req.session.Email = Email;
+        req.session.UserPrincipalName = UserPrincipalName;
+        req.session.status = authResults.status;
+        req.session.user_id = result_user_id;
+        req.session.user_groups = result_user_groups;
+        req.session.admin_groups = result_admin_groups;
+        if (result_admin_groups.length > 0) {
+          permission = 1;
+        }
+        if (result_admin_groups.filter(a => a.id === 7).length > 0) {
+          permission = 2;
+        }
+        req.session.permission = permission;
+        return res.json({ appVersion: version, code: 1, status: req.session.status,
+          FirstName: req.session.FirstName,
+          LastName: req.session.LastName,
+          NedID: req.session.NedID,
+          Telephone: req.session.Telephone,
+          Email: req.session.Email,
+          UserPrincipalName: req.session.UserPrincipalName,
+          User_groups: req.session.user_groups,
+          Admin_groups: req.session.admin_groups,
+          Permission: req.session.permission,
+          User_id: req.session.user_id})
+      });
+    });
+  });
+}); 
 
 // app.post('/mockLogin',function(req,res,next){
 //   var sess = req.session;

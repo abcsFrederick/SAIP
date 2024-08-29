@@ -69,6 +69,8 @@ var users = Backbone.View.extend({
             scrollCollapse: true,
             dom: 'rt'
           });
+          this.$('#UserAdminTable tbody').off();
+          this.$('#UserAdminTable tbody tr').off();
           this.$('#UserAdminTable tbody').on('click', 'tr', _.bind(function (e) {
             if(!$(e.target).hasClass('check_admin')) {
               if ($(e.currentTarget).hasClass('selected')) {
@@ -114,6 +116,9 @@ var users = Backbone.View.extend({
         scrollCollapse: true,
         dom: 'rt'
       });
+
+      this.$('#UserAdminTable tbody').off();
+      this.$('#UserAdminTable tbody tr').off();
       this.$('#UserAdminTable tbody').on('click', 'tr', _.bind(function (e) {
         if(!$(e.target).hasClass('check_admin')) {
           if ($(e.currentTarget).hasClass('selected')) {

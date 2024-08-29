@@ -47,8 +47,8 @@ module.exports = env => {
                 title: 'Testing'
             }),
             new webpack.DefinePlugin({
-                api: env.mode === 'development' ? JSON.stringify(`https://frsivg-mip02d.ncifcrf.gov/v0.1/`) : JSON.stringify(`http://localhost:${env.api}/`),
-                ws: env.mode === 'development' ? JSON.stringify(`wss://frsivg-mip02d.ncifcrf.gov/w0.1/`) : JSON.stringify(`ws://localhost:${env.api}/`)
+                api: env.mode === 'development' ? JSON.stringify(`https://fsivgl-infv01d.ncifcrf.gov/v0.1/`) : JSON.stringify(`http://localhost:${env.api}/`),
+                ws: env.mode === 'development' ? JSON.stringify(`wss://fsivgl-infv01d.ncifcrf.gov/w0.1/`) : JSON.stringify(`ws://localhost:${env.api}/`)
             }),
             new HtmlWebpackTagsPlugin({ tags: ['./fontello/css/fontello.css', './fontello/css/animation.css', 'https://use.fontawesome.com/releases/v5.0.13/css/all.css'], append: true })
         ],

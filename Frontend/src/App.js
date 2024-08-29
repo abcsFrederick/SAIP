@@ -56,7 +56,7 @@ var App = View.extend({
 					// var testingRes = [{'nci_projects_name':'ABCC Folder','nci_projects_created_at':'2010-09-15T02:17:10.000Z','nci_projects_updated_at':'2011-02-14T22:37:44.000Z','site_users_id':3,'site_users_last_name':'Miao','site_users_first_name':'Tianyi','nci_project_users_project_id':58},{'nci_projects_name':'ABCC','nci_projects_created_at':'2010-09-15T02:17:09.000Z','nci_projects_updated_at':'2010-09-15T02:17:09.000Z','site_users_id':3,'site_users_last_name':'Miao','site_users_first_name':'Tianyi','nci_project_users_project_id':33}];
 				} else {
 					// window.location.replace('https://frsivg-mip01p.ncifcrf.gov/');
-					window.location.replace('C:/Users/miaot2/%7B%7BHome%20Folder%7D%7D/html_learning/SAIP/Frontend/public/loginPageDev.html');
+					window.location.replace('https://fsivgl-infv01d.ncifcrf.gov/');
 				}
 			}, this)
 		});
