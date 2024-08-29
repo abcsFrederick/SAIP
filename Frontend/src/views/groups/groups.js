@@ -197,6 +197,8 @@ var groups = Backbone.View.extend({
 
     newGroupData.append('name', $('#newGroup_Name').val());
     newGroupData.append('admin', $('#admin_id').val());
+    newGroupData.append('db', $('#newGroup_DB').val());
+    newGroupData.append('partition', $('#newGroup_Partition').val());
 
     $.ajax({
       url: this.domain + 'api/v1/group',

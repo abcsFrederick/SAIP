@@ -5,6 +5,7 @@ import 'datatables.net'
 // import DataTable from 'datatables.net-dt';
 import 'datatables.net-buttons'
 import Projects_overview_collection from '../../collections/projects/projects_overview'
+import Data_source_overview_collection from '../../collections/data_source/data_source_overview_collection'
 import Projects_overview_model from '../../collections/projects/projects_overview'
 import Projects_overview_templates from '../../templates/projects/projects_overview.pug'
 import FieldsTemplates from '../../templates/projects/projects_overview_pi.pug'
@@ -38,6 +39,9 @@ var projects = View.extend({
     this.mappingAttrReserve = setting.mappingAttrReserve
     this.protocols = setting.protocols
     this.projects_overview_collection = new Projects_overview_collection({
+      domain: this.domain
+    })
+    this.data_source_overview_collection = new Data_source_overview_collection({
       domain: this.domain
     })
     this.PI = []
@@ -351,7 +355,16 @@ var projects = View.extend({
         }, this))
       }, this))
     })
-    return this
+    // this.data_source_overview_collection.fetch({
+    //   data: $.param(this.user_id),
+    //   xhrFields: {
+    //     withCredentials: true							// override ajax to send with credential
+    //   },
+    //   success: (_.bind(function (res) {
+    //     console.log(res)
+    //   }))
+    // });
+    return this;
   },
   selectedUserTableRender (selectedUser) {
     const selectedUserId = parseInt(selectedUser.substr(2))
@@ -443,117 +456,127 @@ var projects = View.extend({
 	    }
   },
   endUserRender () {
-    this.projects_overview_collection.fetch({
+    // this.projects_overview_collection.fetch({
+    //   data: $.param(this.user_id),
+    //   xhrFields: {
+		// 		  withCredentials: true							// override ajax to send with credential
+    //   },
+    //   success: (_.bind(function (res) {
+    //     console.log(res)
+
+    //     this.$el.html(Projects_overview_templates({
+    //       permission: this.permission
+    //     }))
+
+    //     this.projects_overview_table = $('#projects_overview').DataTable({
+    //         language: {
+		// 		        searchPlaceholder: 'Project/PI/Short name'
+		// 		    },
+		// 		    data: res.toJSON(),
+		// 		    rowId: 'nci_projects_id',
+		// 		    createdRow: function (row, data, dataIndex) {
+		// 			      $(row).attr('pid', data.nci_projects_pi_id)
+    //         },
+		// 		    columns: [
+		// 		    	// {
+		// 		    	// 	data:"nci_projects_id"	//	nci_projects_id
+		// 		    	// },
+		// 		    	{
+		// 		    		data: 'nci_projects_name'	//	nci_projects_name
+		// 		    	},{
+    //             data: 'nci_projects_group_name'
+    //           },{
+    //             targets: 2,
+    //             render: function (data, type, full, meta) {
+    //               return full.Pi_Last_name + ',' + full.Pi_First_name
+    //             }
+    //           },
+		// 		    	// {
+		// 		    	// 	"targets": 2,
+		// 		    	// 	"render": function ( data, type, full, meta ) {
+		// 		     //        	return full.Pi_Last_name + ',' + full.Pi_First_name
+		// 		     //        }
+		// 		    	// },
+		// 		    	{
+		// 		    		data: 'number_of_experiments'	//	number_of_experiments
+		// 		    	},
+		// 		    	{
+		// 		    		data: 'number_of_studies'	//	number_of_studies
+		// 		    	},
+		// 		    	{
+		// 		            targets: -3,
+		// 		            render: _.bind(function (data, type, full, meta) {
+		// 		            	if (typeof (full.short_name) === 'string') {
+		// 		            		return full.short_name.replace(/null|[\[\]"]+/g, '')
+		// 		            	} else {
+		// 		            		return full.short_name
+		// 		            	}
+		// 		            }, this)
+		// 		    	},
+		// 		    	{
+		// 		            targets: -2,
+		// 		            render: _.bind(function (data, type, full, meta) {
+		// 		            	if (typeof (full.nci_projects_created_at) === 'string') {
+		// 		            		return full.nci_projects_created_at.slice(0, 10)
+		// 		            	} else {
+		// 		            		return full.nci_projects_created_at
+		// 		            	}
+		// 		            }, this)
+		// 		    	}
+		// 		    	// {
+		// 	      //       	"orderable":false,
+		// 		     //        "targets": -1,
+		// 		     //        "render": _.bind(function ( data, type, full, meta ) {
+		// 		     //        	if (full.projects_status == "I")
+		// 		     //        	{
+		// 		     //        		return "<select id="+full.nci_projects_id+"><option value='I' selected>Inactive</option><option value='A'>Active</option></select>";
+		// 		     //        	}
+		// 		     //        	else{
+		// 		     //        		return "<select id="+full.nci_projects_id+"><option value='A' selected>Active</option><option value='I'>Inactive</option></select>";
+		// 		     //            }
+		// 		     //        },this)
+		// 		    	// }
+
+		// 		    ],
+
+		// 	        destroy: true,
+    //       lengthMenu: [[-1], ['ALL']],
+    //       scrollY: '80vh',
+    //       scrollCollapse: true,
+    //       dom: ' <"datatable_search_patient col-md-12"f>rt<"datatable_Information col-md-12"i>'// <"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
+
+    //     })
+    //     $('#projects_overview tbody').on('click', 'tr', _.bind(function (e) {
+    //       // window.tst=$(e.target);
+    //       if (!$(e.target).is('select')) {
+    //         if (this.experiments) {
+    //           this.experiments.close()
+    //         }
+    //         this.experiments = new Experiments({
+    //           admin: this.permission,
+    //           domain: this.domain,
+    //           domain_ws: this.domain_ws,
+    //           project_id: e.currentTarget.id,
+    //           probes: this.probes,
+    //           pi_id: e.currentTarget.getAttribute('pid'),
+    //           mappingAttrReserve: this.mappingAttrReserve
+    //         })
+    //         $('#PUMA').html(this.experiments.el)
+    //       }
+    //     }, this))
+    //   }, this))
+    // })
+    console.log('aaa')
+    this.data_source_overview_collection.fetch({
       data: $.param(this.user_id),
       xhrFields: {
-				  withCredentials: true							// override ajax to send with credential
+        withCredentials: true							// override ajax to send with credential
       },
       success: (_.bind(function (res) {
         console.log(res)
-
-        this.$el.html(Projects_overview_templates({
-          permission: this.permission
-        }))
-
-        this.projects_overview_table = $('#projects_overview').DataTable({
-            language: {
-				        searchPlaceholder: 'Project/PI/Short name'
-				    },
-				    data: res.toJSON(),
-				    rowId: 'nci_projects_id',
-				    createdRow: function (row, data, dataIndex) {
-					      $(row).attr('pid', data.nci_projects_pi_id)
-            },
-				    columns: [
-				    	// {
-				    	// 	data:"nci_projects_id"	//	nci_projects_id
-				    	// },
-				    	{
-				    		data: 'nci_projects_name'	//	nci_projects_name
-				    	},{
-                data: 'nci_projects_group_name'
-              },{
-                targets: 2,
-                render: function (data, type, full, meta) {
-                  return full.Pi_Last_name + ',' + full.Pi_First_name
-                }
-              },
-				    	// {
-				    	// 	"targets": 2,
-				    	// 	"render": function ( data, type, full, meta ) {
-				     //        	return full.Pi_Last_name + ',' + full.Pi_First_name
-				     //        }
-				    	// },
-				    	{
-				    		data: 'number_of_experiments'	//	number_of_experiments
-				    	},
-				    	{
-				    		data: 'number_of_studies'	//	number_of_studies
-				    	},
-				    	{
-				            targets: -3,
-				            render: _.bind(function (data, type, full, meta) {
-				            	if (typeof (full.short_name) === 'string') {
-				            		return full.short_name.replace(/null|[\[\]"]+/g, '')
-				            	} else {
-				            		return full.short_name
-				            	}
-				            }, this)
-				    	},
-				    	{
-				            targets: -2,
-				            render: _.bind(function (data, type, full, meta) {
-				            	if (typeof (full.nci_projects_created_at) === 'string') {
-				            		return full.nci_projects_created_at.slice(0, 10)
-				            	} else {
-				            		return full.nci_projects_created_at
-				            	}
-				            }, this)
-				    	}
-				    	// {
-			      //       	"orderable":false,
-				     //        "targets": -1,
-				     //        "render": _.bind(function ( data, type, full, meta ) {
-				     //        	if (full.projects_status == "I")
-				     //        	{
-				     //        		return "<select id="+full.nci_projects_id+"><option value='I' selected>Inactive</option><option value='A'>Active</option></select>";
-				     //        	}
-				     //        	else{
-				     //        		return "<select id="+full.nci_projects_id+"><option value='A' selected>Active</option><option value='I'>Inactive</option></select>";
-				     //            }
-				     //        },this)
-				    	// }
-
-				    ],
-
-			        destroy: true,
-          lengthMenu: [[-1], ['ALL']],
-          scrollY: '80vh',
-          scrollCollapse: true,
-          dom: ' <"datatable_search_patient col-md-12"f>rt<"datatable_Information col-md-12"i>'// <"datatable_Length col-md-12"l><"datatable_Pagination col-md-12"p><"clear">'
-
-        })
-        $('#projects_overview tbody').on('click', 'tr', _.bind(function (e) {
-          // window.tst=$(e.target);
-          if (!$(e.target).is('select')) {
-            if (this.experiments) {
-              this.experiments.close()
-            }
-            this.experiments = new Experiments({
-              admin: this.permission,
-              domain: this.domain,
-              domain_ws: this.domain_ws,
-              project_id: e.currentTarget.id,
-              probes: this.probes,
-              pi_id: e.currentTarget.getAttribute('pid'),
-              mappingAttrReserve: this.mappingAttrReserve
-            })
-            $('#PUMA').html(this.experiments.el)
-          }
-        }, this))
-      }, this))
-    })
-    return this
+      }))
+    });
+    return this;
   },
   renderDeletionAlert: function (e) {
     $('#deleteProjectAlert').html(AlertTemplate({

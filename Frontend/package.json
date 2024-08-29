@@ -30,6 +30,7 @@
     "datatables.net-buttons": "^1.6.2",
     "datatables.net-dt": "^1.10.21",
     "datatables.net-rowgroup-dt": "^1.1.2",
+    "datatables.net-select": "^1.7.1",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",

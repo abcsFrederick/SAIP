@@ -2,6 +2,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'backbone'
 
+import Data_overview from '../data_source/data_overview'
 import Projects_overview from '../projects/projects_overview'
 import users from '../users/users'
 import mapping from '../mapping/mapping'
@@ -27,6 +28,7 @@ var controlPanel = View.extend({
   events: {
     'click .projects': 'projects',
     'click .mapping': 'mapping',
+    'click .data': 'data',
     'click .users': 'usersRender',
     'click .group': 'groupsRender',
     'click .protocol': 'protocol',
@@ -94,7 +96,6 @@ var controlPanel = View.extend({
         success: (_.bind(function (res) {
           console.log('users collection');
           console.log(res);
-
           // this.usersRender();
         }, this))
       });
@@ -111,12 +112,30 @@ var controlPanel = View.extend({
         }, this))
       });
     }
+
+    this.data()
     eventsBus.on('addNewProject', this.projects, this)
     eventsBus.on('addNewUserEvent', this.usersRender, this)
     eventsBus.on('addNewGroupEvent', this.groupsRender, this)
     eventsBus.on('addNewUserEvent_access', this.accessRequest, this)
     eventsBus.on('addNewProbeEvent', this.probesRender, this)
     // eventsBus.on('goAbout',this.about,this);
+  },
+  data(e) {
+    if (e !== undefined) {
+      this.$('.active').removeClass('active')
+      $(e.currentTarget).addClass('active');
+    }
+    if (this.dataView) {
+      this.dataView.close();	// prevent from zombie view
+    }
+    this.dataView = new Data_overview({
+      admin: this.is_sys_admin,
+      domain: this.domain,
+      users: this.users,
+      permission: this.permission
+    })
+    $('#PUMA').html(this.dataView.el)
   },
   projects (e) {
     if (e !== undefined) {

@@ -1,0 +1,31 @@
+#table-wrapper(style="width:100hv;border: solid 2px;padding: 20px;border-color:lightgray;border-radius:5px").col-md-12
+    table#data_overview.table.table-hover
+        thead
+            tr
+                th
+                th Name
+                th Group
+                th Action
+
+if permission > 0
+    #grantPermission.modal
+        .modal-content(style='width:60%;left:20%;top:10%')
+            .modal-header
+                span.close &times;
+                h2 Grant Access
+            .modal-body
+                .container(style='width:100%;margin-bottom: 15px;')
+                    .form-group
+                        .col-md-12
+                            label(style='font-size: 20px;;margin-top: 15px;margin-bottom: 15px;') Data Name: 
+                                span#data_name
+                        .col-md-12
+                            table#usersTable.table.table-hover
+                                thead
+                                    tr
+                                        th User Name
+                                        th Group
+
+            .modal-footer
+                button.cancel.btn.btn-default Cancel
+                button#update_permission.btn.btn-success Update

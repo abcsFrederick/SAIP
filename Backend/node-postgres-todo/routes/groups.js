@@ -4,6 +4,10 @@ var config = require('config');
 var fs = require('fs-extra');
 var async = require('async');
 
+const pg = require('pg');
+const Pool = require('pg-pool');
+var parse = require('pg-connection-string').parse;
+
 const mysqlConfig = config.get('dbConfig.mysql');
 const doc_root = config.get('filesystemConfig.doc_root');
 var logger = require('../loggerConfig');
@@ -39,11 +43,15 @@ groupsRouter.get('/groups_overview', isSysAdmin, (req, res, next) => {
   });
 });
 
-groupsRouter.post('/group', isSysAdmin, (req, res, next) => {
+groupsRouter.post('/group', isSysAdmin, async (req, res, next) => {
     
 
   req.checkBody('name','Group name cannot be empty').notEmpty();
   req.checkBody('name','Group name should be a string<varchar(127)>').isString();
+  req.checkBody('db','Group db cannot be empty').notEmpty();
+  req.checkBody('db','Group db should be a string<varchar(127)>').isString();
+  req.checkBody('partition','Group partition cannot be empty').notEmpty();
+  req.checkBody('partition','Group partition should be a string<varchar(127)>').isString();
 
   var errors = req.validationErrors();
 
@@ -53,8 +61,11 @@ groupsRouter.post('/group', isSysAdmin, (req, res, next) => {
       let name = req.body.name;
       let admin = req.body.admin;
       let comment = req.body.comment || '';
+      let db = req.body.db || '';
+      let partition = req.body.partition || '';
 
       let exist_group;
+
       async.waterfall([
         function(callback) {
           mysqlcon.getConnection((err,connection)=>{
@@ -73,33 +84,65 @@ groupsRouter.post('/group', isSysAdmin, (req, res, next) => {
             let msg = 'Same Group named as: ' + name + ' is already exist';
             callback(null, {'err': 1, 'errors': msg});
           } else {
-            mysqlcon.getConnection((err, connection) => {
-              if(err) throw err;
-              var query = connection.query("INSERT INTO site_groups (name, comment, created_at, updated_at) VALUES (?, ?, NOW(), NOW())",
-                  [name, comment], function(err, result) {
-                  if(err) {
-                      throw err; 
-                  }
-                  if(admin) {
-                    mysqlcon.getConnection((err ,connection) => {
-                      if(err) throw err;
-                      var query = connection.query("INSERT INTO site_group_memberships (person_id, group_id, is_admin, created_at, updated_at) VALUES (?, ?, 1, NOW(), NOW())",
-                          [admin, result.insertId], function(err, result) {
-                          if(err) {
-                              throw err; 
-                          }
-                          connection.release();
-                          let msg = 'New group: ' + name + 'is added with admin user Id: ' + admin;
-                          callback(null, {'err': 0,'msg': msg});
-                      });
-                    });
-                  } else {
+            let pgConfig = parse(db);
+            let client = new pg.Client(pgConfig);
+            client.connect().then(() => {
+              mysqlcon.getConnection((err, connection) => {
+                if(err) callback(null, {'err': 1, 'errors': 'Error occurred while getting the connection'});
+                return connection.beginTransaction(err => {
+                  if (err) {
                     connection.release();
-                    let msg = 'New group: ' + name + 'is added without admin user.';
-                    callback(null, {'err': 0,'msg': msg});
+                    return callback(null, {'err': 1, 'errors': 'Error occurred while creating the transaction'});
                   }
+                  return connection.query("INSERT INTO site_groups (name, comment, db, db_partition, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())",
+                    [name, comment, db, partition], function(err, result) {
+                    if(err) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        return callback(null, {'err': 1, 'errors': 'Inserting to site_groups table failed'});
+                      });
+                    }
+                    if(admin) {
+                      return connection.query("INSERT INTO site_group_memberships (person_id, group_id, is_admin, created_at, updated_at) VALUES (?, ?, 1, NOW(), NOW())",
+                            [admin, result.insertId], function(err, result) {
+                            if(err) {
+                              return connection.rollback(() => {
+                                connection.release();
+                                console.log(err)
+                                return callback(null, {'err': 1, 'errors': 'Inserting to site_group_memberships table failed'});
+                              });
+                            }
+                            return connection.commit((err) => {
+                              if (err) {
+                                return connection.rollback(() => {
+                                  connection.release();
+                                  return callback(null, {'err': 1, 'errors': 'Commit failed'});
+                                });
+                              }
+                              connection.release();
+                              let msg = 'New group: ' + name + 'is added with admin user Id: ' + admin;
+                              return callback(null, {'err': 0,'msg': msg});
+                            });
+                        });
+                    } else {
+                      return connection.commit((err) => {
+                        if (err) {
+                          return connection.rollback(() => {
+                                connection.release();
+                                return callback(null, {'err': 1, 'errors': 'Commit failed'});
+                            });
+                        }
+                        let msg = 'New group: ' + name + 'is added without admin user.';
+                        return callback(null, {'err': 0,'msg': msg});
+                        connection.release();
+                      });
+                    }
+                  });
+                });
               });
-            });
+            })
+            .catch(err => callback(null, {'err': 1, 'errors': err.stack}))
+              
           }
         }], function(err, result) {
             return res.json(result);
