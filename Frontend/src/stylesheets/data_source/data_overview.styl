@@ -1,2 +1,24 @@
 .dtrg-group
     background-color #f9f9f9
+
+ul.group-breadcrumb 
+  list-style none
+  margin-bottom 0
+ul.group-breadcrumb  li 
+  display inline
+
+ul.group-breadcrumb  li+li:before 
+  color black
+  content "/\00a0"
+
+ul.group-breadcrumb  li a 
+  color #0275d8
+  text-decoration none
+
+ul.group-breadcrumb  li a:hover 
+  color #01447e
+  cursor pointer
+  text-decoration underline
+
+table.dataTable tbody tr.selected
+    background-color #B0BED9

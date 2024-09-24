@@ -2,7 +2,12 @@
     table#data_overview.table.table-hover
         thead
             tr
-                th
+                th 
+                    if permission > 0
+                        a#permissionSelected.fa.fa-edit.permissionSelected(style='cursor:pointer')
+                    a.fa.fa-download.dataDownloadProgress(style='cursor:pointer')
+                    a.fa.fa-spinner.fa-spin(style='display:none;')
+                    progress.progress(value='0' style='display:none;margin-right:5px;width:16px;font-size:5px;height:5px;margin-bottom:0px')
                 th Name
                 th Group
                 th Action

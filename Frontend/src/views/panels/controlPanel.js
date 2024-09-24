@@ -113,7 +113,6 @@ var controlPanel = View.extend({
       });
     }
 
-    this.data()
     eventsBus.on('addNewProject', this.projects, this)
     eventsBus.on('addNewUserEvent', this.usersRender, this)
     eventsBus.on('addNewGroupEvent', this.groupsRender, this)
@@ -132,8 +131,10 @@ var controlPanel = View.extend({
     this.dataView = new Data_overview({
       admin: this.is_sys_admin,
       domain: this.domain,
+      domain_ws: this.domain_ws,
       users: this.users,
-      permission: this.permission
+      permission: this.permission,
+      groups: this.admin_groups
     })
     $('#PUMA').html(this.dataView.el)
   },
