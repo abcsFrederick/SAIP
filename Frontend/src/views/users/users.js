@@ -59,7 +59,6 @@ var users = Backbone.View.extend({
               targets: 1,
               render: _.bind(function (data, type, full, meta) {
                   return '<input class="check_admin" type=checkbox group_id=' + full.id + ' group_name=' + full.name +'></input>'
-                  
               }, this),
               orderDataType: 'dom-select'
             }],
@@ -198,7 +197,26 @@ var users = Backbone.View.extend({
               orderable: false,
               targets: -2,
               render: _.bind(function (data, type, full, meta) {
-                if (full.active === 1) { return '<select class=\'changeUserStatus\' id=' + full.id + ' ><option value=\'1\' selected>Active</option><option value=\'0\'>Inactive</option></select>' } else { { return '<select class=\'changeUserStatus\' id=' + full.id + '><option value=\'1\'>Active</option><option value=\'0\' selected>Inactive</option></select>' } }
+                if (full.id === this.user_id) {
+                  return ``;
+                }
+                if (this.permission > 1) {
+                  if (!full.admin_groups) {
+                    return ``;
+                  }
+                  if (full.active === 1) { 
+                    return `<select class='changeUserStatus' id=${full.id} group_id=${this.admin_groups[0].id}><option value='1' selected>AD</option><option value='0'>User</option></select>`;
+                  } else { 
+                    return `<select class='changeUserStatus' id=${full.id} group_id=${this.admin_groups[0].id}><option value='1'>AD</option><option value='0' selected>User</option></select>`;
+                  }
+                } else {
+                  if (full.active === 1) { 
+                    return `<select class='changeUserStatus' id=${full.id} group_id=${this.admin_groups[0].id}><option value='1' selected>Active</option><option value='0'>Inactive</option></select>`;
+                  } else { 
+                    return `<select class='changeUserStatus' id=${full.id} group_id=${this.admin_groups[0].id}><option value='1'>Active</option><option value='0' selected>Inactive</option></select>`;
+                  }
+                }
+                
               }, this)
             }, {
               orderable: false,
@@ -254,6 +272,7 @@ var users = Backbone.View.extend({
     const status = e.currentTarget[e.currentTarget.selectedIndex].value
 
     newUserStatus.append('user_id', e.currentTarget.id)
+    newUserStatus.append('group_id', $(e.currentTarget).attr('group_id'))
     newUserStatus.append('user_status', status)
 
     $.ajax({

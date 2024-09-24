@@ -770,10 +770,9 @@ app.get('/mysql',function(req,res,next){
 app.get('/accessRequest',request_Access(ADServiceAccount,ADServicePassword,isAuth),function(req,res,next){
 
 });
-app.get('/', NIH_Authenticate(ADServiceAccount, ADServicePassword, isAuth), function(req, res, next) {
-});
+// app.get('/', NIH_Authenticate(ADServiceAccount, ADServicePassword, isAuth), function(req, res, next) {
+// });
 
-/*
 //Fake session
 app.get('/',function(req,res,next){
   req.session.regenerate(function(err){
@@ -894,7 +893,6 @@ LEFT JOIN site_groups ON t2.group_id=site_groups.id ) AS t3 Group by t3.name;
     });
   });
 }); 
-*/
 
 // app.post('/mockLogin',function(req,res,next){
 //   var sess = req.session;

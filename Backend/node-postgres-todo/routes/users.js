@@ -116,50 +116,57 @@ usersRouter.post('/usersChangePermission', isAdmin, (req, res, next) => {   //is
 });
 
 usersRouter.post('/user_status', isAdmin, (req, res, next) => {
-  /*
-      remove project from particular users
-  */
-  
-  logger.info({
-      level: 'info',
-      message: req.session.FirstName + ' ' + req.session.LastName
-      + '(' + req.session.user_id[0] + ') POST `/api/v1/user_status`'
-  });
+    /*
+        remove project from particular users
+    */
 
-  req.checkBody('user_id','user id cannot be empty').notEmpty();
-  req.checkBody('user_id','user id should be an integer<int(11)>').isInt();
-  req.checkBody('user_status','user status cannot be empty').notEmpty();
-  req.checkBody('user_status','user status should be a string<varchar(255)>').isString();
-  var errors = req.validationErrors();
-  if(errors){
-      console.log(errors);
-  }
-  else{
-      let user_id = parseInt(req.body.user_id);
-      let user_status = parseInt(req.body.user_status);
-      let results=[];
-      // console.log("UPDATE site_users SET active="+user_status+" WHERE id="+user_id+";");
-      //console.log(typeof(project_status));
-      //console.log(typeof(project_id));
-      mysqlcon.getConnection((err,connection)=>{
-          if(err) throw err;
-          var query = connection.query("UPDATE site_users SET active=? WHERE id=?",[user_status,user_id]);
-          query.on('result',(row)=>{
-                  results.push(row);
-          });
-          query.on('end',()=>{
-              logger.info({
-                  level: 'info',
-                  message: req.session.FirstName + ' ' + req.session.LastName
-                  + '(' + req.session.user_id[0] + ') successfully UPDATE site_users SET active='+user_status+' WHERE id='+user_id
-              });
-              connection.release();
-              return res.json(user_status);
-          });
-      }); 
-      
-      
-  }
+    logger.info({
+        level: 'info',
+        message: req.session.FirstName + ' ' + req.session.LastName
+        + '(' + req.session.user_id[0] + ') POST `/api/v1/user_status`'
+    });
+
+    req.checkBody('user_id','user id cannot be empty').notEmpty();
+    req.checkBody('user_id','user id should be an integer<int(11)>').isInt();
+    req.checkBody('group_id','group id cannot be empty').notEmpty();
+    req.checkBody('group_id','group id should be an integer<int(11)>').isInt();
+    req.checkBody('user_status','user status cannot be empty').notEmpty();
+    req.checkBody('user_status','user status should be a string<varchar(255)>').isString();
+    var errors = req.validationErrors();
+    if(errors) {
+        console.log(errors);
+    } else {
+        let user_id = parseInt(req.body.user_id);
+        let group_id = parseInt(req.body.group_id);
+        let user_status = parseInt(req.body.user_status);
+        let results = [];
+        mysqlcon.getConnection((err, connection) => {
+            if(err) throw err;
+            if (req.session.permission < 2) {
+                var query = connection.query("UPDATE site_group_memberships SET active=? WHERE person_id=? AND group_id=?", [user_status, user_id, group_id]);
+                query.on('end', () => {
+                    logger.info({
+                        level: 'info',
+                        message: `${req.session.FirstName} ${req.session.LastName} (${req.session.user_id[0]}) 
+                        successfully UPDATE site_group_memberships SET active=${user_status} WHERE person_id=${user_id} AND group_id=${group_id}`
+                    });
+                    connection.release();
+                    return res.json(user_status);
+                });
+            } else {
+                var query = connection.query("UPDATE site_group_memberships SET is_admin=? WHERE person_id=?", [user_status, user_id]);
+                query.on('end', () => {
+                    logger.info({
+                        level: 'info',
+                        message: `${req.session.FirstName} ${req.session.LastName} (${req.session.user_id[0]}) 
+                        successfully UPDATE site_group_memberships SET is_admin=${user_status} WHERE person_id=${user_id}`
+                    });
+                    connection.release();
+                    return res.json(user_status);
+                });
+            }
+        }); 
+    }
 });
 
 usersRouter.put('/user_edit', isAdmin, (req, res, next) => {

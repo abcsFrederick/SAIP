@@ -44,7 +44,7 @@ module.exports = env => {
                 'window.jQuery': 'jquery'
             }),
             new HtmlWebpackPlugin({
-                title: 'Smb'
+                title: 'SmbDMA'
             }),
             new webpack.DefinePlugin({
                 api: env.mode === 'development' ? JSON.stringify(`https://fsivgl-infv01d.ncifcrf.gov/v0.1/`) : JSON.stringify(`http://localhost:${env.api}/`),

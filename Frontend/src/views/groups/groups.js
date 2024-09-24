@@ -10,6 +10,7 @@ var groups = Backbone.View.extend({
   events: {
     'click #add_New_Group': 'add_New_Group',
     'click .group_edit': 'edit_Group_Dialog',
+    'click .refresh': 'update_DB',
     'click #edit_Group': 'edit_Group'
   },
   initialize (setting) {
@@ -59,16 +60,25 @@ var groups = Backbone.View.extend({
             },
             {
               orderable: false,
-              targets: -2,
+              targets: 2,
               render: _.bind(function (data, type, full, meta) {
                 return full.number_of_users
                 ;
               }, this)
             }, {
               orderable: false,
+              targets: -2,
+              render: _.bind(function (data, type, full, meta) {
+                return full.updated_at.slice(0, 19).replace('T', ' ');
+                ;
+              }, this)
+            },
+            {
+              orderable: false,
               targets: -1,
               render: _.bind(function (data, type, full, meta) {
-                return '<a name=' + full.name + ' group_id=' + full.id + ' class=\'fa fa-edit group_edit\' style=\'cursor:pointer\'></a>'
+                return `<a name=${full.name} db_partition='${full.db_partition}' group_id=${full.id} class='fa fa-edit group_edit' style='cursor:pointer'></a>
+                <a name=${full.name} db_partition='${full.db_partition}' group_id=${full.id} class='fa fa-undo refresh' style='cursor:pointer'></a>`
               }, this)
             }
           ],
@@ -197,7 +207,6 @@ var groups = Backbone.View.extend({
 
     newGroupData.append('name', $('#newGroup_Name').val());
     newGroupData.append('admin', $('#admin_id').val());
-    newGroupData.append('db', $('#newGroup_DB').val());
     newGroupData.append('partition', $('#newGroup_Partition').val());
 
     $.ajax({
@@ -235,6 +244,7 @@ var groups = Backbone.View.extend({
     this.currentEdit_group_id = $(e.currentTarget).attr('group_id');
     $('#EditGroup').show();
     $('#editGroup_Name').val($(e.currentTarget).attr('name'));
+    $('#editGroup_Partition').val($(e.currentTarget).attr('db_partition'));
     this.currentEdit_Name = $(e.currentTarget).attr('name');
 
 
@@ -249,7 +259,7 @@ var groups = Backbone.View.extend({
     var editGroupData = new FormData()
     editGroupData.append('group_id', this.currentEdit_group_id)
     editGroupData.append('name', $('#editGroup_Name').val())
-
+    editGroupData.append('partition', $('#editGroup_Partition').val())
     $.ajax({
       url: this.domain + 'api/v1/group_edit',
       type: 'PUT',
@@ -280,6 +290,41 @@ var groups = Backbone.View.extend({
         }
       })
     })
+  },
+  update_DB (e) {
+    var updataGroupDB = new FormData()
+
+    updataGroupDB.append('group_id', $(e.currentTarget).attr('group_id'));
+
+    $.ajax({
+      url: this.domain + 'api/v1/group/refresh',
+      type: 'POST',
+      data: updataGroupDB,
+      processData: false, // important
+      contentType: false, // important
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      success: _.bind(function (res) {
+        if (!res.err) {
+          $('#EditGroup').hide();
+          $('.alert-success').empty();
+          $('.alert-success').html(res.msg);
+          $('.alert-success').fadeTo('slow', 0.8).delay(3000).slideUp(500);
+        } else {
+          $('.alert-danger').empty();
+          if (typeof (res.errors) === 'object') {
+            for (let a = 0; a < res.errors.length; a++) {
+              $('.alert-danger').append('<li>' + res.errors[a].msg + '</li>');
+            }
+          } else if (typeof (res.errors) === 'string') {
+            $('.alert-danger').append('<li>' + res.errors + '</li>');
+          }
+          $('.alert-danger').fadeTo('slow', 0.8).delay(3000).slideUp(500);
+        }
+      }, this)
+    });
   }
 })
 

@@ -5,6 +5,7 @@
 				th Group Name
 				th # of Admin
 				th # of Users
+				th last update
 				th
 if admin
 	#addNewGroup.modal
@@ -24,19 +25,12 @@ if admin
 									i.fas.fa-users
 								input#newGroup_Name.form-control(type="text" required)
 
-						label.col-md-3.control-label Group DB:
-						.col-md-3.inputGroupContainer
-							.input-group
-								span.input-group-addon
-									i.fas.fa-users
-								input#newGroup_DB.form-control(type="text" required)
-
 						label.col-md-3.control-label Group Partition:
 						.col-md-3.inputGroupContainer
 							.input-group
 								span.input-group-addon
 									i.fas.fa-users
-								input#newGroup_Partition.form-control(type="text" required)
+								input#newGroup_Partition.form-control(type="text")
 
 						label.col-md-3.control-label Admin User:
 						.col-md-3.inputGroupContainer
@@ -68,6 +62,13 @@ if admin
 								span.input-group-addon
 									i.fas.fa-users
 								input#editGroup_Name.form-control(type="text" required)
+
+						label.col-md-3.control-label Group Partition:
+						.col-md-3.inputGroupContainer
+							.input-group
+								span.input-group-addon
+									i.fas.fa-users
+								input#editGroup_Partition.form-control(type="text")
 
 
 			.modal-footer

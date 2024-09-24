@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 
 var data_source_overview = Backbone.Model.extend({
-	id:''
+	id: ''
 });
 
 export default data_source_overview;

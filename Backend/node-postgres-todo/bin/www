@@ -6,6 +6,9 @@
 var fs = require('fs');
 var rimraf = require('rimraf');
 
+const { updataDB } = require('../utils.js');
+
+
 var path = __dirname+'/../routes/'
 fs.readdir(path, function(err, items) {
   for(let a=0;a<items.length;a++){
@@ -110,4 +113,6 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  // monitorArchive('archive_TACL', '/Users/miaot2/tacl_group');
+  // updataDB('archive_TACL', '/Users/miaot2/tacl_group', 9);
 }
