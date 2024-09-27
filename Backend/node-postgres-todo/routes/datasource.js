@@ -262,14 +262,14 @@ datasourceRouter.ws('/pre_download', async (ws, req) => {
                  + '(' + req.session.user_id[0] + ') WebSocket `/api/v1/pre_download` '
     });
 
-    let workSpace = '/Users/miaot2/Temp_Test';
-    // var workSpace = intermediate_storage + req.session.UserPrincipalName;
-    let output_name = 'randon_124';
+    // let workSpace = '/Users/miaot2/Temp_Test';
+    var workSpace = intermediate_storage + req.session.UserPrincipalName;
+    let output_name = Date.now();
     let output = path.join(workSpace, output_name);
 
     if (fs.existsSync(output)) {
         await rimraf(output);
-    } 
+    }
     await fsp.mkdir(output, 0o755);
 
     ws.send(JSON.stringify({'err': 5, 'msg': 'ready for copy'}));
