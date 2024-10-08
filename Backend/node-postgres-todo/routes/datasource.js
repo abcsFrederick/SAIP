@@ -268,7 +268,7 @@ datasourceRouter.ws('/pre_download', async (ws, req) => {
 
     // let workSpace = '/Users/miaot2/Temp_Test';
     var workSpace = intermediate_storage + req.session.UserPrincipalName;
-    let output_name = Date.now();
+    let output_name = Date.now().toString();
     let output = path.join(workSpace, output_name);
 
     if (fs.existsSync(output)) {
