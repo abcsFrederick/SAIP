@@ -18,6 +18,10 @@ const Pool = require('pg-pool');
 const { reject } = require('async');
 var parse = require('pg-connection-string').parse;
 
+var config = require('config');
+const intermediate_storage = config.get('filesystemConfig.intermediate_storage');
+
+
 const dirSize = async dir => {
     const files = await fsp.readdir( dir, { withFileTypes: true } );
   
