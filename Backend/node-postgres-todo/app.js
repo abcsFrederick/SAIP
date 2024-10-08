@@ -330,7 +330,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
                           eventTracking('Login', req.session.user_id[0]);
                         }
                         // console.log('page refresh!!!!!!!!!');
-                        var workSpace = intermediate_storage + req.session.Email;
+                        var workSpace = intermediate_storage + req.session.UserPrincipalName;
                         if (fs.existsSync(workSpace)) {
                           rimraf(workSpace, function () { 
                             // console.log('rm -rf '+workSpace); 
@@ -365,7 +365,7 @@ function NIH_Authenticate(SERVICE_ACCOUNT_USERNAME,SERVICE_ACCOUNT_PASSWORD,CALL
         }   
       });
     } else {
-      var workSpace = intermediate_storage + req.session.Email;
+      var workSpace = intermediate_storage + req.session.UserPrincipalName;
       if (fs.existsSync(workSpace)) {
         rimraf(workSpace, function (err) { 
           fs.mkdir(workSpace, 0o755);
