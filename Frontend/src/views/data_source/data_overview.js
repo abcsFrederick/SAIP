@@ -111,12 +111,12 @@ var data = View.extend({
                 targets: -1,
                 render: _.bind(function (data, type, full, meta) {
                     if (full.is_admin) {
-                        return `<a class='fa fa-edit permission' style='cursor:pointer' source_group_name=${full.source_group_name} source_group_id=${full.source_group_id} source_id=${full.source_id} source_name=${full.source_name} source_path=${full.source_path} source_type=${full.source_type} /a>
-                        <a class='fa fa-download dataDownloadProgress' style='cursor:pointer' location=${full.source_path} /a>
+                        return `<a class='fa fa-edit permission' style='cursor:pointer' source_group_name=${full.source_group_name} source_group_id=${full.source_group_id} source_id=${full.source_id} source_name='${full.source_name}' source_path='${full.source_path}' source_type=${full.source_type} /a>
+                        <a class='fa fa-download dataDownloadProgress' style='cursor:pointer' location='${full.source_path}' /a>
                         <a class='fa fa-spinner.fa-spin' style='display:none;'></a>
                         <progress class='progress' value='0' style='display: none; margin-right: 5px; width: 16px; font-size: 5px; height: 5px; margin-bottom: 0px'></progress>`;
                     } else {
-                        return `<a class='fa fa-download dataDownloadProgress' style='cursor:pointer' location=${full.source_path} /a>
+                        return `<a class='fa fa-download dataDownloadProgress' style='cursor:pointer' location='${full.source_path}' /a>
                         <a class='fa fa-spinner fa-spin' style='display:none;'></a>
                         <progress class='progress' value='0' style='display: none; margin-right: 5px; width: 16px; font-size: 5px; height: 5px; margin-bottom: 0px'></progress>`;
                     }
