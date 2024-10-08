@@ -45,7 +45,7 @@ const dirSize = async dir => {
 let zipFolderWithProgress = function(webSocket, srcFolder, zipFilePath, totalSize, callback) {
     var output = fs.createWriteStream(zipFilePath);
     const archive = archiver('zip', {
-        zlib: { level: 9 } // Sets the compression level.
+        zlib: { level: -1 } // Sets the compression level.
     });
 
     output.on('close', function() {
