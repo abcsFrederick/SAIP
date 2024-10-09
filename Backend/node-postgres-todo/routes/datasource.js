@@ -7,7 +7,7 @@ var express = require('express');
 var archiver = require('archiver');
 // var async = require('async');
 
-const { isAdmin, isAuth, mysqlcon, pgconpool } = require('../utils.js');
+const { isAdmin, isAuth, mysqlcon, pgconpool, eventTracking } = require('../utils.js');
 
 var logger = require('../loggerConfig.js');
 
@@ -252,6 +252,7 @@ datasourceRouter.get('/post_download', isAuth, (req, res, next) => {
             + '(' + req.session.user_id[0] + ') successfully download zip file path: '+ req.query.absolutePath
         });
         await rimraf(downloadAbsolutePath);
+        eventTracking('Data', req.session.user_id[0]);
     });
 });
 
@@ -318,9 +319,11 @@ datasourceRouter.ws('/pre_download', async (ws, req) => {
 
 datasourceRouter.post('/data_source/permission', isAdmin, async (req, res, next) => {
 
-    // let source_id = req.body.source_id;
-    // let source_group_id = req.body.source_group_id;
-    // let source_group_name = req.body.source_group_name;
+    logger.info({
+        level: 'info',
+        message: req.session.FirstName + ' ' + req.session.LastName
+        + '(' + req.session.user_id[0] + ') POST `/data_source/permission` '
+    });;
     let access_user_lists = req.body.access_user_lists;
 
     let validate_errors = `Please at least provide a user`;
@@ -347,6 +350,7 @@ datasourceRouter.post('/data_source/permission', isAdmin, async (req, res, next)
             source_group_id, source_group_name, source_id) VALUES ?`;
                 console.log(mysql)
                 let result = await grantAccess(mysql, [values]);
+                eventTracking('Permission', req.session.user_id[0]);
             }
         }
     }

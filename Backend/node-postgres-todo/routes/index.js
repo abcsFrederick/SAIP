@@ -227,6 +227,24 @@ var eventTracking = function(type, user) {
                 });
         });
     }
+    if (type === 'data_download') {
+        let event = 'Data Download';
+        let eventType = 'Site::DataDownloadEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if(err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') download a data'
+                    });
+                    connection.release();
+                });
+        });
+    }
 }
 
 // router.get('/api/v1/protocol_groups',isAdmin,(req,res,next)=>{  //isAdmin

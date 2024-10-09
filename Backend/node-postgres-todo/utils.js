@@ -223,4 +223,115 @@ var refreshDB = function (DB_TABLE, partition, group_id, last_update_time) {
         });
     });
 }
-module.exports = { isSysAdmin, isAdmin, isAuth, mysqlcon, pgconpool, initializeDB, monitorArchive, refreshDB }
+
+var eventTracking = function(type, user) {
+    if (type === 'Login') {
+        let event = 'Login';
+        let eventType = 'Site::UserLoginEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if (err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') login'
+                    });
+                    connection.release();
+                });
+        });
+    }
+    if (type === 'Study') {
+        let event = 'Study Download';
+        let eventType = 'Site::StudyDownloadEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if (err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') download a study'
+                    });
+                    connection.release();
+                });
+        });
+    }
+    if (type === 'Experiment') {
+        let event = 'Experiment Download';
+        let eventType = 'Site::ExperimentDownloadEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if (err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') download an experiment'
+                    });
+                    connection.release();
+                });
+        });
+    }
+    if (type === 'Series') {
+        let event = 'Series Download';
+        let eventType = 'Site::SeriesDownloadEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if(err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') download a series'
+                    });
+                    connection.release();
+                });
+        });
+    }
+    if (type === 'Data') {
+        let event = 'Data Download';
+        let eventType = 'Site::DataDownloadEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if(err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') download a data'
+                    });
+                    connection.release();
+                });
+        });
+    }
+    if (type === 'Permission') {
+        let event = 'Assign Permission';
+        let eventType = 'Site::AssignPermissionEvent';
+        mysqlcon.getConnection((err, connection) => {
+            if (err) throw err;
+            var query = connection.query("INSERT INTO site_statistics ( event,type,user_id,owner_id,timestamp,created_at,updated_at) \
+                VALUES (?,?,?,null,NOW(),NOW(),NOW())",
+                [event,eventType,user],
+                function (err, result) {
+                    if(err) throw err;
+                    logger.info({
+                        level: 'info',
+                        message: 'Record user(' + user + ') assign permission for users.'
+                    });
+                    connection.release();
+                });
+        });
+    }
+}
+module.exports = { isSysAdmin, isAdmin, isAuth, mysqlcon, pgconpool, initializeDB, monitorArchive, refreshDB, eventTracking }

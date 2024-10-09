@@ -234,7 +234,7 @@ groupsRouter.post('/group/refresh', isAdmin, async (req, res, next) => {
   logger.info({
     level: 'info',
     message: req.session.FirstName + ' ' + req.session.LastName
-    + '(' + req.session.user_id[0] + ') PUT `/api/v1/group_edit`'
+    + '(' + req.session.user_id[0] + ') PUT `/api/v1/refresh`'
   });
 
   req.checkBody('group_id','group id cannot be empty').notEmpty();
