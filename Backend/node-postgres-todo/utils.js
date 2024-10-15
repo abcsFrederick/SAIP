@@ -6,6 +6,7 @@ var config = require('config');
 
 const mysqlConfig = config.get('dbConfig.mysql');
 const postgresConfig = config.get('dbConfig.postgres');
+var logger = require('./loggerConfig.js');
 
 const mysql = require('mysql');
 var mysqlcon = mysql.createPool(mysqlConfig);

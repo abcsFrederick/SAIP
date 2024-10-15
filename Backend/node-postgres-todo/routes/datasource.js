@@ -133,7 +133,7 @@ let getLists = (sql, is_admin) => {
 
 let grantAccess = (sql, val) => { 
     return new Promise ((resolve, reject) => {
-        console.log(sql)
+        console.log(sql, val)
         let lists = [];
         mysqlcon.getConnection((err, connection) => {
             if (err) throw err;
@@ -316,6 +316,20 @@ datasourceRouter.ws('/pre_download', async (ws, req) => {
     });
           
 });
+datasourceRouter.get('/data_source/permission', isAdmin, async (req, res, next) => {
+    logger.info({
+        level: 'info',
+        message: req.session.FirstName + ' ' + req.session.LastName
+        + '(' + req.session.user_id[0] + ') GET `/data_source/permission` '
+    });
+    let source_id = req.query.source_id,
+    source_group_id = req.query.source_group_id,
+    source_group_name = req.query.source_group_name;
+    let check_exit_sql = `SELECT * from user_files WHERE source_id=${source_id} AND source_group_id=${source_group_id} AND source_group_name='${source_group_name}'`;
+    let exist_users = await getLists(check_exit_sql);
+    let exist_users_id = exist_users.map(x => x.user_id.toString());
+    return res.json(exist_users_id);
+});
 
 datasourceRouter.post('/data_source/permission', isAdmin, async (req, res, next) => {
 
@@ -323,16 +337,32 @@ datasourceRouter.post('/data_source/permission', isAdmin, async (req, res, next)
         level: 'info',
         message: req.session.FirstName + ' ' + req.session.LastName
         + '(' + req.session.user_id[0] + ') POST `/data_source/permission` '
-    });;
+    });
     let access_user_lists = req.body.access_user_lists;
+    let source_list = JSON.parse(req.body.source_list);
 
     let validate_errors = `Please at least provide a user`;
 
     if (access_user_lists === '') {
+        for (let a = 0; a < source_list.length; a++) {
+            let source_id = source_list[a]['source_id'];
+            let source_group_id = parseInt(source_list[a]['source_group_id']);
+            let source_group_name = source_list[a]['source_group_name'];
+            if (source_group_id === req.session.admin_groups[0]['id'] || req.session.permission > 1) {
+                let check_exit_sql = `SELECT * from user_files WHERE source_id=${source_id} AND source_group_id=${source_group_id} AND source_group_name='${source_group_name}'`;
+                let exist_users = await getLists(check_exit_sql);
+                let exist_users_id = exist_users.map(x => x.user_id.toString());
+                var values_for_delete =  exist_users_id.map(x => parseInt(x));
+                if (values_for_delete.length) {
+                    let mysql = `DELETE FROM user_files WHERE source_group_id=${source_group_id} AND source_id=${source_id} AND user_id IN (?)`;
+                    let result = await grantAccess(mysql, [values_for_delete]);
+                    return res.json({'err': 0, 'msg': 'Successfully delete permission for unselected users.'});
+                }
+            }
+        }
         return res.json({'err': 1, validate_errors});
     }
     access_user_lists = access_user_lists.split(',');
-    let source_list = JSON.parse(req.body.source_list);
     for (let a = 0; a < source_list.length; a++) {
         let source_id = source_list[a]['source_id'];
         let source_group_id = parseInt(source_list[a]['source_group_id']);
@@ -344,6 +374,9 @@ datasourceRouter.post('/data_source/permission', isAdmin, async (req, res, next)
             let new_users = access_user_lists.filter(function(e) {
                 return this.indexOf(e) < 0;
             }, exist_users_id);
+            let remove_users = exist_users_id.filter(function(e) {
+                return this.indexOf(e) < 0;
+            }, access_user_lists);
             var values =  new_users.map(x => [parseInt(x), source_group_id, source_group_name, source_id]);
             if (values.length) {
                 let mysql = `INSERT INTO user_files ( user_id, 
@@ -351,6 +384,12 @@ datasourceRouter.post('/data_source/permission', isAdmin, async (req, res, next)
                 console.log(mysql)
                 let result = await grantAccess(mysql, [values]);
                 eventTracking('Permission', req.session.user_id[0]);
+            }
+            console.log(remove_users)
+            var values_for_delete =  remove_users.map(x => parseInt(x));
+            if (values_for_delete.length) {
+                let mysql = `DELETE FROM user_files WHERE source_group_id=${source_group_id} AND source_id=${source_id} AND user_id IN (?)`;
+                let result = await grantAccess(mysql, [values_for_delete]);
             }
         }
     }

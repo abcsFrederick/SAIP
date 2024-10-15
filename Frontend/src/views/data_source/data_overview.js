@@ -264,9 +264,19 @@ var data = View.extend({
         'source_group_id': source_group_id,
         'source_group_name': source_group_name
     }]
-    this.renderPermissionDialog(source_name)
+    $.ajax({
+        url: this.domain + 'api/v1/data_source/permission',
+        type: 'GET',
+        data: this.sourceList[0],
+        xhrFields: {
+            withCredentials: true
+        },
+        success: _.bind(function (res) {
+            this.renderPermissionDialog(source_name, res)
+        }, this)
+    });
   },
-  renderPermissionDialog(name) {
+  renderPermissionDialog(name, permissionList=false) {
     this.accessUserLists = [];
     $('#data_name').text(name);
     this.$('#grantPermission').show();
@@ -287,6 +297,13 @@ var data = View.extend({
         }],
         dom: '<"datatable_search_user col-md-12"f>rt'
     });
+    if (permissionList) {
+        this.accessUserLists = permissionList;
+        for (let a = 0; a < permissionList.length; a++) {
+            this.usersTable.$('#' + permissionList[a]).addClass('selected');
+        }
+    }
+    
     this.$('#usersTable tbody').off();
     this.$('#usersTable tbody').on('click', 'tr', _.bind(function (e) {
         if ($(e.currentTarget).hasClass('selected')) {
