@@ -2763,15 +2763,17 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                                             (SELECT id AS pat_id,pat_path,pat_name FROM patients WHERE id in ("+arg+")) AS t1 LEFT JOIN \
                                             studies ON t1.pat_id = studies.pat_id) AS t2 LEFT JOIN series ON t2.study_id=series.study_id;");
                     query.on('row', (row) => {
-                        let eachIndex = [];
-                        eachIndex.push(row['pat_name']);
-                        eachIndex.push(row['pat_path']);
-                        eachIndex.push(row['study_description']);
-                        eachIndex.push(row['study_path']);
-                        eachIndex.push(row['series_description']);
-                        eachIndex.push(row['series_path']);
-                        eachIndex.push(row['modality']);
-                        allPatientsPath_result.push(eachIndex);
+                        if (row['study_path']) {
+                            let eachIndex = [];
+                            eachIndex.push(row['pat_name']);
+                            eachIndex.push(row['pat_path']);
+                            eachIndex.push(row['study_description']);
+                            eachIndex.push(row['study_path']);
+                            eachIndex.push(row['series_description']);
+                            eachIndex.push(row['series_path']);
+                            eachIndex.push(row['modality']);
+                            allPatientsPath_result.push(eachIndex);
+                        }
                     });
                     query.on('end', () => {
                         done();
@@ -2989,7 +2991,7 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                     for(let a = 0; a < arg.length; a++) {
                       pat_nameDisplay.push(arg[a][0]);
                       pat_pathDisplay.push(arg[a][1]);
-                      if (row['study_path']) {
+                      if (arg[a][2]) {
                         // replace / to avoid folder hierarchy misunderstanding
                         study_nameDisplay.push(arg[a][2].replace('/', '_'));
                       } else {
