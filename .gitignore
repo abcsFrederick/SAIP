@@ -16,3 +16,4 @@ Backend/config/*
 SAIP_2021_04_12.sql.gz
 start*.sh
 sftp-config.json
+.vscode/
