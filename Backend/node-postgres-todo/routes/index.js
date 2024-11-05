@@ -2989,8 +2989,12 @@ router.ws('/api/v1/experiment_download/:experiment_id/:experiments_name', functi
                     for(let a = 0; a < arg.length; a++) {
                       pat_nameDisplay.push(arg[a][0]);
                       pat_pathDisplay.push(arg[a][1]);
-                      // replace / to avoid folder hierarchy misunderstanding
-                      study_nameDisplay.push(arg[a][2].replace('/', '_'));
+                      if (row['study_path']) {
+                        // replace / to avoid folder hierarchy misunderstanding
+                        study_nameDisplay.push(arg[a][2].replace('/', '_'));
+                      } else {
+                        study_nameDisplay.push(arg[a][2]);
+                      }
                       study_pathDisplay.push(arg[a][3]);
                       series_nameDisplay.push(arg[a][4]);
                       series_pathDisplay.push(arg[a][5]);
